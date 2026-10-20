@@ -1,0 +1,64 @@
+/* Uses the portfolio's existing semantic palette and type system. */
+:root {
+  --category-edge: color-mix(in oklab, var(--wh) 10%, transparent);
+  --category-shadow: 0 16px 40px color-mix(in oklab, var(--bg) 65%, transparent);
+  --category-card-width: 300px;
+  --category-card-height: 380px;
+  --category-curve: 54px;
+}
+.art-category { padding: 44px 0 32px; border-top: 1px solid var(--line); overflow: hidden; }
+.category-heading { position: relative; z-index: 3; text-align: center; margin: 0 auto 24px; padding: 0 24px; }
+.category-heading .eb { justify-content: center; margin-bottom: 12px; }
+.category-heading h2 { font-size: 48px; margin: 0; letter-spacing: 0; }
+.category-viewport { position: relative; isolation: isolate; }
+.category-viewport::before, .category-viewport::after {
+  content: ""; position: absolute; z-index: 2; left: -10%; width: 120%;
+  height: calc(var(--category-curve) * 2); border-radius: 50%;
+  background: var(--bg); pointer-events: none;
+}
+.category-viewport::before { top: calc(var(--category-curve) * -1); border-bottom: 1px solid var(--category-edge); }
+.category-viewport::after { bottom: calc(var(--category-curve) * -1); border-top: 1px solid var(--category-edge); }
+.category-track.cp {
+  display: flex; gap: 18px; max-width: none; margin: 0; padding: 0 4vw;
+  border: 0; overflow-x: auto; overflow-y: hidden;
+  scroll-snap-type: none; scroll-behavior: auto;
+  scrollbar-width: none; overscroll-behavior-x: contain; touch-action: pan-x pan-y;
+  cursor: grab;
+}
+.category-track::-webkit-scrollbar { display: none; }
+.category-track.is-dragging { cursor: grabbing; scroll-snap-type: none; scroll-behavior: auto; }
+.category-track.cp a {
+  flex: 0 0 var(--category-card-width); height: var(--category-card-height);
+  aspect-ratio: auto; border-radius: 8px; scroll-snap-align: none;
+  justify-content: center; padding: 30px 24px; user-select: none;
+  transition: border-color .3s var(--ease), box-shadow .3s var(--ease);
+}
+.category-track.cp a i { opacity: .65; }
+.category-track.cp a b { font-size: 28px; letter-spacing: 0; }
+.category-track.cp a span { opacity: 1; transform: none; color: var(--tx); font-size: 13px; }
+.category-track.cp a:hover, .category-track.cp a:focus-visible {
+  transform: none; border-color: var(--red); box-shadow: var(--category-shadow);
+}
+.category-track.cp a:hover i, .category-track.cp a:focus-visible i { opacity: .95; transform: scale(1.045); }
+.category-track.cp a:hover b, .category-track.cp a:focus-visible b { transform: scale(1.025); }
+.category-track.cp a b { transition: transform .3s var(--ease); }
+.category-track.cp a:focus-visible { outline-offset: -4px; }
+.category-controls { display: flex; align-items: center; justify-content: space-between; gap: 24px; max-width: 1280px; padding: 18px 4vw 0; margin: auto; }
+.category-progress { flex: 1; height: 2px; background: var(--bd); overflow: hidden; }
+.category-progress-fill { width: 0; height: 100%; background: var(--red); transition: width .15s linear; }
+.category-count { color: var(--mu); font-size: 12px; min-width: 40px; text-align: right; font-variant-numeric: tabular-nums; }
+.category-arrows { display: flex; gap: 8px; }
+.category-arrows .ca { position: static; transform: none; width: 42px; height: 42px; background: var(--s1); border-color: var(--bd); color: var(--wh); display: grid; place-items: center; }
+.category-arrows .ca:hover:not(:disabled) { background: var(--red); border-color: var(--red); }
+.category-arrows .ca:disabled { opacity: .3; cursor: default; }
+.category-arrows svg { width: 18px; height: 18px; }
+@media (min-width: 1600px) { :root { --category-card-width: 340px; --category-card-height: 400px; } }
+@media (max-width: 1000px) { :root { --category-card-width: 260px; --category-card-height: 340px; --category-curve: 40px; } .category-heading h2 { font-size: 40px; } }
+@media (max-width: 560px) {
+  :root { --category-card-width: 72vw; --category-card-height: 310px; --category-curve: 28px; }
+  .art-category { padding-top: 32px; } .category-heading h2 { font-size: 34px; }
+  .category-track.cp { gap: 12px; padding-inline: 6vw; }
+  .category-track.cp a b { font-size: 26px; }
+  .category-controls { padding-inline: 6vw; gap: 16px; }
+}
+@media (prefers-reduced-motion: reduce) { .category-track.cp { scroll-behavior: auto; } }

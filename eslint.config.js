@@ -4,7 +4,7 @@ import tseslint from 'typescript-eslint';
 import reactHooks from 'eslint-plugin-react-hooks';
 
 export default tseslint.config(
-  { ignores: ['dist', 'node_modules', 'legacy', 'Nozique_web.html'] },
+  { ignores: ['dist', 'node_modules', 'legacy', 'src/site/legacy', 'Nozique_web.html'] },
   js.configs.recommended,
   ...tseslint.configs.recommended,
   {

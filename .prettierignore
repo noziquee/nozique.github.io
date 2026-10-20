@@ -3,3 +3,5 @@ node_modules
 legacy
 Nozique_web.html
 package-lock.json
+src/site/legacy
+src/site/styles

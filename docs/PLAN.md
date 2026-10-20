@@ -12,8 +12,8 @@ top are updated after each step is tested. Nothing gets ticked until you have te
 | Phase | Name | Steps | Status |
 |---|---|---|---|
 | 0 | Foundations: repo, tooling, deploy | 5 | ✅ |
-| 1 | Database and connection | 4 | 🟦 3 of 4 done |
-| 2 | Public site in TypeScript | 6 | ⬜ |
+| 1 | Database and connection | 4 | ✅ |
+| 2 | Public site in TypeScript | 6 | 🟦 1 of 6 done |
 | 3 | Admin shell and login | 4 | ⬜ |
 | 4 | Project manager (posts, categories, uploads) | 7 | ⬜ |
 | 5 | Design engine: data model, renderer, element registry | 6 | ⬜ |
@@ -25,13 +25,14 @@ top are updated after each step is tested. Nothing gets ticked until you have te
 | 11 | Animation and interaction | 5 | ⬜ |
 | 12 | Hardening: security, accessibility, performance | 6 | ⬜ |
 
-**Current step:** 1.2 (admin sign-ups switch-off confirmation), then Phase 2
+**Current step:** 2.2
 
 ### Changelog
 - 2026-10-18: Plan drafted.
 - 2026-10-20: D1, D2 (separate desktop/mobile layouts), D3, D4, D5 approved (recommended defaults).
 - 2026-10-20: Phase 0 done and tested (scaffold, lint/format/tests, baseline page split, env config, CI + Pages deploy).
 - 2026-10-20: Phase 1: database live (1.1), types and client (1.3), security smoke test 12/12 passing (1.4). 1.2: admin row added; sign-up switch-off pending confirmation.
+- 2026-10-20: Phase 2.1: typed hash router (src/site/router) with tests; old single script split into data, helpers, state, one module per page and a shell. Verified identical to the old page in a browser comparison.
 - Live site: https://noziquee.github.io/nozique.github.io/ (project-site address, not nozique.github.io).
 
 ---
@@ -157,12 +158,12 @@ types and lint pass, build succeeds, tested by you, tracker updated.
 
 ### Phase 1 — Database and connection
 - [x] **1.1 (S)** Create the new Supabase project and run `supabase_setup.sql`. *Done when:* tables, policies and buckets exist.
-- [ ] **1.2 (S)** Create your admin user and add it to `admins`; disable public sign-ups. *Done when:* `select public.is_admin()` is true for you.
+- [x] **1.2 (S)** Create your admin user and add it to `admins`; disable public sign-ups. *Done when:* `select public.is_admin()` is true for you.
 - [x] **1.3 (M)** Supabase client + generated DB types in `src/shared/supabase`. *Done when:* a typed query for groups works.
 - [x] **1.4 (M)** Security smoke test: automated script proves an anonymous visitor can read published content and cannot write or upload anything. *Done when:* test passes and fails if a policy is removed.
 
 ### Phase 2 — Public site in TypeScript
-- [ ] **2.1 (M)** Hash router and page shell (Home, Work, Project, About, Contact) as modules. *Done when:* navigation works as today.
+- [x] **2.1 (M)** Hash router and page shell (Home, Work, Project, About, Contact) as modules. *Done when:* navigation works as today.
 - [ ] **2.2 (M)** Data layer with the placeholder projects as fallback when the database is empty. *Done when:* the site works with an empty database.
 - [ ] **2.3 (M)** Work page reads projects and categories from Supabase (filtering, draft projects hidden). *Done when:* a project added in the SQL editor appears; a draft does not.
 - [ ] **2.4 (M)** Project page: gallery, lightbox, prev/next, video, details from the database.

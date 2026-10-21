@@ -1,4 +1,4 @@
-import { CAT } from './data.js';
+import { CAT, P } from './data.js';
 export const $=s=>document.querySelector(s);
 export const M=$('#m');
 export const HD=$('.hd');
@@ -25,3 +25,7 @@ export const SOC=[
 /* Unconfigured networks still show as a button, marked "coming soon", and go nowhere. */
 export const soc=()=>SOC.map(([n,h,s])=>!h?`<span class="off" role="img" aria-label="${n} (link coming soon)" title="${n}: coming soon"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">${s}</svg></span>`:`<a href="${h}" ${h[0]=='m'?'':'target="_blank" rel="noopener"'} aria-label="${n}" title="${n}"><svg viewBox="0 0 24 24" fill="currentColor" role="img" aria-hidden="true">${s}</svg></a>`).join('');
 export const card=(p,x='',st='')=>`<a class="card${an(p)?' an':''} ${x}" href="#/work/${esc(p.id)}" data-c="${p.c}" data-cur="View" aria-label="${esc(p.t)}, ${esc(CAT[p.c])}, ${p.y}" style="${st}">${an(p)?'<span class="tg">Play</span>':''}${p.f&&x=='w'?'<span class="tg f">Featured</span>':''}<div class="im">${pic(p)}</div><div class="ov"><span class="lab"><em class="cl">${esc(CAT[p.c])}</em>${p.y}</span><h3>${esc(p.t)}</h3><span class="vp"><b>View project</b>${esc(p.tl.split(",").slice(0,2).join(","))}</span></div></a>`;
+/* Featured projects for the home page; when none are marked featured, the first three are used. */
+export const featured=()=>{const f=P.filter(p=>p.f);return f.length?f:P.slice(0,3)};
+/* Categories that have at least one published project, in order. */
+export const cats=()=>Object.entries(CAT).filter(([k])=>P.some(p=>p.c==k));

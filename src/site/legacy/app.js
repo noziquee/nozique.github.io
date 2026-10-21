@@ -2,7 +2,7 @@ import { parseHash, pageTitle } from '../router/route';
 import { loadSiteData } from '../data/source';
 import { getSupabase } from '../../shared/supabase/client';
 import { CAT, P, useSiteData } from './data.js';
-import { $, M, HD, WP, plural, soc } from './helpers.js';
+import { $, M, HD, WP, plural, soc, featured } from './helpers.js';
 import { STATE } from './state.js';
 import { home } from './pages/home.js';
 import { work } from './pages/work.js';
@@ -20,7 +20,7 @@ addEventListener('hashchange',route);
 document.addEventListener('click',e=>{const f=e.target.closest('[data-f]');if(f){STATE.flt=f.dataset.f;if(location.hash=='#/work'){e.preventDefault();route()}}});
 /* page behaviours */
 function init(pg,id){
-if(pg==''||pg=='home'){const sl=document.querySelectorAll('.sl'),F=P.filter(p=>p.f),hv=$('.hv');let k=0;
+if(pg==''||pg=='home'){const sl=document.querySelectorAll('.sl'),F=featured(),hv=$('.hv');let k=0;
 const ch=document.querySelectorAll('.chips button'),go=n=>{sl[k].classList.remove('on');ch[k].classList.remove('on');k=n;sl[k].classList.add('on');ch[k].classList.add('on');$('#cp').textContent=F[k].t;$('#cp').href=$('.hvl').href='#/work/'+F[k].id;$('#ct').textContent=`${k+1} / ${sl.length}`;sl.forEach((s,j)=>s.setAttribute('aria-hidden',j!=k));ch.forEach((b,j)=>b.setAttribute('aria-pressed',j==k));const g=$('.pg');g.style.animation='none';g.offsetWidth;g.style.animation=''},st=()=>{clearInterval(STATE.timer);if(sl.length>1&&!matchMedia('(prefers-reduced-motion:reduce)').matches)STATE.timer=setInterval(()=>{if(!document.hidden)go((k+1)%sl.length)},4500)};ch.forEach((b,n)=>b.onclick=()=>{go(n);st()});st();const hr=$('.hr');hr.onmouseenter=hr.onfocusin=()=>{clearInterval(STATE.timer);$('.pg').style.animationPlayState='paused'};hr.onmouseleave=hr.onfocusout=()=>{$('.pg').style.animationPlayState='';st()};
 hv.onmousemove=e=>{const b=hv.getBoundingClientRect(),x=(e.clientX-b.left)/b.width-.5,y=(e.clientY-b.top)/b.height-.5;hv.style.transform=`perspective(900px) rotateY(${x*9}deg) rotateX(${-y*9}deg)`};hv.onmouseleave=()=>hv.style.transform=''}
 if(pg=='work'&&!id){const cs=[...document.querySelectorAll('.mas .card')],bs=document.querySelectorAll('.fl button');let ft;

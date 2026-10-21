@@ -13,7 +13,7 @@ top are updated after each step is tested. Nothing gets ticked until you have te
 |---|---|---|---|
 | 0 | Foundations: repo, tooling, deploy | 5 | ✅ |
 | 1 | Database and connection | 4 | ✅ |
-| 2 | Public site in TypeScript | 6 | 🟦 5 of 6 done |
+| 2 | Public site in TypeScript | 6 | ✅ |
 | 3 | Admin shell and login | 4 | ⬜ |
 | 4 | Project manager (posts, categories, uploads) | 7 | ⬜ |
 | 5 | Design engine: data model, renderer, element registry | 6 | ⬜ |
@@ -25,7 +25,7 @@ top are updated after each step is tested. Nothing gets ticked until you have te
 | 11 | Animation and interaction | 5 | ⬜ |
 | 12 | Hardening: security, accessibility, performance | 6 | ⬜ |
 
-**Current step:** 2.6
+**Current step:** 3.1 (Phase 2 awaiting final user check)
 
 ### Changelog
 - 2026-10-18: Plan drafted.
@@ -37,6 +37,7 @@ top are updated after each step is tested. Nothing gets ticked until you have te
 - 2026-10-21: Phase 2.3 tested live: a published test project appeared (Home, Work, project page), a draft did not. Two TEST rows (slugs test-published-project, test-hidden-draft) still in the database; to be removed.
 - 2026-10-21: Phase 2.4 in progress: fixed Work/About/Contact side padding (CSS), project hero shows whole image (no crop), fake Process / Wireframe / Animation placeholders only on sample projects, prev/next hidden with one project. Finding: original artwork files are 7-8 MB PNGs; Phase 4 upload manager must resize and compress (WebP/JPEG) before upload.
 - 2026-10-21: Phase 2.4 tested with real images (hero fit, gallery, lightbox). Phase 2.5: home page handles no featured projects (falls back to first three) and hides categories with no published projects (home carousel, stats, Work filters). Verified in browser with 3 data scenarios, no JS errors; sample content unchanged.
+- 2026-10-21: Phase 2.6: About and Contact checked at desktop and phone widths (no overflow, form validation unchanged); About hides the sample-only "How a piece comes together" art for real projects. Phase 2 complete pending user check.
 - Live site: https://noziquee.github.io/nozique.github.io/ (project-site address, not nozique.github.io).
 
 ---
@@ -172,7 +173,7 @@ types and lint pass, build succeeds, tested by you, tracker updated.
 - [x] **2.3 (M)** Work page reads projects and categories from Supabase (filtering, draft projects hidden). *Done when:* a project added in the SQL editor appears; a draft does not.
 - [x] **2.4 (M)** Project page: gallery, lightbox, prev/next, video, details from the database.
 - [x] **2.5 (M)** Home page: featured projects and category carousel from the database.
-- [ ] **2.6 (S)** About and Contact pages (existing contact validation kept). *Done when:* all pages match the current design on desktop and mobile.
+- [x] **2.6 (S)** About and Contact pages (existing contact validation kept). *Done when:* all pages match the current design on desktop and mobile.
 
 ### Phase 3 — Admin shell and login
 - [ ] **3.1 (M)** React app scaffold, admin layout (sidebar: Projects, Website, Settings), route guard.

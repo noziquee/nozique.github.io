@@ -13,4 +13,4 @@ return`<section class="sec w ph"><div class="rs"><aside class="rl"><div class="p
 <div class="rs2"><h2>Education and training</h2><div class="rx"><span class="lab">2022-2024</span><div><b>Arts and Design Strand, Senior High School</b><em>Baguio City National High School</em></div></div><div class="rx"><span class="lab">2024-2027</span><div><b>Bachelor of Multimedia Arts, College</b><em>University of Cordilleras</em></div></div></div>
 <div class="rs2"><h2>Creative focus</h2>${ch(['Character Design','Portrait Illustration'])}</div>
 <div class="rs2"><a class="btn r" href="#/contact">Work with me</a> <a class="btn" href="#/work">See my work</a></div></div></div></section>
-<section class="sec w"><h2>How a piece comes together</h2><div class="ps">${[0,2,4,6].map((k,i)=>`<div><div>${art(S,st[k+1],2)}</div><b>${i+1}. ${st[k]}</b></div>`).join('')}</div></section>`}
+${S.ph?`<section class="sec w"><h2>How a piece comes together</h2><div class="ps">${[0,2,4,6].map((k,i)=>`<div><div>${art(S,st[k+1],2)}</div><b>${i+1}. ${st[k]}</b></div>`).join('')}</div></section>`:''}`}

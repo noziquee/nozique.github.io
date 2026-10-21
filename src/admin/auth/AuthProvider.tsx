@@ -1,4 +1,12 @@
-import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import type { ReactNode } from 'react';
 import type { Session } from '@supabase/supabase-js';
 import { getSupabase } from '../../shared/supabase/client';
@@ -42,6 +50,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     message: null,
   });
 
+  // Used to tell "you signed out" apart from "your session ended on its own".
+  const wasAdmin = useRef(false);
+  const choseToSignOut = useRef(false);
+
+  useEffect(() => {
+    wasAdmin.current = snapshot.status === 'admin';
+  }, [snapshot.status]);
+
   useEffect(() => {
     let active = true;
     const client = (() => {
@@ -61,7 +77,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     async function resolve(session: Session | null) {
       if (!session) {
-        if (active) setSnapshot({ status: 'signedOut', email: null, message: null });
+        const expired = wasAdmin.current && !choseToSignOut.current;
+        choseToSignOut.current = false;
+        if (active) {
+          setSnapshot({
+            status: 'signedOut',
+            email: null,
+            message: expired ? 'Your session ended. Please sign in again.' : null,
+          });
+        }
         return;
       }
       const email = session.user.email ?? null;
@@ -94,6 +118,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const signOut = useCallback(async () => {
+    choseToSignOut.current = true;
     await getSupabase().auth.signOut();
   }, []);
 

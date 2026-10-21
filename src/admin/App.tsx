@@ -2,6 +2,8 @@ import type { ReactNode } from 'react';
 import { AuthProvider, useAuth } from './auth/AuthProvider';
 import { LoginPage } from './auth/LoginPage';
 import { AdminLayout } from './layout/AdminLayout';
+import { ErrorBoundary } from './ui/ErrorBoundary';
+import { ErrorMessage, Loading } from './ui/states';
 
 function Screen({ title, children }: { title: string; children?: ReactNode }) {
   return (
@@ -19,7 +21,11 @@ function AuthGate() {
 
   switch (status) {
     case 'loading':
-      return <Screen title="Loading…" />;
+      return (
+        <Screen title="Nozique Admin">
+          <Loading />
+        </Screen>
+      );
     case 'signedOut':
       return <LoginPage />;
     case 'noAccess':
@@ -35,11 +41,8 @@ function AuthGate() {
       );
     case 'error':
       return (
-        <Screen title="Something went wrong">
-          <p className="error">{message}</p>
-          <button type="button" onClick={() => window.location.reload()}>
-            Try again
-          </button>
+        <Screen title="Nozique Admin">
+          <ErrorMessage onRetry={() => window.location.reload()}>{message}</ErrorMessage>
         </Screen>
       );
     case 'admin':
@@ -49,8 +52,10 @@ function AuthGate() {
 
 export function App() {
   return (
-    <AuthProvider>
-      <AuthGate />
-    </AuthProvider>
+    <ErrorBoundary>
+      <AuthProvider>
+        <AuthGate />
+      </AuthProvider>
+    </ErrorBoundary>
   );
 }

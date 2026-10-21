@@ -14,7 +14,7 @@ top are updated after each step is tested. Nothing gets ticked until you have te
 | 0 | Foundations: repo, tooling, deploy | 5 | ✅ |
 | 1 | Database and connection | 4 | ✅ |
 | 2 | Public site in TypeScript | 6 | ✅ |
-| 3 | Admin shell and login | 4 | ⬜ |
+| 3 | Admin shell and login | 4 | 🟦 2 of 4 done |
 | 4 | Project manager (posts, categories, uploads) | 7 | ⬜ |
 | 5 | Design engine: data model, renderer, element registry | 6 | ⬜ |
 | 6 | Visual editor core | 8 | ⬜ |
@@ -25,7 +25,7 @@ top are updated after each step is tested. Nothing gets ticked until you have te
 | 11 | Animation and interaction | 5 | ⬜ |
 | 12 | Hardening: security, accessibility, performance | 6 | ⬜ |
 
-**Current step:** 3.1 and 3.2 (written, awaiting your test); 2.6 awaiting your final check
+**Current step:** 3.3 and 3.4 (written, awaiting your test); 2.6 awaiting your final check
 
 ### Changelog
 - 2026-10-18: Plan drafted.
@@ -39,6 +39,7 @@ top are updated after each step is tested. Nothing gets ticked until you have te
 - 2026-10-21: Phase 2.4 tested with real images (hero fit, gallery, lightbox). Phase 2.5: home page handles no featured projects (falls back to first three) and hides categories with no published projects (home carousel, stats, Work filters). Verified in browser with 3 data scenarios, no JS errors; sample content unchanged.
 - 2026-10-21: Phase 2.6: About and Contact checked at desktop and phone widths (no overflow, form validation unchanged); About hides the sample-only "How a piece comes together" art for real projects. Phase 2 complete pending user check.
 - 2026-10-21: Phase 3.1 + 3.2 written together (admin layout, hash routing, Supabase login, admin-only gate, sign out). Not yet tested by user.
+- 2026-10-21: Phase 3.1 and 3.2 tested by user (login, sidebar, sign out). Phase 3.3 + 3.4 written: session-ended notice, shared Loading/Error/Empty components, error boundary, site fonts in admin. Awaiting test.
 - Live site: https://noziquee.github.io/nozique.github.io/ (project-site address, not nozique.github.io).
 
 ---
@@ -177,8 +178,8 @@ types and lint pass, build succeeds, tested by you, tracker updated.
 - [x] **2.6 (S)** About and Contact pages (existing contact validation kept). *Done when:* all pages match the current design on desktop and mobile.
 
 ### Phase 3 — Admin shell and login
-- [ ] **3.1 (M)** React app scaffold, admin layout (sidebar: Projects, Website, Settings), route guard.
-- [ ] **3.2 (M)** Login/logout with Supabase Auth; non-admin accounts are shown "no access". *Done when:* only your account gets in.
+- [x] **3.1 (M)** React app scaffold, admin layout (sidebar: Projects, Website, Settings), route guard.
+- [x] **3.2 (M)** Login/logout with Supabase Auth; non-admin accounts are shown "no access". *Done when:* only your account gets in.
 - [ ] **3.3 (S)** Session expiry handling and friendly error/loading/empty states (shared components).
 - [ ] **3.4 (S)** Admin styling that matches the Nozique palette (dark, red accent).
 

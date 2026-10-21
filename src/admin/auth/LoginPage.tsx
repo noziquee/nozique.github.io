@@ -3,7 +3,7 @@ import type { FormEvent } from 'react';
 import { useAuth } from './AuthProvider';
 
 export function LoginPage() {
-  const { signIn } = useAuth();
+  const { signIn, message } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
@@ -28,6 +28,7 @@ export function LoginPage() {
         <h1>
           NOZI<span className="accent">Q</span>UE <small>Admin</small>
         </h1>
+        {message && <p className="notice">{message}</p>}
         <label htmlFor="login-email">Email</label>
         <input
           id="login-email"

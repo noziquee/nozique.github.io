@@ -35,6 +35,7 @@ top are updated after each step is tested. Nothing gets ticked until you have te
 - 2026-10-20: Phase 2.1: typed hash router (src/site/router) with tests; old single script split into data, helpers, state, one module per page and a shell. Verified identical to the old page in a browser comparison.
 - 2026-10-21: Phase 2.2: typed data layer (src/site/data): placeholders as fallback, database loader with 4s timeout, safe links/escaping. Page code reads through a temporary adapter until each page is rewritten (2.3-2.6). Note: 2.3 is now mostly verification, since the loader already reads categories and published projects.
 - 2026-10-21: Phase 2.3 tested live: a published test project appeared (Home, Work, project page), a draft did not. Two TEST rows (slugs test-published-project, test-hidden-draft) still in the database; to be removed.
+- 2026-10-21: Phase 2.4 in progress: fixed Work/About/Contact side padding (CSS), project hero shows whole image (no crop), fake Process / Wireframe / Animation placeholders only on sample projects, prev/next hidden with one project. Finding: original artwork files are 7-8 MB PNGs; Phase 4 upload manager must resize and compress (WebP/JPEG) before upload.
 - Live site: https://noziquee.github.io/nozique.github.io/ (project-site address, not nozique.github.io).
 
 ---

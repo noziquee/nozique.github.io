@@ -21,6 +21,8 @@ export interface LegacyProject {
   video: string;
   role: string;
   an: boolean;
+  /** True while the built-in sample projects are shown. */
+  ph: boolean;
 }
 
 /** Replace the contents of the legacy project list and category map in place. */
@@ -47,6 +49,7 @@ export function applyToLegacy(
       video: p.video,
       role: p.role,
       an: isAnimation(p.category),
+      ph: data.source === 'placeholder',
     });
   }
   for (const key of Object.keys(categories)) delete categories[key];

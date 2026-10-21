@@ -7,7 +7,7 @@ a{color:inherit;text-decoration:none}svg{display:block;width:100%;height:100%}
 h1,h2,h3,.hn{font-family:var(--d);color:var(--wh);line-height:.95;font-stretch:112%;font-weight:800;letter-spacing:-.01em}
 h2{font-size:clamp(38px,6.5vw,84px);margin:0 0 36px}
 .w{max-width:1280px;margin:0 auto;padding:0 4vw}
-.sec{padding:96px 0}
+.sec{padding-block:96px}
 .lab{font-size:13px;color:var(--mu);letter-spacing:.02em}
 .btn{display:inline-block;padding:14px 26px;border:1px solid var(--wh);font:700 15px var(--d);font-stretch:110%;color:var(--wh);background:none;cursor:pointer;transition:background .25s,color .25s,transform .2s}
 .btn:hover{background:var(--wh);color:#000}.btn.r{background:var(--red);border-color:var(--red)}.btn.r:hover{background:var(--red2);border-color:var(--red2);color:#fff}
@@ -138,7 +138,7 @@ svg.g .a{fill:#5a5a5a}svg.dm{filter:brightness(.7) contrast(1.1)}
 @media(max-width:860px){
 .nav,.rt .btn{display:none}.bg{display:block}.hr{position:relative;right:auto;top:auto;width:100%;margin:28px 0}.hero{min-height:auto;padding-top:100px}
 .hero .hn{font-size:14.5vw;margin-top:8px}.bento{grid-template-columns:1fr 1fr;grid-auto-rows:200px}.bento .card:nth-child(n){grid-column:auto;grid-row:auto}.bento .card:nth-child(1){grid-column:span 2}
-.pm,.ab{grid-template-columns:1fr}.gl{grid-template-columns:1fr}.ps{grid-template-columns:1fr 1fr}.fm{grid-template-columns:1fr}.sec{padding:64px 0}.cmp,.gl .card{aspect-ratio:4/3}.lb .pv,.lb .nx{top:auto;bottom:20px}}
+.pm,.ab{grid-template-columns:1fr}.gl{grid-template-columns:1fr}.ps{grid-template-columns:1fr 1fr}.fm{grid-template-columns:1fr}.sec{padding-block:64px}.cmp,.gl .card{aspect-ratio:4/3}.lb .pv,.lb .nx{top:auto;bottom:20px}}
 @media(orientation:landscape) and (max-height:620px){.hero{display:grid;grid-template-columns:1fr 1fr;gap:4vw;align-content:start;min-height:auto;padding-top:84px}
 .hi{grid-column:1;grid-row:1;align-self:center}.hr{grid-column:2;grid-row:1;position:relative;right:auto;top:auto;width:100%;margin:0}.hero .hn{grid-column:1/-1;font-size:14.5vw;margin-top:24px}}
 .wp{visibility:hidden;transition:transform .35s cubic-bezier(.7,0,.3,1),visibility 0s .35s}.wp.on{visibility:visible;transition:transform .35s cubic-bezier(.7,0,.3,1)}
@@ -224,3 +224,5 @@ main>*{animation:pgIn .55s var(--ease) both}
 @keyframes pgIn{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
 @media(prefers-reduced-motion:reduce){main>*{animation:none}*,*::before,*::after{transition-duration:.01ms!important}}
 @media(max-width:860px){.hr{padding-right:10px}.hs{gap:22px}.st{font-size:clamp(40px,11vw,60px)}}
+/* Project page: show a whole image in the hero instead of cropping it. */
+.hc .im img{object-fit:contain;background:var(--s1)}

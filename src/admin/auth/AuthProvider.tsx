@@ -57,6 +57,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
     })();
     if (!client) return;
+    const db = client;
 
     async function resolve(session: Session | null) {
       if (!session) {
@@ -64,7 +65,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         return;
       }
       const email = session.user.email ?? null;
-      const { data, error } = await client.rpc('is_admin');
+      const { data, error } = await db.rpc('is_admin');
       if (!active) return;
       if (error) {
         setSnapshot({ status: 'error', email, message: 'Could not check your access.' });
@@ -75,7 +76,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     // Fires once with the saved login (or none), then on every sign-in, sign-out and refresh.
     // The check runs in a timeout because calling the database inside this callback can stall.
-    const { data } = client.auth.onAuthStateChange((_event, session) => {
+    const { data } = db.auth.onAuthStateChange((_event, session) => {
       setTimeout(() => void resolve(session), 0);
     });
     return () => {

@@ -1,7 +1,7 @@
 import { P } from '../data.js';
 import { art, soc } from '../helpers.js';
 const PROFILE='';/* Your portrait as a data: URI (remote image URLs are blocked on the published page) */
-export function about(){const S=P[1],st=['Sketch','w','Block-out','g','Detail','dm','Final',''],ch=a=>`<div class="ch">${a.map(s=>`<span>${s}</span>`).join('')}</div>`,job=()=>`<div class="rx"><span class="lab">[Year to Year]</span><div><b>[Role or project title]</b><em>[Studio, client or personal project]</em><p>[One or two lines on what you made and your part in it.]</p></div></div>`;
+export function about(){const S=P[1]||P[0],st=['Sketch','w','Block-out','g','Detail','dm','Final',''],ch=a=>`<div class="ch">${a.map(s=>`<span>${s}</span>`).join('')}</div>`,job=()=>`<div class="rx"><span class="lab">[Year to Year]</span><div><b>[Role or project title]</b><em>[Studio, client or personal project]</em><p>[One or two lines on what you made and your part in it.]</p></div></div>`;
 return`<section class="sec w ph"><div class="rs"><aside class="rl"><div class="pf">${PROFILE?`<img src="${PROFILE}" alt="Portrait of Ken Rainier D. Quizon">`:`<svg viewBox="0 0 100 100" role="img" aria-label="Profile photo placeholder"><rect width="100" height="100" fill="#1e1e1e"/><circle cx="50" cy="38" r="17" fill="#4a4a4a"/><path d="M15 100c0-23 15-37 35-37s35 14 35 37z" fill="#4a4a4a"/></svg>`}</div>
 <h1 class="rn">Ken Rainier D. Quizon</h1><p class="rr">Nozique &middot; Character designer, illustrator, 3D artist and animator</p>
 <div class="rb"><h3>Contact</h3><p><a href="mailto:nozique7@gmail.com" style="color:var(--wh)">nozique7@gmail.com</a></p><p>Baguio City, Philippines</p><div class="so" style="margin-top:14px">${soc()}</div></div>

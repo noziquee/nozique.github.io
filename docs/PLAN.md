@@ -13,7 +13,7 @@ top are updated after each step is tested. Nothing gets ticked until you have te
 |---|---|---|---|
 | 0 | Foundations: repo, tooling, deploy | 5 | ✅ |
 | 1 | Database and connection | 4 | ✅ |
-| 2 | Public site in TypeScript | 6 | 🟦 2 of 6 done |
+| 2 | Public site in TypeScript | 6 | 🟦 3 of 6 done |
 | 3 | Admin shell and login | 4 | ⬜ |
 | 4 | Project manager (posts, categories, uploads) | 7 | ⬜ |
 | 5 | Design engine: data model, renderer, element registry | 6 | ⬜ |
@@ -25,7 +25,7 @@ top are updated after each step is tested. Nothing gets ticked until you have te
 | 11 | Animation and interaction | 5 | ⬜ |
 | 12 | Hardening: security, accessibility, performance | 6 | ⬜ |
 
-**Current step:** 2.3
+**Current step:** 2.4
 
 ### Changelog
 - 2026-10-18: Plan drafted.
@@ -34,6 +34,7 @@ top are updated after each step is tested. Nothing gets ticked until you have te
 - 2026-10-20: Phase 1: database live (1.1), types and client (1.3), security smoke test 12/12 passing (1.4). 1.2: admin row added; sign-up switch-off pending confirmation.
 - 2026-10-20: Phase 2.1: typed hash router (src/site/router) with tests; old single script split into data, helpers, state, one module per page and a shell. Verified identical to the old page in a browser comparison.
 - 2026-10-21: Phase 2.2: typed data layer (src/site/data): placeholders as fallback, database loader with 4s timeout, safe links/escaping. Page code reads through a temporary adapter until each page is rewritten (2.3-2.6). Note: 2.3 is now mostly verification, since the loader already reads categories and published projects.
+- 2026-10-21: Phase 2.3 tested live: a published test project appeared (Home, Work, project page), a draft did not. Two TEST rows (slugs test-published-project, test-hidden-draft) still in the database; to be removed.
 - Live site: https://noziquee.github.io/nozique.github.io/ (project-site address, not nozique.github.io).
 
 ---
@@ -166,7 +167,7 @@ types and lint pass, build succeeds, tested by you, tracker updated.
 ### Phase 2 — Public site in TypeScript
 - [x] **2.1 (M)** Hash router and page shell (Home, Work, Project, About, Contact) as modules. *Done when:* navigation works as today.
 - [x] **2.2 (M)** Data layer with the placeholder projects as fallback when the database is empty. *Done when:* the site works with an empty database.
-- [ ] **2.3 (M)** Work page reads projects and categories from Supabase (filtering, draft projects hidden). *Done when:* a project added in the SQL editor appears; a draft does not.
+- [x] **2.3 (M)** Work page reads projects and categories from Supabase (filtering, draft projects hidden). *Done when:* a project added in the SQL editor appears; a draft does not.
 - [ ] **2.4 (M)** Project page: gallery, lightbox, prev/next, video, details from the database.
 - [ ] **2.5 (M)** Home page: featured projects and category carousel from the database.
 - [ ] **2.6 (S)** About and Contact pages (existing contact validation kept). *Done when:* all pages match the current design on desktop and mobile.

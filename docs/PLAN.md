@@ -25,7 +25,7 @@ top are updated after each step is tested. Nothing gets ticked until you have te
 | 11 | Animation and interaction | 5 | ⬜ |
 | 12 | Hardening: security, accessibility, performance | 6 | ⬜ |
 
-**Current step:** 3.1 (Phase 2 awaiting final user check)
+**Current step:** 3.1 and 3.2 (written, awaiting your test); 2.6 awaiting your final check
 
 ### Changelog
 - 2026-10-18: Plan drafted.
@@ -38,6 +38,7 @@ top are updated after each step is tested. Nothing gets ticked until you have te
 - 2026-10-21: Phase 2.4 in progress: fixed Work/About/Contact side padding (CSS), project hero shows whole image (no crop), fake Process / Wireframe / Animation placeholders only on sample projects, prev/next hidden with one project. Finding: original artwork files are 7-8 MB PNGs; Phase 4 upload manager must resize and compress (WebP/JPEG) before upload.
 - 2026-10-21: Phase 2.4 tested with real images (hero fit, gallery, lightbox). Phase 2.5: home page handles no featured projects (falls back to first three) and hides categories with no published projects (home carousel, stats, Work filters). Verified in browser with 3 data scenarios, no JS errors; sample content unchanged.
 - 2026-10-21: Phase 2.6: About and Contact checked at desktop and phone widths (no overflow, form validation unchanged); About hides the sample-only "How a piece comes together" art for real projects. Phase 2 complete pending user check.
+- 2026-10-21: Phase 3.1 + 3.2 written together (admin layout, hash routing, Supabase login, admin-only gate, sign out). Not yet tested by user.
 - Live site: https://noziquee.github.io/nozique.github.io/ (project-site address, not nozique.github.io).
 
 ---

@@ -51,6 +51,7 @@ describe('categoryKey', () => {
   });
   it('knows which categories are animations', () => {
     expect(isAnimation('anim3d')).toBe(true);
+    expect(isAnimation('stop-motion-animation')).toBe(true);
     expect(isAnimation('abstract')).toBe(false);
   });
 });

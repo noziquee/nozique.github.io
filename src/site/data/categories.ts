@@ -28,5 +28,5 @@ export function categoryKey(name: string): string {
 
 /** True for categories whose projects are animations (they show a Play tag and video). */
 export function isAnimation(key: string): boolean {
-  return key === 'anim2d' || key === 'anim3d';
+  return key === 'anim2d' || key === 'anim3d' || key.includes('animation');
 }

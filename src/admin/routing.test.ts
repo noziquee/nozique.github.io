@@ -9,6 +9,8 @@ describe('parseAdminHash', () => {
   });
   it('recognises each admin page', () => {
     expect(parseAdminHash('#/projects')).toBe('projects');
+    expect(parseAdminHash('#/categories')).toBe('categories');
+    expect(parseAdminHash('#/categories')).toBe('categories');
     expect(parseAdminHash('#/website')).toBe('website');
     expect(parseAdminHash('#/settings')).toBe('settings');
   });

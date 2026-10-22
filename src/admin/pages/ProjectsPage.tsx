@@ -289,9 +289,7 @@ export function ProjectsPage() {
       )}
 
       {projects.length === 0 ? (
-        <EmptyState title="No projects yet">
-          Click “New project” to add your first one.
-        </EmptyState>
+        <EmptyState title="No projects yet">Click “New project” to add your first one.</EmptyState>
       ) : visible.length === 0 ? (
         <EmptyState title="No projects match">Try clearing the filters.</EmptyState>
       ) : (

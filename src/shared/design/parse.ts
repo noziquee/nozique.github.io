@@ -4,8 +4,7 @@ import { CURRENT_DESIGN_VERSION, designSchema } from './schema';
 import type { Design } from './types';
 
 export type LoadResult =
-  | { ok: true; design: Design; migratedFrom: number | null }
-  | { ok: false; errors: string[] };
+  { ok: true; design: Design; migratedFrom: number | null } | { ok: false; errors: string[] };
 
 function describe(issue: ZodIssue): string {
   const where = issue.path.length > 0 ? issue.path.join('.') : 'design';

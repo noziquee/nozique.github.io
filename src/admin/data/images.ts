@@ -28,7 +28,10 @@ export async function addImage(postId: string, file: File, sortOrder: number): P
   if (upload.error) throw new Error(upload.error.message);
 
   const url = db.storage.from(GALLERY_BUCKET).getPublicUrl(path).data.publicUrl;
-  const alt = file.name.replace(/\.[^.]+$/, '').replace(/[-_]+/g, ' ').trim();
+  const alt = file.name
+    .replace(/\.[^.]+$/, '')
+    .replace(/[-_]+/g, ' ')
+    .trim();
   const insert = await db
     .from('post_images')
     .insert({ post_id: postId, url, sort_order: sortOrder, alt });

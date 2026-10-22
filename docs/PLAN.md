@@ -16,7 +16,7 @@ top are updated after each step is tested. Nothing gets ticked until you have te
 | 2 | Public site in TypeScript | 6 | ✅ |
 | 3 | Admin shell and login | 4 | ✅ |
 | 4 | Project manager (posts, categories, uploads) | 7 | ✅ |
-| 4R | Projects admin layout rework (grid, category chips, dialog editor) | 5 | 🟦 4 of 5 done |
+| 4R | Projects admin layout rework (grid, category chips, dialog editor) | 5 | ✅ |
 | 5 | Design engine: data model, renderer, element registry | 6 | ⬜ |
 | 6 | Visual editor core | 8 | ⬜ |
 | 7 | More elements, one at a time | 8 | ⬜ |
@@ -26,7 +26,7 @@ top are updated after each step is tested. Nothing gets ticked until you have te
 | 11 | Animation and interaction | 5 | ⬜ |
 | 12 | Hardening: security, accessibility, performance | 6 | ⬜ |
 
-**Current step:** 4R.5 (written, awaiting your test)
+**Current step:** Phase 5 planning (waiting for your go-ahead on the plan below)
 
 ### Changelog
 - 2026-10-18: Plan drafted.
@@ -56,6 +56,7 @@ top are updated after each step is tested. Nothing gets ticked until you have te
 - 2026-10-22: Phase 4R.2 tested by user and ticked. Phase 4R.3 written: project editor is now a two-column dialog over the project grid (images and video left; details, visibility and Save/Cancel/Delete right). Esc and × close it (asks if unsaved), focus stays inside, the grid behind refreshes after changes, one column on phones. Awaiting test.
 - 2026-10-22: Phase 4R.3 tested by user and ticked. Phase 4R.4 written: images in the dialog are a grid of square thumbnails (first one badged Thumbnail, × to remove, drag to reorder, + Add files and drop zone); click a thumbnail to edit its alt text and caption underneath. Awaiting test.
 - 2026-10-22: Phase 4R.4 tested by user and ticked. Phase 4R.5 written: removed the separate Categories page and sidebar entry (categories are managed with the chips on Projects; an old #/categories link opens Projects), removed unused list/editor CSS. Awaiting test. After 4R.5 passes, Phase 5 starts.
+- 2026-10-22: Phase 4R.5 tested by user and ticked; Phase 4R complete.
 - Live site: https://noziquee.github.io/nozique.github.io/ (project-site address, not nozique.github.io).
 
 ---
@@ -228,7 +229,7 @@ types and lint pass, build succeeds, tested by you, tracker updated.
 - [x] **4R.2 (M)** Card grid instead of rows. Square cards with the thumbnail, title, "Category · N images", and Draft/Featured badges on the image corner. ⋮ menu: Edit, Publish/Unpublish, Feature/Unfeature, Delete. Drag cards to reorder, and reordering now also works while a category chip is selected (only that category's cards move, as in the template). Dashed "+ Add project" card at the end. A small Grid/List switch keeps the current list view available.
 - [x] **4R.3 (L)** Editor as a two-column dialog over the grid. Left column: images. Right column: category, title, description, year, tools, role, card shape, Visibility (Published/Featured), then Save / Cancel / Delete. Video moves into a section under the images. Esc and × close it, unsaved changes still ask first, focus stays inside the dialog, the address (`#/projects/<id>`) and browser Back still work, one column on phones.
 - [x] **4R.4 (M)** Image thumbnails inside the dialog. A grid of square thumbnails (first one badged "Thumbnail", × to remove, drag to reorder, "+ Add files" and drop zone). Clicking a thumbnail shows its alt text and caption fields underneath, because the tiles are too small to hold inputs.
-- [ ] **4R.5 (S)** Polish and cleanup. Empty and loading states, keyboard use, phone widths, remove the old row/list-only CSS and the separate Categories page once the chips are confirmed good (decision below), update tests and this plan.
+- [x] **4R.5 (S)** Polish and cleanup. Empty and loading states, keyboard use, phone widths, remove the old row/list-only CSS and the separate Categories page once the chips are confirmed good (decision below), update tests and this plan.
 
 **Decisions (I will go with the recommended option unless you say otherwise):**
 - **R1 Categories page:** keep it in the sidebar until the chips are tested; then remove it in 4R.5 (recommended) or keep both.

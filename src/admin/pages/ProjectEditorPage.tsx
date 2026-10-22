@@ -2,7 +2,13 @@ import { useEffect, useState } from 'react';
 import type { FormEvent } from 'react';
 import { listGroups } from '../data/groups';
 import type { Group } from '../data/groups';
-import { createProject, getProject, updateProject } from '../data/projects';
+import {
+  createProject,
+  getProject,
+  setFeatured,
+  setPublished,
+  updateProject,
+} from '../data/projects';
 import {
   ASPECTS,
   EMPTY_FORM,
@@ -16,6 +22,7 @@ import {
 import type { FormErrors, ProjectForm } from '../data/projectRules';
 import { adminHref, projectHref } from '../routing';
 import type { ProjectRoute } from '../routing';
+import { PublishControls } from '../ui/PublishControls';
 import { ErrorMessage, Loading } from '../ui/states';
 import { ProjectImages } from './ProjectImages';
 import { ProjectVideo } from './ProjectVideo';
@@ -39,6 +46,9 @@ export function ProjectEditorPage({ route }: { route: ProjectRoute }) {
   const [notice, setNotice] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const [attempt, setAttempt] = useState(0);
+  const [meta, setMeta] = useState({ status: 'draft', featured: false });
+  const [metaBusy, setMetaBusy] = useState(false);
+  const [metaError, setMetaError] = useState<string | null>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -53,6 +63,7 @@ export function ProjectEditorPage({ route }: { route: ProjectRoute }) {
           return;
         }
         const loaded = row ? formFromRow(row) : EMPTY_FORM;
+        if (row) setMeta({ status: row.status, featured: row.featured });
         setForm(loaded);
         setSaved(loaded);
         if (justCreated) setNotice('Project created as a draft.');
@@ -106,6 +117,18 @@ export function ProjectEditorPage({ route }: { route: ProjectRoute }) {
     } finally {
       setSaving(false);
     }
+  }
+
+  async function changeMeta(next: Partial<typeof meta>, save: () => Promise<void>) {
+    setMetaBusy(true);
+    setMetaError(null);
+    try {
+      await save();
+      setMeta((current) => ({ ...current, ...next }));
+    } catch (error) {
+      setMetaError(error instanceof Error ? error.message : 'Could not save the change.');
+    }
+    setMetaBusy(false);
   }
 
   function onCancel() {
@@ -243,6 +266,35 @@ export function ProjectEditorPage({ route }: { route: ProjectRoute }) {
 
       {id ? (
         <>
+          <section className="images">
+            <h2>Visibility</h2>
+            <p className="muted">
+              {meta.status === 'published'
+                ? 'This project is live on your site.'
+                : 'This project is a draft. Visitors cannot see it until you publish it.'}
+            </p>
+            <PublishControls
+              status={meta.status}
+              featured={meta.featured}
+              busy={metaBusy}
+              onTogglePublished={() => {
+                const publish = meta.status !== 'published';
+                void changeMeta({ status: publish ? 'published' : 'draft' }, () =>
+                  setPublished(id, publish),
+                );
+              }}
+              onToggleFeatured={() =>
+                void changeMeta({ featured: !meta.featured }, () =>
+                  setFeatured(id, !meta.featured),
+                )
+              }
+            />
+            {metaError && (
+              <p className="error" role="alert">
+                {metaError}
+              </p>
+            )}
+          </section>
           <ProjectImages postId={id} />
           <ProjectVideo postId={id} />
         </>

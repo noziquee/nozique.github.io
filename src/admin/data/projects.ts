@@ -60,3 +60,16 @@ export async function updateProject(id: string, values: ProjectValues): Promise<
   const { error } = await getSupabase().from('posts').update(values).eq('id', id);
   if (error) throw new Error(error.message);
 }
+
+/** Published projects show on your site. Drafts are hidden from visitors. */
+export async function setPublished(id: string, published: boolean): Promise<void> {
+  const status = published ? 'published' : 'draft';
+  const { error } = await getSupabase().from('posts').update({ status }).eq('id', id);
+  if (error) throw new Error(error.message);
+}
+
+/** Featured projects are the ones shown on the home page. */
+export async function setFeatured(id: string, featured: boolean): Promise<void> {
+  const { error } = await getSupabase().from('posts').update({ featured }).eq('id', id);
+  if (error) throw new Error(error.message);
+}

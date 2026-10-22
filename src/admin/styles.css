@@ -507,3 +507,21 @@ ul.error {
   border-radius: 10px;
   background: #000;
 }
+
+.publish-controls {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+button.badge-btn {
+  padding: 3px 10px;
+  background: transparent;
+  font-size: 12px;
+  font-weight: 400;
+  cursor: pointer;
+}
+
+button.badge-btn:hover:not(:disabled) {
+  border-color: var(--text);
+}

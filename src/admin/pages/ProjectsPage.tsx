@@ -1,11 +1,12 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { listGroups } from '../data/groups';
 import type { Group } from '../data/groups';
-import { listProjects } from '../data/projects';
+import { listProjects, setFeatured, setPublished } from '../data/projects';
 import type { ProjectSummary } from '../data/projects';
 import { NO_FILTERS, filterProjects, hasFilters } from '../data/projectFilter';
 import type { ProjectFilters, StatusFilter } from '../data/projectFilter';
 import { NEW_PROJECT_HREF, projectHref } from '../routing';
+import { PublishControls } from '../ui/PublishControls';
 import { EmptyState, ErrorMessage, Loading } from '../ui/states';
 
 /** Only show thumbnails that are real https addresses. */
@@ -19,6 +20,8 @@ export function ProjectsPage() {
   const [status, setStatus] = useState<'loading' | 'ready' | 'error'>('loading');
   const [error, setError] = useState<string | null>(null);
   const [filters, setFilters] = useState<ProjectFilters>(NO_FILTERS);
+  const [busyId, setBusyId] = useState<string | null>(null);
+  const [actionError, setActionError] = useState<string | null>(null);
 
   const load = useCallback(async () => {
     setStatus('loading');
@@ -39,6 +42,22 @@ export function ProjectsPage() {
 
   const groupName = useMemo(() => new Map(groups.map((g) => [g.id, g.name])), [groups]);
   const visible = useMemo(() => filterProjects(projects, filters), [projects, filters]);
+
+  async function change(
+    id: string,
+    patch: Partial<Pick<ProjectSummary, 'status' | 'featured'>>,
+    save: () => Promise<void>,
+  ) {
+    setBusyId(id);
+    setActionError(null);
+    try {
+      await save();
+      setProjects((list) => list.map((p) => (p.id === id ? { ...p, ...patch } : p)));
+    } catch (e) {
+      setActionError(e instanceof Error ? e.message : 'Could not save the change.');
+    }
+    setBusyId(null);
+  }
 
   if (status === 'loading') return <Loading label="Loading projects…" />;
   if (status === 'error') {
@@ -99,6 +118,12 @@ export function ProjectsPage() {
         )}
       </div>
 
+      {actionError && (
+        <p className="error" role="alert">
+          {actionError}
+        </p>
+      )}
+
       {projects.length === 0 ? (
         <EmptyState title="No projects yet">
           Click “New project” to add your first one.
@@ -124,10 +149,22 @@ export function ProjectsPage() {
                     {p.imageCount === 1 ? 'image' : 'images'}
                   </span>
                 </span>
-                {p.featured && <span className="badge badge-featured">Featured</span>}
-                <span className={`badge badge-${p.status === 'published' ? 'live' : 'draft'}`}>
-                  {p.status === 'published' ? 'Published' : 'Draft'}
-                </span>
+                <PublishControls
+                  status={p.status}
+                  featured={p.featured}
+                  busy={busyId === p.id}
+                  onTogglePublished={() => {
+                    const publish = p.status !== 'published';
+                    void change(p.id, { status: publish ? 'published' : 'draft' }, () =>
+                      setPublished(p.id, publish),
+                    );
+                  }}
+                  onToggleFeatured={() =>
+                    void change(p.id, { featured: !p.featured }, () =>
+                      setFeatured(p.id, !p.featured),
+                    )
+                  }
+                />
               </li>
             );
           })}

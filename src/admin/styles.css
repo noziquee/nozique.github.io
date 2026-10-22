@@ -76,7 +76,8 @@ button.primary {
   font-weight: 600;
 }
 
-input {
+input,
+select {
   width: 100%;
   font: inherit;
   color: var(--text);
@@ -316,3 +317,62 @@ button.danger:hover:not(:disabled) {
   }
 }
 
+
+.filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 16px 0 0;
+  max-width: 720px;
+}
+
+.filters input {
+  flex: 1;
+  min-width: 180px;
+}
+
+.thumb {
+  width: 48px;
+  height: 48px;
+  flex: none;
+  border-radius: 8px;
+  object-fit: cover;
+  background: var(--bg);
+}
+
+.thumb-empty {
+  border: 1px dashed var(--line);
+}
+
+.row-sub {
+  display: block;
+  margin-top: 2px;
+  font-size: 13px;
+  font-weight: 400;
+}
+
+.badge {
+  padding: 3px 9px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+.badge-live {
+  border-color: #3fb67a;
+  color: #3fb67a;
+}
+
+.badge-draft {
+  color: var(--muted);
+}
+
+.badge-featured {
+  border-color: var(--red);
+  color: var(--red);
+}
+
+.filters select {
+  width: auto;
+}

@@ -16,7 +16,7 @@ import {
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { listGroups } from '../data/groups';
-import type { Group } from '../data/groups';
+import type { GroupWithCount } from '../data/groups';
 import {
   deleteProject,
   listProjects,
@@ -29,6 +29,7 @@ import { NO_FILTERS, filterProjects, hasFilters } from '../data/projectFilter';
 import type { ProjectFilters, StatusFilter } from '../data/projectFilter';
 import { reorder } from '../data/imageRules';
 import { NEW_PROJECT_HREF, projectHref } from '../routing';
+import { CategoryChips } from './CategoryChips';
 import { PublishControls } from '../ui/PublishControls';
 import { EmptyState, ErrorMessage, Loading } from '../ui/states';
 
@@ -108,7 +109,7 @@ function ProjectRow({
 
 export function ProjectsPage() {
   const [projects, setProjects] = useState<ProjectSummary[]>([]);
-  const [groups, setGroups] = useState<Group[]>([]);
+  const [groups, setGroups] = useState<GroupWithCount[]>([]);
   const [status, setStatus] = useState<'loading' | 'ready' | 'error'>('loading');
   const [error, setError] = useState<string | null>(null);
   const [filters, setFilters] = useState<ProjectFilters>(NO_FILTERS);
@@ -190,6 +191,15 @@ export function ProjectsPage() {
         published · Drag the handle to change the order on your site.
       </p>
 
+      <CategoryChips
+        groups={groups}
+        total={projects.length}
+        uncategorized={projects.filter((p) => !p.group_id).length}
+        active={filters.category}
+        onSelect={(category) => setFilters({ ...filters, category })}
+        onChanged={load}
+      />
+
       <div className="filters">
         <input
           type="search"
@@ -198,19 +208,6 @@ export function ProjectsPage() {
           value={filters.search}
           onChange={(e) => setFilters({ ...filters, search: e.target.value })}
         />
-        <select
-          aria-label="Filter by category"
-          value={filters.category}
-          onChange={(e) => setFilters({ ...filters, category: e.target.value })}
-        >
-          <option value="all">All categories</option>
-          {groups.map((g) => (
-            <option key={g.id} value={g.id}>
-              {g.name}
-            </option>
-          ))}
-          <option value="none">No category</option>
-        </select>
         <select
           aria-label="Filter by status"
           value={filters.status}

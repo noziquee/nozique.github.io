@@ -1,6 +1,5 @@
 import { useAuth } from '../auth/AuthProvider';
 import { ADMIN_PAGES, adminHref, useAdminPage } from '../routing';
-import { CategoriesPage } from '../features/categories/CategoriesPage';
 import { CategoriesPage } from '../pages/CategoriesPage';
 import { ProjectsPage } from '../pages/ProjectsPage';
 import { SettingsPage } from '../pages/SettingsPage';

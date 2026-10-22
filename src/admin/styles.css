@@ -242,58 +242,6 @@ label {
   font-size: 14px;
 }
 
-.add-row {
-  display: flex;
-  gap: 8px;
-  margin: 20px 0 8px;
-  max-width: 560px;
-}
-
-.rows {
-  list-style: none;
-  margin: 20px 0 0;
-  padding: 0;
-  max-width: 760px;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.row {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 10px 12px;
-  background: var(--panel);
-  border: 1px solid var(--line);
-  border-radius: 10px;
-}
-
-.row-main {
-  flex: 1;
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 10px;
-}
-
-.row-main strong {
-  margin-right: auto;
-}
-
-.row-main input {
-  flex: 1;
-  min-width: 160px;
-  width: auto;
-}
-
-.handle {
-  cursor: grab;
-  touch-action: none;
-  padding: 6px 8px;
-  color: var(--muted);
-}
-
 button.danger {
   background: transparent;
   border-color: #ff7a73;

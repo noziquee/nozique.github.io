@@ -5,7 +5,6 @@ export type AdminPage = 'projects' | 'categories' | 'website' | 'settings';
 export const ADMIN_PAGES: readonly { id: AdminPage; label: string }[] = [
   { id: 'projects', label: 'Projects' },
   { id: 'categories', label: 'Categories' },
-  { id: 'categories', label: 'Categories' },
   { id: 'website', label: 'Website' },
   { id: 'settings', label: 'Settings' },
 ];

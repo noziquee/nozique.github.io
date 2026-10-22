@@ -36,7 +36,6 @@ export function AdminLayout() {
       <main className="content">
         {page === 'projects' && <ProjectsPage />}
         {page === 'categories' && <CategoriesPage />}
-        {page === 'categories' && <CategoriesPage />}
         {page === 'website' && <WebsitePage />}
         {page === 'settings' && <SettingsPage />}
       </main>

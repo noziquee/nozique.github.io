@@ -434,3 +434,61 @@ a.button.primary {
     grid-template-columns: 1fr;
   }
 }
+
+.images {
+  margin-top: 40px;
+  max-width: 720px;
+}
+
+.images h2 {
+  margin-bottom: 4px;
+}
+
+.dropzone {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 16px;
+  padding: 18px;
+  border: 1px dashed var(--line);
+  border-radius: 10px;
+}
+
+.dropzone.is-over {
+  border-color: var(--red);
+  background: var(--panel);
+}
+
+.thumb-lg {
+  width: 88px;
+  height: 88px;
+}
+
+.image-row {
+  align-items: flex-start;
+}
+
+.image-fields {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+  min-width: 0;
+}
+
+.image-fields input {
+  width: 100%;
+}
+
+ul.error {
+  margin: 12px 0 0;
+  padding-left: 20px;
+}
+
+@media (max-width: 560px) {
+  .image-row {
+    flex-wrap: wrap;
+  }
+}

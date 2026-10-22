@@ -17,6 +17,7 @@ import type { FormErrors, ProjectForm } from '../data/projectRules';
 import { adminHref, projectHref } from '../routing';
 import type { ProjectRoute } from '../routing';
 import { ErrorMessage, Loading } from '../ui/states';
+import { ProjectImages } from './ProjectImages';
 
 /** Set when a project was just created, so the next editor page can say so. */
 let justCreated = false;
@@ -238,6 +239,12 @@ export function ProjectEditorPage({ route }: { route: ProjectRoute }) {
           {dirty && <span className="muted">Unsaved changes</span>}
         </div>
       </form>
+
+      {id ? (
+        <ProjectImages postId={id} />
+      ) : (
+        <p className="muted">Create the project first, then you can add images.</p>
+      )}
     </section>
   );
 }

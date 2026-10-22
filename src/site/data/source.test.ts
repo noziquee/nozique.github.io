@@ -9,6 +9,7 @@ function fakeClient(rows: Rows, error: string | null = null): Pick<NoziqueClient
   const from = (table: string) => {
     const query = {
       select: () => query,
+      eq: () => query,
       order: () => query,
       then: (resolve: (value: unknown) => unknown) =>
         Promise.resolve(

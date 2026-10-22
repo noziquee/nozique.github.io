@@ -47,6 +47,7 @@ top are updated after each step is tested. Nothing gets ticked until you have te
 - 2026-10-22: Phase 4.3 tested by user and ticked. Phase 4.4 written: image upload on the project editor (multiple files or drag-and-drop, resized to max 2400 px and compressed to WebP in the browser, first image is the thumbnail, drag to reorder, alt text and captions, remove deletes the file). Awaiting test.
 - 2026-10-22: Phase 4.4 tested by user and ticked. Phase 4.5 written: video on the project editor (upload MP4/WebM up to 50 MB, or paste a direct .mp4/.webm link; preview; replace and remove clean up the old stored file). YouTube/Vimeo links are not supported yet because the site uses a plain video player (could be added in Phase 7.6). Awaiting test.
 - 2026-10-22: Phase 4.5 tested by user and ticked. Phase 4.6 written: Draft/Published and Featured toggles on the Projects list and in the editor (Visibility panel). Awaiting test (check the public site too).
+- 2026-10-22: Phase 4.6 bug found by user: drafts visible on the public site. Cause: when you are signed in to the admin in the same browser, the database lets your admin session read drafts. Fix: the public site now asks only for published projects and also filters drafts itself. To check the visitor view, use a private window or sign out.
 - Live site: https://noziquee.github.io/nozique.github.io/ (project-site address, not nozique.github.io).
 
 ---

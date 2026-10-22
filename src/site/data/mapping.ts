@@ -68,7 +68,11 @@ export function mapRows(groups: GroupRow[], posts: PostRow[], images: ImageRow[]
     list.push(image);
     imagesByPost.set(image.post_id, list);
   }
-  const projects = posts.map((post) => mapPost(post, imagesByPost.get(post.id) ?? [], groupById));
+  // Drafts are hidden from visitors by the database, but a signed-in admin can read them too,
+  // so the site filters them out itself as well.
+  const projects = posts
+    .filter((post) => post.status === 'published')
+    .map((post) => mapPost(post, imagesByPost.get(post.id) ?? [], groupById));
 
   const sortedGroups = [...groups].sort((a, b) => (a.sort_order ?? 1e9) - (b.sort_order ?? 1e9));
   const categories: Category[] = sortedGroups.map((group) => ({

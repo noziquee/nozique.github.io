@@ -22,6 +22,7 @@ export async function fetchSiteData(client: DbClient): Promise<SiteData> {
     client
       .from('posts')
       .select('*')
+      .eq('status', 'published')
       .order('sort_order', { nullsFirst: false })
       .order('created_at', { ascending: false }),
     client.from('post_images').select('*').order('sort_order'),

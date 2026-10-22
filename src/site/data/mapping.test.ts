@@ -110,6 +110,15 @@ describe('mapRows', () => {
   });
 });
 
+describe('mapRows drafts', () => {
+  it('leaves drafts out, even if the database returns them', () => {
+    const live = post({ id: 'a', title: 'Live' });
+    const hidden = post({ id: 'b', title: 'Hidden', status: 'draft' });
+    const rows = [live, hidden];
+    expect(mapRows([], rows, []).projects.map((p) => p.title)).toEqual(['Live']);
+  });
+});
+
 describe('safeId', () => {
   it('keeps plain slugs and falls back for anything that could break a link', () => {
     expect(safeId('my-piece-2', 'row-id')).toBe('my-piece-2');

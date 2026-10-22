@@ -16,6 +16,7 @@ top are updated after each step is tested. Nothing gets ticked until you have te
 | 2 | Public site in TypeScript | 6 | ✅ |
 | 3 | Admin shell and login | 4 | ✅ |
 | 4 | Project manager (posts, categories, uploads) | 7 | 🟦 6 of 7 done |
+| 4R | Projects admin layout rework (grid, category chips, dialog editor) | 5 | ⬜ planned |
 | 5 | Design engine: data model, renderer, element registry | 6 | ⬜ |
 | 6 | Visual editor core | 8 | ⬜ |
 | 7 | More elements, one at a time | 8 | ⬜ |
@@ -49,6 +50,7 @@ top are updated after each step is tested. Nothing gets ticked until you have te
 - 2026-10-22: Phase 4.5 tested by user and ticked. Phase 4.6 written: Draft/Published and Featured toggles on the Projects list and in the editor (Visibility panel). Awaiting test (check the public site too).
 - 2026-10-22: Phase 4.6 bug found by user: drafts visible on the public site. Cause: when you are signed in to the admin in the same browser, the database lets your admin session read drafts. Fix: the public site now asks only for published projects and also filters drafts itself. To check the visitor view, use a private window or sign out.
 - 2026-10-22: Phase 4.6 tested by user and ticked. Phase 4.7 written: delete project (removes its image and video files too) from the list and the editor; drag to reorder projects on the list (disabled while filters are active). Awaiting test.
+- 2026-10-22: User supplied admin_phase_10.html (old Nica admin) and asked for a layout-only rework of the Projects admin, keeping all built functions. Inspected its Gallery admin (chip bar, card grid, two-column dialog editor). Added Phase 4R plan before Phase 5. Step 4.7 is still awaiting its test.
 - Live site: https://noziquee.github.io/nozique.github.io/ (project-site address, not nozique.github.io).
 
 ---
@@ -202,6 +204,33 @@ types and lint pass, build succeeds, tested by you, tracker updated.
 - [ ] **4.7 (S)** Delete project (also removes its files from storage) and drag to reorder projects.
 
 > After Phase 4 you can run your real portfolio from the admin, before the visual editor exists.
+
+### Phase 4R — Projects admin layout rework (before Phase 5)
+
+**Goal:** change only the *layout* of the Projects admin to the gallery-admin layout in your `admin_phase_10.html` (category chips on top, square project cards, editor in a two-column dialog). **Every element and function built in Phase 4 stays**: search, status filter, thumbnails, Published/Draft and Featured toggles, drag-to-reorder, delete with file cleanup, the editor fields, image upload with resize/compress, alt text and captions, video upload/link. The database layer (`src/admin/data/*`) is not touched; only components and CSS change. We keep our dark/red Nozique look; we borrow the template's structure, not its brown/cream colours.
+
+**What the template does (inspected):**
+- *Category chip bar:* "All" plus one pill per group. Click filters the grid. Each pill has a ⋮ menu (Rename, Delete), pills drag to reorder, and a dashed "+ Add Group" pill opens an inline name field.
+- *Post grid:* responsive square cards (image, title, "Group · N images"), a ⋮ menu on each card (Edit, Delete), drag cards to reorder, and a dashed "+ Add Post" card at the end. Clicking a card opens the editor. Reordering inside a group only moves that group's cards and leaves the rest where they were.
+- *Editor dialog:* a centered overlay, two columns. Left: image thumbnails (first one badged "Thumbnail", × to remove, drag to reorder, "+ Add files"). Right: group, title, description, then Save / Cancel / Delete. Stacks to one column on phones.
+
+**Differences I will deliberately NOT copy (they would remove things you like):**
+- The template saves images only when you press "Save Post". Ours saves each upload, reorder, remove and alt/caption edit immediately, so nothing is lost. This stays.
+- The template has no status, featured, year, tools, role, card shape, video, alt text or captions. All of those stay and get a place in the new layout.
+
+**Steps** (each tested by you before the next, same protocol):
+- [ ] **4R.1 (M)** Category chips on the Projects page. "All" + a pill per category with project counts replaces the category dropdown. Pills drag to reorder, ⋮ menu has Rename (inline, not a pop-up) and Delete (same confirmation as now), dashed "+ Add category" pill opens an inline field. Search and the status filter stay. Uses the existing category functions.
+- [ ] **4R.2 (M)** Card grid instead of rows. Square cards with the thumbnail, title, "Category · N images", and Draft/Featured badges on the image corner. ⋮ menu: Edit, Publish/Unpublish, Feature/Unfeature, Delete. Drag cards to reorder, and reordering now also works while a category chip is selected (only that category's cards move, as in the template). Dashed "+ Add project" card at the end. A small Grid/List switch keeps the current list view available.
+- [ ] **4R.3 (L)** Editor as a two-column dialog over the grid. Left column: images. Right column: category, title, description, year, tools, role, card shape, Visibility (Published/Featured), then Save / Cancel / Delete. Video moves into a section under the images. Esc and × close it, unsaved changes still ask first, focus stays inside the dialog, the address (`#/projects/<id>`) and browser Back still work, one column on phones.
+- [ ] **4R.4 (M)** Image thumbnails inside the dialog. A grid of square thumbnails (first one badged "Thumbnail", × to remove, drag to reorder, "+ Add files" and drop zone). Clicking a thumbnail shows its alt text and caption fields underneath, because the tiles are too small to hold inputs.
+- [ ] **4R.5 (S)** Polish and cleanup. Empty and loading states, keyboard use, phone widths, remove the old row/list-only CSS and the separate Categories page once the chips are confirmed good (decision below), update tests and this plan.
+
+**Decisions (I will go with the recommended option unless you say otherwise):**
+- **R1 Categories page:** keep it in the sidebar until the chips are tested; then remove it in 4R.5 (recommended) or keep both.
+- **R2 Image saving:** keep instant saving (recommended) or switch to the template's "Save Post commits everything".
+- **R3 Grid/List switch:** include it (recommended, costs little) or grid only.
+
+**Not part of this phase:** the visual website editor (Phases 5 onward). The Website tab layout in the template belongs to those phases.
 
 ### Phase 5 — Design engine
 - [ ] **5.1 (M)** Design types + Zod schema + versioning + migration framework. *Done when:* unit tests validate good and bad designs.

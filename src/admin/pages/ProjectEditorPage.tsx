@@ -4,6 +4,7 @@ import { listGroups } from '../data/groups';
 import type { Group } from '../data/groups';
 import {
   createProject,
+  deleteProject,
   getProject,
   setFeatured,
   setPublished,
@@ -129,6 +130,22 @@ export function ProjectEditorPage({ route }: { route: ProjectRoute }) {
       setMetaError(error instanceof Error ? error.message : 'Could not save the change.');
     }
     setMetaBusy(false);
+  }
+
+  async function onDelete() {
+    if (!id) return;
+    const message = `Delete “${saved.title}”? Its images and video are deleted too.`;
+    if (!window.confirm(`${message} This cannot be undone.`)) return;
+    setSaving(true);
+    setSaveError(null);
+    try {
+      await deleteProject(id);
+      setSaved(form);
+      window.location.hash = adminHref('projects');
+    } catch (error) {
+      setSaveError(error instanceof Error ? error.message : 'Could not delete the project.');
+      setSaving(false);
+    }
   }
 
   function onCancel() {
@@ -261,6 +278,16 @@ export function ProjectEditorPage({ route }: { route: ProjectRoute }) {
             {dirty ? 'Cancel' : 'Back'}
           </button>
           {dirty && <span className="muted">Unsaved changes</span>}
+          {id && (
+            <button
+              type="button"
+              className="danger push-right"
+              disabled={saving}
+              onClick={() => void onDelete()}
+            >
+              Delete project
+            </button>
+          )}
         </div>
       </form>
 

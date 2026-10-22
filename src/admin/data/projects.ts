@@ -1,6 +1,9 @@
 import { getSupabase } from '../../shared/supabase/client';
 import type { Row } from '../../shared/supabase/database.types';
+import { filesToDelete } from './projectCleanup';
+import { GALLERY_BUCKET } from './imageRules';
 import type { ProjectValues } from './projectRules';
+import { VIDEO_BUCKET } from './videoRules';
 
 export type ProjectSummary = Row<'posts'> & {
   /** First image, used as the thumbnail. */
@@ -72,4 +75,39 @@ export async function setPublished(id: string, published: boolean): Promise<void
 export async function setFeatured(id: string, featured: boolean): Promise<void> {
   const { error } = await getSupabase().from('posts').update({ featured }).eq('id', id);
   if (error) throw new Error(error.message);
+}
+
+/** Save the order shown on screen: the first id gets 0, the next 1, and so on. */
+export async function saveProjectOrder(ids: readonly string[]): Promise<void> {
+  const db = getSupabase();
+  const results = await Promise.all(
+    ids.map((id, index) => db.from('posts').update({ sort_order: index }).eq('id', id)),
+  );
+  const failed = results.find((result) => result.error);
+  if (failed?.error) throw new Error(failed.error.message);
+}
+
+/** Delete a project, its image rows, and the image and video files it uploaded. */
+export async function deleteProject(id: string): Promise<void> {
+  const db = getSupabase();
+  const [images, post] = await Promise.all([
+    db.from('post_images').select('url').eq('post_id', id),
+    db.from('posts').select('video_url').eq('id', id).maybeSingle(),
+  ]);
+  if (images.error) throw new Error(images.error.message);
+  if (post.error) throw new Error(post.error.message);
+
+  const files = filesToDelete(
+    images.data.map((image) => image.url),
+    post.data?.video_url ?? null,
+  );
+
+  const rows = await db.from('post_images').delete().eq('post_id', id);
+  if (rows.error) throw new Error(rows.error.message);
+  const removed = await db.from('posts').delete().eq('id', id);
+  if (removed.error) throw new Error(removed.error.message);
+
+  // The project is gone. Clearing its files is best effort.
+  if (files.images.length) await db.storage.from(GALLERY_BUCKET).remove(files.images);
+  if (files.videos.length) await db.storage.from(VIDEO_BUCKET).remove(files.videos);
 }

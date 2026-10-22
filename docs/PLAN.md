@@ -15,7 +15,7 @@ top are updated after each step is tested. Nothing gets ticked until you have te
 | 1 | Database and connection | 4 | ✅ |
 | 2 | Public site in TypeScript | 6 | ✅ |
 | 3 | Admin shell and login | 4 | ✅ |
-| 4 | Project manager (posts, categories, uploads) | 7 | 🟦 5 of 7 done |
+| 4 | Project manager (posts, categories, uploads) | 7 | 🟦 6 of 7 done |
 | 5 | Design engine: data model, renderer, element registry | 6 | ⬜ |
 | 6 | Visual editor core | 8 | ⬜ |
 | 7 | More elements, one at a time | 8 | ⬜ |
@@ -25,7 +25,7 @@ top are updated after each step is tested. Nothing gets ticked until you have te
 | 11 | Animation and interaction | 5 | ⬜ |
 | 12 | Hardening: security, accessibility, performance | 6 | ⬜ |
 
-**Current step:** 4.6 (written, awaiting your test)
+**Current step:** 4.7 (written, awaiting your test)
 
 ### Changelog
 - 2026-10-18: Plan drafted.
@@ -48,6 +48,7 @@ top are updated after each step is tested. Nothing gets ticked until you have te
 - 2026-10-22: Phase 4.4 tested by user and ticked. Phase 4.5 written: video on the project editor (upload MP4/WebM up to 50 MB, or paste a direct .mp4/.webm link; preview; replace and remove clean up the old stored file). YouTube/Vimeo links are not supported yet because the site uses a plain video player (could be added in Phase 7.6). Awaiting test.
 - 2026-10-22: Phase 4.5 tested by user and ticked. Phase 4.6 written: Draft/Published and Featured toggles on the Projects list and in the editor (Visibility panel). Awaiting test (check the public site too).
 - 2026-10-22: Phase 4.6 bug found by user: drafts visible on the public site. Cause: when you are signed in to the admin in the same browser, the database lets your admin session read drafts. Fix: the public site now asks only for published projects and also filters drafts itself. To check the visitor view, use a private window or sign out.
+- 2026-10-22: Phase 4.6 tested by user and ticked. Phase 4.7 written: delete project (removes its image and video files too) from the list and the editor; drag to reorder projects on the list (disabled while filters are active). Awaiting test.
 - Live site: https://noziquee.github.io/nozique.github.io/ (project-site address, not nozique.github.io).
 
 ---
@@ -197,7 +198,7 @@ types and lint pass, build succeeds, tested by you, tracker updated.
 - [x] **4.3 (L)** Project editor: title, description, category, year, tools, role, cover aspect.
 - [x] **4.4 (L)** Image upload (multiple), drag to reorder, first image is the thumbnail, alt text and captions.
 - [x] **4.5 (M)** Video: upload or link for animation projects.
-- [ ] **4.6 (S)** Draft/published toggle and "Featured" toggle. *Done when:* changes show on the public site correctly.
+- [x] **4.6 (S)** Draft/published toggle and "Featured" toggle. *Done when:* changes show on the public site correctly.
 - [ ] **4.7 (S)** Delete project (also removes its files from storage) and drag to reorder projects.
 
 > After Phase 4 you can run your real portfolio from the admin, before the visual editor exists.

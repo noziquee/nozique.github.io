@@ -1,10 +1,33 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import {
+  DndContext,
+  KeyboardSensor,
+  PointerSensor,
+  closestCenter,
+  useSensor,
+  useSensors,
+} from '@dnd-kit/core';
+import type { DragEndEvent } from '@dnd-kit/core';
+import {
+  SortableContext,
+  sortableKeyboardCoordinates,
+  useSortable,
+  verticalListSortingStrategy,
+} from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
 import { listGroups } from '../data/groups';
 import type { Group } from '../data/groups';
-import { listProjects, setFeatured, setPublished } from '../data/projects';
+import {
+  deleteProject,
+  listProjects,
+  saveProjectOrder,
+  setFeatured,
+  setPublished,
+} from '../data/projects';
 import type { ProjectSummary } from '../data/projects';
 import { NO_FILTERS, filterProjects, hasFilters } from '../data/projectFilter';
 import type { ProjectFilters, StatusFilter } from '../data/projectFilter';
+import { reorder } from '../data/imageRules';
 import { NEW_PROJECT_HREF, projectHref } from '../routing';
 import { PublishControls } from '../ui/PublishControls';
 import { EmptyState, ErrorMessage, Loading } from '../ui/states';
@@ -14,17 +37,90 @@ function safeThumb(url: string | null): string | null {
   return url && url.startsWith('https://') ? url : null;
 }
 
+interface RowProps {
+  project: ProjectSummary;
+  categoryName: string;
+  busy: boolean;
+  canReorder: boolean;
+  onTogglePublished: () => void;
+  onToggleFeatured: () => void;
+  onDelete: () => void;
+}
+
+function ProjectRow({
+  project: p,
+  categoryName,
+  busy,
+  canReorder,
+  onTogglePublished,
+  onToggleFeatured,
+  onDelete,
+}: RowProps) {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
+    id: p.id,
+  });
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.6 : 1,
+  };
+  const thumb = safeThumb(p.thumbnail);
+  const imageLabel = `${p.imageCount} ${p.imageCount === 1 ? 'image' : 'images'}`;
+
+  return (
+    <li ref={setNodeRef} style={style} className="row">
+      <button
+        type="button"
+        className="handle"
+        aria-label={`Reorder ${p.title}`}
+        title={canReorder ? 'Drag to reorder' : 'Clear the filters to reorder'}
+        disabled={busy || !canReorder}
+        {...attributes}
+        {...listeners}
+      >
+        ⠿
+      </button>
+      {thumb ? (
+        <img className="thumb" src={thumb} alt="" loading="lazy" />
+      ) : (
+        <span className="thumb thumb-empty" aria-hidden="true" />
+      )}
+      <span className="row-name">
+        <a href={projectHref(p.id)}>{p.title}</a>
+        <span className="muted row-sub">
+          {categoryName}
+          {p.year ? ` · ${p.year}` : ''} · {imageLabel}
+        </span>
+      </span>
+      <PublishControls
+        status={p.status}
+        featured={p.featured}
+        busy={busy}
+        onTogglePublished={onTogglePublished}
+        onToggleFeatured={onToggleFeatured}
+      />
+      <button type="button" className="danger" disabled={busy} onClick={onDelete}>
+        Delete
+      </button>
+    </li>
+  );
+}
+
 export function ProjectsPage() {
   const [projects, setProjects] = useState<ProjectSummary[]>([]);
   const [groups, setGroups] = useState<Group[]>([]);
   const [status, setStatus] = useState<'loading' | 'ready' | 'error'>('loading');
   const [error, setError] = useState<string | null>(null);
   const [filters, setFilters] = useState<ProjectFilters>(NO_FILTERS);
-  const [busyId, setBusyId] = useState<string | null>(null);
+  const [busy, setBusy] = useState(false);
   const [actionError, setActionError] = useState<string | null>(null);
 
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 6 } }),
+    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }),
+  );
+
   const load = useCallback(async () => {
-    setStatus('loading');
     try {
       const [p, g] = await Promise.all([listProjects(), listGroups()]);
       setProjects(p);
@@ -42,21 +138,34 @@ export function ProjectsPage() {
 
   const groupName = useMemo(() => new Map(groups.map((g) => [g.id, g.name])), [groups]);
   const visible = useMemo(() => filterProjects(projects, filters), [projects, filters]);
+  const canReorder = !hasFilters(filters);
 
-  async function change(
-    id: string,
-    patch: Partial<Pick<ProjectSummary, 'status' | 'featured'>>,
-    save: () => Promise<void>,
-  ) {
-    setBusyId(id);
+  /** Run a change, then refresh so the screen always matches the database. */
+  async function run(action: () => Promise<void>) {
+    setBusy(true);
     setActionError(null);
     try {
-      await save();
-      setProjects((list) => list.map((p) => (p.id === id ? { ...p, ...patch } : p)));
+      await action();
     } catch (e) {
       setActionError(e instanceof Error ? e.message : 'Could not save the change.');
     }
-    setBusyId(null);
+    await load();
+    setBusy(false);
+  }
+
+  function onDragEnd(event: DragEndEvent) {
+    const { active, over } = event;
+    if (!over || active.id === over.id || !canReorder) return;
+    const next = reorder(projects, String(active.id), String(over.id));
+    setProjects(next);
+    void run(() => saveProjectOrder(next.map((p) => p.id)));
+  }
+
+  function onDelete(p: ProjectSummary) {
+    const message =
+      `Delete “${p.title}”? Its ${p.imageCount} ${p.imageCount === 1 ? 'image' : 'images'}` +
+      ' and video files are deleted too. This cannot be undone.';
+    if (window.confirm(message)) void run(() => deleteProject(p.id));
   }
 
   if (status === 'loading') return <Loading label="Loading projects…" />;
@@ -78,7 +187,7 @@ export function ProjectsPage() {
       </div>
       <p className="muted">
         {projects.length} total · {projects.filter((p) => p.status === 'published').length}{' '}
-        published
+        published · Drag the handle to change the order on your site.
       </p>
 
       <div className="filters">
@@ -131,44 +240,27 @@ export function ProjectsPage() {
       ) : visible.length === 0 ? (
         <EmptyState title="No projects match">Try clearing the filters.</EmptyState>
       ) : (
-        <ul className="list">
-          {visible.map((p) => {
-            const thumb = safeThumb(p.thumbnail);
-            return (
-              <li key={p.id} className="row">
-                {thumb ? (
-                  <img className="thumb" src={thumb} alt="" loading="lazy" />
-                ) : (
-                  <span className="thumb thumb-empty" aria-hidden="true" />
-                )}
-                <span className="row-name">
-                  <a href={projectHref(p.id)}>{p.title}</a>
-                  <span className="muted row-sub">
-                    {(p.group_id && groupName.get(p.group_id)) || 'No category'}
-                    {p.year ? ` · ${p.year}` : ''} · {p.imageCount}{' '}
-                    {p.imageCount === 1 ? 'image' : 'images'}
-                  </span>
-                </span>
-                <PublishControls
-                  status={p.status}
-                  featured={p.featured}
-                  busy={busyId === p.id}
+        <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={onDragEnd}>
+          <SortableContext items={visible.map((p) => p.id)} strategy={verticalListSortingStrategy}>
+            <ul className="list list-wide">
+              {visible.map((p) => (
+                <ProjectRow
+                  key={p.id}
+                  project={p}
+                  categoryName={(p.group_id && groupName.get(p.group_id)) || 'No category'}
+                  busy={busy}
+                  canReorder={canReorder}
                   onTogglePublished={() => {
                     const publish = p.status !== 'published';
-                    void change(p.id, { status: publish ? 'published' : 'draft' }, () =>
-                      setPublished(p.id, publish),
-                    );
+                    void run(() => setPublished(p.id, publish));
                   }}
-                  onToggleFeatured={() =>
-                    void change(p.id, { featured: !p.featured }, () =>
-                      setFeatured(p.id, !p.featured),
-                    )
-                  }
+                  onToggleFeatured={() => void run(() => setFeatured(p.id, !p.featured))}
+                  onDelete={() => onDelete(p)}
                 />
-              </li>
-            );
-          })}
-        </ul>
+              ))}
+            </ul>
+          </SortableContext>
+        </DndContext>
       )}
     </section>
   );

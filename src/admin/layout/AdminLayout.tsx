@@ -1,6 +1,5 @@
 import { useAuth } from '../auth/AuthProvider';
 import { ADMIN_PAGES, adminHref, useAdminPage, useProjectRoute } from '../routing';
-import { CategoriesPage } from '../pages/CategoriesPage';
 import { ProjectEditorPage } from '../pages/ProjectEditorPage';
 import { ProjectsPage } from '../pages/ProjectsPage';
 import { SettingsPage } from '../pages/SettingsPage';
@@ -40,7 +39,6 @@ export function AdminLayout() {
         {page === 'projects' && editor && (
           <ProjectEditorPage key={editor.kind === 'edit' ? editor.id : 'new'} route={editor} />
         )}
-        {page === 'categories' && <CategoriesPage />}
         {page === 'website' && <WebsitePage />}
         {page === 'settings' && <SettingsPage />}
       </main>

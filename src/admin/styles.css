@@ -284,18 +284,6 @@ button.danger {
   overflow-wrap: anywhere;
 }
 
-.row-count {
-  font-size: 14px;
-  white-space: nowrap;
-}
-
-.row-edit {
-  flex: 1;
-  display: flex;
-  gap: 8px;
-  align-items: center;
-}
-
 .handle {
   padding: 6px 10px;
   cursor: grab;
@@ -317,7 +305,6 @@ button.danger:hover:not(:disabled) {
     flex-basis: calc(100% - 60px);
   }
 }
-
 
 .filters {
   display: flex;
@@ -411,10 +398,6 @@ a.button.primary {
   text-decoration: underline;
 }
 
-.editor {
-  max-width: 640px;
-}
-
 .field-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -460,37 +443,9 @@ a.button.primary {
   background: var(--panel);
 }
 
-.thumb-lg {
-  width: 88px;
-  height: 88px;
-}
-
-.image-row {
-  align-items: flex-start;
-}
-
-.image-fields {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 8px;
-  min-width: 0;
-}
-
-.image-fields input {
-  width: 100%;
-}
-
 ul.error {
   margin: 12px 0 0;
   padding-left: 20px;
-}
-
-@media (max-width: 560px) {
-  .image-row {
-    flex-wrap: wrap;
-  }
 }
 
 .video-preview {

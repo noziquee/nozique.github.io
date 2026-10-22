@@ -4,12 +4,12 @@ import { adminHref, parseAdminHash, parseProjectRoute, projectHref } from './rou
 describe('parseAdminHash', () => {
   it('opens Projects by default', () => {
     expect(parseAdminHash('')).toBe('projects');
+    expect(parseAdminHash('#/categories')).toBe('projects'); // the old Categories page
     expect(parseAdminHash('#/')).toBe('projects');
     expect(parseAdminHash('#/nope')).toBe('projects');
   });
   it('recognises each admin page', () => {
     expect(parseAdminHash('#/projects')).toBe('projects');
-    expect(parseAdminHash('#/categories')).toBe('categories');
     expect(parseAdminHash('#/website')).toBe('website');
     expect(parseAdminHash('#/settings')).toBe('settings');
   });

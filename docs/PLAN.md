@@ -17,7 +17,7 @@ top are updated after each step is tested. Nothing gets ticked until you have te
 | 3 | Admin shell and login | 4 | ✅ |
 | 4 | Project manager (posts, categories, uploads) | 7 | ✅ |
 | 4R | Projects admin layout rework (grid, category chips, dialog editor) | 5 | ✅ |
-| 5 | Design engine: data model, renderer, element registry | 6 | ⬜ |
+| 5 | Design engine: data model, renderer, element registry | 6 | 🟦 0 of 6 done |
 | 6 | Visual editor core | 8 | ⬜ |
 | 7 | More elements, one at a time | 8 | ⬜ |
 | 8 | Editor power tools | 8 | ⬜ |
@@ -26,7 +26,7 @@ top are updated after each step is tested. Nothing gets ticked until you have te
 | 11 | Animation and interaction | 5 | ⬜ |
 | 12 | Hardening: security, accessibility, performance | 6 | ⬜ |
 
-**Current step:** Phase 5 planning (waiting for your go-ahead on the plan below)
+**Current step:** 5.1 (written, awaiting your test)
 
 ### Changelog
 - 2026-10-18: Plan drafted.
@@ -57,6 +57,7 @@ top are updated after each step is tested. Nothing gets ticked until you have te
 - 2026-10-22: Phase 4R.3 tested by user and ticked. Phase 4R.4 written: images in the dialog are a grid of square thumbnails (first one badged Thumbnail, × to remove, drag to reorder, + Add files and drop zone); click a thumbnail to edit its alt text and caption underneath. Awaiting test.
 - 2026-10-22: Phase 4R.4 tested by user and ticked. Phase 4R.5 written: removed the separate Categories page and sidebar entry (categories are managed with the chips on Projects; an old #/categories link opens Projects), removed unused list/editor CSS. Awaiting test. After 4R.5 passes, Phase 5 starts.
 - 2026-10-22: Phase 4R.5 tested by user and ticked; Phase 4R complete.
+- 2026-10-22: Phase 5 started. 5.1 written: design format in src/shared/design (version 1: desktop layout + optional phone layout; text and shape elements; strict validation of colours, ids, numbers and limits; version upgrade framework; 25+ unit tests). New dependency: zod (user must run npm install and commit package-lock.json). Awaiting test.
 - Live site: https://noziquee.github.io/nozique.github.io/ (project-site address, not nozique.github.io).
 
 ---

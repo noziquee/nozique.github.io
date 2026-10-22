@@ -16,7 +16,7 @@ top are updated after each step is tested. Nothing gets ticked until you have te
 | 2 | Public site in TypeScript | 6 | ✅ |
 | 3 | Admin shell and login | 4 | ✅ |
 | 4 | Project manager (posts, categories, uploads) | 7 | ✅ |
-| 4R | Projects admin layout rework (grid, category chips, dialog editor) | 5 | 🟦 2 of 5 done |
+| 4R | Projects admin layout rework (grid, category chips, dialog editor) | 5 | 🟦 3 of 5 done |
 | 5 | Design engine: data model, renderer, element registry | 6 | ⬜ |
 | 6 | Visual editor core | 8 | ⬜ |
 | 7 | More elements, one at a time | 8 | ⬜ |
@@ -26,7 +26,7 @@ top are updated after each step is tested. Nothing gets ticked until you have te
 | 11 | Animation and interaction | 5 | ⬜ |
 | 12 | Hardening: security, accessibility, performance | 6 | ⬜ |
 
-**Current step:** 4R.3 (written, awaiting your test)
+**Current step:** 4R.4 (written, awaiting your test)
 
 ### Changelog
 - 2026-10-18: Plan drafted.
@@ -54,6 +54,7 @@ top are updated after each step is tested. Nothing gets ticked until you have te
 - 2026-10-22: Phase 4.7 tested by user and ticked; Phase 4 complete. Phase 4R.1 written: category chips (filter, drag to reorder, rename inline, delete, add inline) replace the category dropdown on the Projects page. Awaiting test.
 - 2026-10-22: Phase 4R.1 tested by user and ticked. Phase 4R.2 written: square project cards with thumbnail, title, category, image count, Draft/Featured badges and a ⋮ menu (Edit, Publish/Unpublish, Feature, Delete); drag cards to reorder (also inside a filtered view: only the visible cards move); Add project card; Grid/List switch (remembered). Awaiting test.
 - 2026-10-22: Phase 4R.2 tested by user and ticked. Phase 4R.3 written: project editor is now a two-column dialog over the project grid (images and video left; details, visibility and Save/Cancel/Delete right). Esc and × close it (asks if unsaved), focus stays inside, the grid behind refreshes after changes, one column on phones. Awaiting test.
+- 2026-10-22: Phase 4R.3 tested by user and ticked. Phase 4R.4 written: images in the dialog are a grid of square thumbnails (first one badged Thumbnail, × to remove, drag to reorder, + Add files and drop zone); click a thumbnail to edit its alt text and caption underneath. Awaiting test.
 - Live site: https://noziquee.github.io/nozique.github.io/ (project-site address, not nozique.github.io).
 
 ---
@@ -224,7 +225,7 @@ types and lint pass, build succeeds, tested by you, tracker updated.
 **Steps** (each tested by you before the next, same protocol):
 - [x] **4R.1 (M)** Category chips on the Projects page. "All" + a pill per category with project counts replaces the category dropdown. Pills drag to reorder, ⋮ menu has Rename (inline, not a pop-up) and Delete (same confirmation as now), dashed "+ Add category" pill opens an inline field. Search and the status filter stay. Uses the existing category functions.
 - [x] **4R.2 (M)** Card grid instead of rows. Square cards with the thumbnail, title, "Category · N images", and Draft/Featured badges on the image corner. ⋮ menu: Edit, Publish/Unpublish, Feature/Unfeature, Delete. Drag cards to reorder, and reordering now also works while a category chip is selected (only that category's cards move, as in the template). Dashed "+ Add project" card at the end. A small Grid/List switch keeps the current list view available.
-- [ ] **4R.3 (L)** Editor as a two-column dialog over the grid. Left column: images. Right column: category, title, description, year, tools, role, card shape, Visibility (Published/Featured), then Save / Cancel / Delete. Video moves into a section under the images. Esc and × close it, unsaved changes still ask first, focus stays inside the dialog, the address (`#/projects/<id>`) and browser Back still work, one column on phones.
+- [x] **4R.3 (L)** Editor as a two-column dialog over the grid. Left column: images. Right column: category, title, description, year, tools, role, card shape, Visibility (Published/Featured), then Save / Cancel / Delete. Video moves into a section under the images. Esc and × close it, unsaved changes still ask first, focus stays inside the dialog, the address (`#/projects/<id>`) and browser Back still work, one column on phones.
 - [ ] **4R.4 (M)** Image thumbnails inside the dialog. A grid of square thumbnails (first one badged "Thumbnail", × to remove, drag to reorder, "+ Add files" and drop zone). Clicking a thumbnail shows its alt text and caption fields underneath, because the tiles are too small to hold inputs.
 - [ ] **4R.5 (S)** Polish and cleanup. Empty and loading states, keyboard use, phone widths, remove the old row/list-only CSS and the separate Categories page once the chips are confirmed good (decision below), update tests and this plan.
 

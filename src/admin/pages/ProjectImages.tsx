@@ -12,8 +12,8 @@ import type { DragEndEvent } from '@dnd-kit/core';
 import {
   SortableContext,
   sortableKeyboardCoordinates,
+  rectSortingStrategy,
   useSortable,
-  verticalListSortingStrategy,
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { addImage, listImages, removeImage, saveImageOrder, updateImageText } from '../data/images';
@@ -29,26 +29,69 @@ function safeSrc(url: string): string | null {
   return url.startsWith('https://') ? url : null;
 }
 
-interface RowProps {
+interface ThumbProps {
   image: ProjectImage;
-  isCover: boolean;
+  position: number;
+  selected: boolean;
   disabled: boolean;
-  onSaveText: (id: string, alt: string, caption: string) => void;
-  onRemove: (image: ProjectImage) => void;
+  onSelect: () => void;
+  onRemove: () => void;
 }
 
-function ImageRow({ image, isCover, disabled, onSaveText, onRemove }: RowProps) {
+/** One square thumbnail. The first one is the project's thumbnail on the site. */
+function ImageThumb({ image, position, selected, disabled, onSelect, onRemove }: ThumbProps) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: image.id,
+    disabled,
   });
-  const [alt, setAlt] = useState(image.alt ?? '');
-  const [caption, setCaption] = useState(image.caption ?? '');
   const src = safeSrc(image.url);
   const style = {
     transform: CSS.Transform.toString(transform),
     transition,
-    opacity: isDragging ? 0.6 : 1,
+    opacity: isDragging ? 0.5 : 1,
   };
+  return (
+    <li
+      ref={setNodeRef}
+      style={style}
+      className={`thumb-tile${selected ? ' selected' : ''}`}
+      {...attributes}
+      {...listeners}
+      role="listitem"
+    >
+      <button
+        type="button"
+        className="thumb-tile-btn"
+        aria-label={`Image ${position + 1}${position === 0 ? ' (thumbnail)' : ''}: edit text`}
+        aria-pressed={selected}
+        onClick={onSelect}
+      >
+        {src ? <img src={src} alt="" loading="lazy" draggable={false} /> : null}
+      </button>
+      {position === 0 && <span className="thumb-badge">Thumbnail</span>}
+      <button
+        type="button"
+        className="thumb-remove"
+        aria-label={`Remove image ${position + 1}`}
+        title="Remove"
+        disabled={disabled}
+        onClick={onRemove}
+      >
+        ×
+      </button>
+    </li>
+  );
+}
+
+interface DetailsProps {
+  image: ProjectImage;
+  onSaveText: (id: string, alt: string, caption: string) => void;
+}
+
+/** Alt text and caption for the selected image. Saved when you click out of a field. */
+function ImageDetails({ image, onSaveText }: DetailsProps) {
+  const [alt, setAlt] = useState(image.alt ?? '');
+  const [caption, setCaption] = useState(image.caption ?? '');
 
   function saveIfChanged() {
     if (alt !== (image.alt ?? '') || caption !== (image.caption ?? '')) {
@@ -57,45 +100,24 @@ function ImageRow({ image, isCover, disabled, onSaveText, onRemove }: RowProps) 
   }
 
   return (
-    <li ref={setNodeRef} style={style} className="row image-row">
-      <button
-        type="button"
-        className="handle"
-        aria-label="Drag to reorder image"
-        disabled={disabled}
-        {...attributes}
-        {...listeners}
-      >
-        ⠿
-      </button>
-      {src ? (
-        <img className="thumb thumb-lg" src={src} alt="" loading="lazy" />
-      ) : (
-        <span className="thumb thumb-lg thumb-empty" aria-hidden="true" />
-      )}
-      <div className="image-fields">
-        {isCover && <span className="badge badge-featured">Cover (thumbnail)</span>}
-        <input
-          aria-label="Alt text (describe the image)"
-          placeholder="Alt text: describe the image"
-          maxLength={200}
-          value={alt}
-          onChange={(e) => setAlt(e.target.value)}
-          onBlur={saveIfChanged}
-        />
-        <input
-          aria-label="Caption"
-          placeholder="Caption (optional)"
-          maxLength={300}
-          value={caption}
-          onChange={(e) => setCaption(e.target.value)}
-          onBlur={saveIfChanged}
-        />
-      </div>
-      <button type="button" className="danger" disabled={disabled} onClick={() => onRemove(image)}>
-        Remove
-      </button>
-    </li>
+    <div className="image-details">
+      <label htmlFor="img-alt">Alt text (describe the image)</label>
+      <input
+        id="img-alt"
+        maxLength={200}
+        value={alt}
+        onChange={(e) => setAlt(e.target.value)}
+        onBlur={saveIfChanged}
+      />
+      <label htmlFor="img-caption">Caption (optional)</label>
+      <input
+        id="img-caption"
+        maxLength={300}
+        value={caption}
+        onChange={(e) => setCaption(e.target.value)}
+        onBlur={saveIfChanged}
+      />
+    </div>
   );
 }
 
@@ -107,6 +129,7 @@ export function ProjectImages({ postId }: { postId: string }) {
   const [progress, setProgress] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [dragOver, setDragOver] = useState(false);
+  const [selectedId, setSelectedId] = useState<string | null>(null);
   const input = useRef<HTMLInputElement>(null);
 
   const sensors = useSensors(
@@ -127,6 +150,8 @@ export function ProjectImages({ postId }: { postId: string }) {
   useEffect(() => {
     void load();
   }, [load]);
+
+  const selected = images.find((image) => image.id === selectedId) ?? null;
 
   async function upload(files: File[]) {
     if (files.length === 0 || busy) return;
@@ -214,7 +239,7 @@ export function ProjectImages({ postId }: { postId: string }) {
     <section className="images">
       <h2>Images</h2>
       <p className="muted">
-        The first image is the project’s thumbnail. Drag the handle to reorder. Large images are
+        The first image is the project’s thumbnail. Drag images to reorder them. Large images are
         resized and compressed automatically.
       </p>
 
@@ -241,7 +266,7 @@ export function ProjectImages({ postId }: { postId: string }) {
           disabled={busy}
           onClick={() => input.current?.click()}
         >
-          Choose images
+          + Add files
         </button>
         <span className="muted">or drop them here (JPG, PNG, WebP)</span>
       </div>
@@ -269,25 +294,34 @@ export function ProjectImages({ postId }: { postId: string }) {
         <p className="muted">No images yet. Without one, the site shows a placeholder.</p>
       )}
       {state === 'ready' && images.length > 0 && (
-        <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={onDragEnd}>
-          <SortableContext
-            items={images.map((image) => image.id)}
-            strategy={verticalListSortingStrategy}
-          >
-            <ul className="list">
-              {images.map((image, index) => (
-                <ImageRow
-                  key={image.id}
-                  image={image}
-                  isCover={index === 0}
-                  disabled={busy}
-                  onSaveText={(id, alt, caption) => void onSaveText(id, alt, caption)}
-                  onRemove={(target) => void onRemove(target)}
-                />
-              ))}
-            </ul>
-          </SortableContext>
-        </DndContext>
+        <>
+          <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={onDragEnd}>
+            <SortableContext items={images.map((image) => image.id)} strategy={rectSortingStrategy}>
+              <ul className="thumb-grid">
+                {images.map((image, index) => (
+                  <ImageThumb
+                    key={image.id}
+                    image={image}
+                    position={index}
+                    selected={image.id === selectedId}
+                    disabled={busy}
+                    onSelect={() => setSelectedId(image.id === selectedId ? null : image.id)}
+                    onRemove={() => void onRemove(image)}
+                  />
+                ))}
+              </ul>
+            </SortableContext>
+          </DndContext>
+          {selected ? (
+            <ImageDetails
+              key={selected.id}
+              image={selected}
+              onSaveText={(id, alt, caption) => void onSaveText(id, alt, caption)}
+            />
+          ) : (
+            <p className="muted">Click an image to edit its alt text and caption.</p>
+          )}
+        </>
       )}
     </section>
   );

@@ -5,6 +5,7 @@ import { listProjects } from '../data/projects';
 import type { ProjectSummary } from '../data/projects';
 import { NO_FILTERS, filterProjects, hasFilters } from '../data/projectFilter';
 import type { ProjectFilters, StatusFilter } from '../data/projectFilter';
+import { NEW_PROJECT_HREF, projectHref } from '../routing';
 import { EmptyState, ErrorMessage, Loading } from '../ui/states';
 
 /** Only show thumbnails that are real https addresses. */
@@ -50,7 +51,12 @@ export function ProjectsPage() {
 
   return (
     <section>
-      <h1>Projects</h1>
+      <div className="page-head">
+        <h1>Projects</h1>
+        <a className="button primary" href={NEW_PROJECT_HREF}>
+          New project
+        </a>
+      </div>
       <p className="muted">
         {projects.length} total · {projects.filter((p) => p.status === 'published').length}{' '}
         published
@@ -94,7 +100,9 @@ export function ProjectsPage() {
       </div>
 
       {projects.length === 0 ? (
-        <EmptyState title="No projects yet">Creating projects comes in step 4.3.</EmptyState>
+        <EmptyState title="No projects yet">
+          Click “New project” to add your first one.
+        </EmptyState>
       ) : visible.length === 0 ? (
         <EmptyState title="No projects match">Try clearing the filters.</EmptyState>
       ) : (
@@ -109,7 +117,7 @@ export function ProjectsPage() {
                   <span className="thumb thumb-empty" aria-hidden="true" />
                 )}
                 <span className="row-name">
-                  {p.title}
+                  <a href={projectHref(p.id)}>{p.title}</a>
                   <span className="muted row-sub">
                     {(p.group_id && groupName.get(p.group_id)) || 'No category'}
                     {p.year ? ` · ${p.year}` : ''} · {p.imageCount}{' '}

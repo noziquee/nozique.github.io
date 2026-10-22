@@ -15,7 +15,7 @@ top are updated after each step is tested. Nothing gets ticked until you have te
 | 1 | Database and connection | 4 | ✅ |
 | 2 | Public site in TypeScript | 6 | ✅ |
 | 3 | Admin shell and login | 4 | ✅ |
-| 4 | Project manager (posts, categories, uploads) | 7 | 🟦 1 of 7 done |
+| 4 | Project manager (posts, categories, uploads) | 7 | 🟦 2 of 7 done |
 | 5 | Design engine: data model, renderer, element registry | 6 | ⬜ |
 | 6 | Visual editor core | 8 | ⬜ |
 | 7 | More elements, one at a time | 8 | ⬜ |
@@ -25,7 +25,7 @@ top are updated after each step is tested. Nothing gets ticked until you have te
 | 11 | Animation and interaction | 5 | ⬜ |
 | 12 | Hardening: security, accessibility, performance | 6 | ⬜ |
 
-**Current step:** 4.2 (written, awaiting your test)
+**Current step:** 4.3 (written, awaiting your test)
 
 ### Changelog
 - 2026-10-18: Plan drafted.
@@ -43,6 +43,7 @@ top are updated after each step is tested. Nothing gets ticked until you have te
 - 2026-10-21: Phases 2.6, 3.3 and 3.4 tested by user; Phase 3 complete.
 - 2026-10-22: Phase 4.1 written: Categories page (add, rename, delete with project count warning, drag to reorder with dnd-kit). New dependency: @dnd-kit (user must run npm install and commit package-lock.json). Awaiting test.
 - 2026-10-22: Phase 4.1 tested by user and ticked. Phase 4.2 written: projects list with search, category and status filters, thumbnails, Published/Draft/Featured badges (read-only; editing comes in 4.3). Awaiting test.
+- 2026-10-22: Phase 4.2 tested by user and ticked. Phase 4.3 written: project editor (title, description, category, year, tools, role, card shape), New project button, click a project to edit; new projects start as drafts. Awaiting test.
 - Live site: https://noziquee.github.io/nozique.github.io/ (project-site address, not nozique.github.io).
 
 ---
@@ -188,7 +189,7 @@ types and lint pass, build succeeds, tested by you, tracker updated.
 
 ### Phase 4 — Project manager
 - [x] **4.1 (M)** Categories (groups): create, rename, delete, drag to reorder.
-- [ ] **4.2 (M)** Projects list with category filter, search, status badges.
+- [x] **4.2 (M)** Projects list with category filter, search, status badges.
 - [ ] **4.3 (L)** Project editor: title, description, category, year, tools, role, cover aspect.
 - [ ] **4.4 (L)** Image upload (multiple), drag to reorder, first image is the thumbnail, alt text and captions.
 - [ ] **4.5 (M)** Video: upload or link for animation projects.

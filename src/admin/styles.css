@@ -77,7 +77,8 @@ button.primary {
 }
 
 input,
-select {
+select,
+textarea {
   width: 100%;
   font: inherit;
   color: var(--text);
@@ -375,4 +376,61 @@ button.danger:hover:not(:disabled) {
 
 .filters select {
   width: auto;
+}
+
+textarea {
+  resize: vertical;
+}
+
+.page-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+a.button {
+  display: inline-block;
+  padding: 10px 14px;
+  border-radius: 8px;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+a.button.primary {
+  background: var(--red);
+  color: #fff;
+}
+
+.row-name a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.row-name a:hover {
+  text-decoration: underline;
+}
+
+.editor {
+  max-width: 640px;
+}
+
+.field-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0 16px;
+}
+
+.form-actions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 24px;
+}
+
+@media (max-width: 560px) {
+  .field-grid {
+    grid-template-columns: 1fr;
+  }
 }

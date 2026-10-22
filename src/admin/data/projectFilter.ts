@@ -28,3 +28,24 @@ export function filterProjects<T extends Filterable>(items: readonly T[], f: Pro
 export function hasFilters(f: ProjectFilters): boolean {
   return f.category !== 'all' || f.status !== 'all' || f.search.trim() !== '';
 }
+
+/**
+ * Move the project `activeId` to where `overId` is, but only among the projects currently
+ * shown. Projects that are filtered out keep their exact places in the full list.
+ */
+export function reorderWithinVisible<T extends { id: string }>(
+  all: readonly T[],
+  visible: readonly T[],
+  activeId: string,
+  overId: string,
+): T[] {
+  const from = visible.findIndex((item) => item.id === activeId);
+  const to = visible.findIndex((item) => item.id === overId);
+  if (from < 0 || to < 0 || from === to) return [...all];
+  const moved = [...visible];
+  const [item] = moved.splice(from, 1);
+  moved.splice(to, 0, item as T);
+  const shown = new Set(visible.map((entry) => entry.id));
+  let cursor = 0;
+  return all.map((entry) => (shown.has(entry.id) ? (moved[cursor++] as T) : entry));
+}

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { NO_FILTERS, filterProjects, hasFilters } from './projectFilter';
+import { NO_FILTERS, filterProjects, hasFilters, reorderWithinVisible } from './projectFilter';
 
 const items = [
   { title: 'Orc Warrior', status: 'published', group_id: 'a' },
@@ -28,5 +28,22 @@ describe('filterProjects', () => {
   it('knows when filters are active', () => {
     expect(hasFilters(NO_FILTERS)).toBe(false);
     expect(hasFilters({ ...NO_FILTERS, search: 'x' })).toBe(true);
+  });
+});
+
+describe('reorderWithinVisible', () => {
+  const all = ['a', 'b', 'c', 'd', 'e'].map((id) => ({ id }));
+  const ids = (list: { id: string }[]) => list.map((item) => item.id);
+
+  it('reorders everything when all are visible', () => {
+    expect(ids(reorderWithinVisible(all, all, 'a', 'c'))).toEqual(['b', 'c', 'a', 'd', 'e']);
+  });
+  it('only moves the visible ones and keeps the others in place', () => {
+    const visible = [all[0], all[2], all[4]] as { id: string }[]; // a, c, e
+    expect(ids(reorderWithinVisible(all, visible, 'e', 'a'))).toEqual(['e', 'b', 'a', 'd', 'c']);
+  });
+  it('changes nothing for unknown ids or the same place', () => {
+    expect(ids(reorderWithinVisible(all, all, 'x', 'a'))).toEqual(ids(all));
+    expect(ids(reorderWithinVisible(all, all, 'a', 'a'))).toEqual(ids(all));
   });
 });

@@ -657,3 +657,202 @@ button.badge-btn:hover:not(:disabled) {
 .chip-menu button.danger {
   color: #ff7a73;
 }
+
+.view-switch {
+  display: inline-flex;
+  margin-left: auto;
+}
+
+.view-switch button {
+  border-radius: 0;
+}
+
+.view-switch button:first-child {
+  border-radius: 8px 0 0 8px;
+}
+
+.view-switch button:last-child {
+  border-left: none;
+  border-radius: 0 8px 8px 0;
+}
+
+.view-switch button[aria-pressed='true'] {
+  background: var(--red);
+  border-color: var(--red);
+  color: #fff;
+}
+
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+  gap: 16px;
+  margin: 20px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.card {
+  position: relative;
+  overflow: visible;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--panel);
+  cursor: grab;
+  touch-action: none;
+}
+
+.card-link {
+  display: block;
+  overflow: hidden;
+  border-radius: 14px;
+  color: inherit;
+  text-decoration: none;
+}
+
+.card-media {
+  display: block;
+  position: relative;
+  width: 100%;
+  padding-top: 100%;
+  background: var(--bg);
+}
+
+.card-media img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.card-noimage {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.card-info {
+  display: block;
+  padding: 10px 12px 12px;
+}
+
+.card-title {
+  display: block;
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+.card-sub {
+  display: block;
+  margin-top: 2px;
+  font-size: 13px;
+}
+
+.card:hover {
+  border-color: var(--muted);
+}
+
+.card-badges {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  pointer-events: none;
+}
+
+.card-badge {
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.7);
+  color: #fff;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.card-badge-featured {
+  background: var(--red);
+}
+
+.card-menu-btn {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.7);
+  line-height: 1;
+}
+
+.card-menu {
+  position: absolute;
+  top: 40px;
+  right: 8px;
+  z-index: 20;
+  min-width: 190px;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--panel);
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.5);
+}
+
+.card-menu a,
+.card-menu button {
+  display: block;
+  width: 100%;
+  padding: 9px 12px;
+  border: none;
+  border-radius: 0;
+  background: transparent;
+  color: var(--text);
+  text-align: left;
+  text-decoration: none;
+  font: inherit;
+  cursor: pointer;
+}
+
+.card-menu a:hover,
+.card-menu button:hover {
+  background: var(--bg);
+}
+
+.card-menu button.danger {
+  color: #ff7a73;
+}
+
+.card-add {
+  border-style: dashed;
+  background: transparent;
+  cursor: pointer;
+  aspect-ratio: 1 / 1;
+}
+
+.card-add a {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  height: 100%;
+  color: var(--muted);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.card-add:hover a {
+  color: var(--text);
+}
+
+.card-add-plus {
+  font-size: 28px;
+  line-height: 1;
+  font-weight: 400;
+}

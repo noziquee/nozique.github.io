@@ -10,6 +10,7 @@ import {
 import type { DragEndEvent } from '@dnd-kit/core';
 import {
   SortableContext,
+  rectSortingStrategy,
   sortableKeyboardCoordinates,
   useSortable,
   verticalListSortingStrategy,
@@ -25,24 +26,41 @@ import {
   setPublished,
 } from '../data/projects';
 import type { ProjectSummary } from '../data/projects';
-import { NO_FILTERS, filterProjects, hasFilters } from '../data/projectFilter';
+import {
+  NO_FILTERS,
+  filterProjects,
+  hasFilters,
+  reorderWithinVisible,
+} from '../data/projectFilter';
 import type { ProjectFilters, StatusFilter } from '../data/projectFilter';
-import { reorder } from '../data/imageRules';
 import { NEW_PROJECT_HREF, projectHref } from '../routing';
 import { CategoryChips } from './CategoryChips';
+import { ProjectCard, safeThumb } from './ProjectCard';
 import { PublishControls } from '../ui/PublishControls';
 import { EmptyState, ErrorMessage, Loading } from '../ui/states';
 
-/** Only show thumbnails that are real https addresses. */
-function safeThumb(url: string | null): string | null {
-  return url && url.startsWith('https://') ? url : null;
+const VIEW_KEY = 'nozique.admin.projectsView';
+
+function readView(): 'grid' | 'list' {
+  try {
+    return window.localStorage.getItem(VIEW_KEY) === 'list' ? 'list' : 'grid';
+  } catch {
+    return 'grid';
+  }
+}
+
+function saveView(view: 'grid' | 'list') {
+  try {
+    window.localStorage.setItem(VIEW_KEY, view);
+  } catch {
+    // Remembering the view is a convenience only.
+  }
 }
 
 interface RowProps {
   project: ProjectSummary;
   categoryName: string;
   busy: boolean;
-  canReorder: boolean;
   onTogglePublished: () => void;
   onToggleFeatured: () => void;
   onDelete: () => void;
@@ -52,7 +70,6 @@ function ProjectRow({
   project: p,
   categoryName,
   busy,
-  canReorder,
   onTogglePublished,
   onToggleFeatured,
   onDelete,
@@ -74,8 +91,8 @@ function ProjectRow({
         type="button"
         className="handle"
         aria-label={`Reorder ${p.title}`}
-        title={canReorder ? 'Drag to reorder' : 'Clear the filters to reorder'}
-        disabled={busy || !canReorder}
+        title="Drag to reorder"
+        disabled={busy}
         {...attributes}
         {...listeners}
       >
@@ -115,6 +132,8 @@ export function ProjectsPage() {
   const [filters, setFilters] = useState<ProjectFilters>(NO_FILTERS);
   const [busy, setBusy] = useState(false);
   const [actionError, setActionError] = useState<string | null>(null);
+  const [view, setView] = useState<'grid' | 'list'>(readView);
+  const [menuId, setMenuId] = useState<string | null>(null);
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 6 } }),
@@ -137,9 +156,25 @@ export function ProjectsPage() {
     void load();
   }, [load]);
 
+  useEffect(() => {
+    if (!menuId) return;
+    const close = (event: Event) => {
+      const target = event.target as HTMLElement | null;
+      if (!target?.closest('.card-menu, .card-menu-btn')) setMenuId(null);
+    };
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') setMenuId(null);
+    };
+    document.addEventListener('click', close);
+    document.addEventListener('keydown', onKey);
+    return () => {
+      document.removeEventListener('click', close);
+      document.removeEventListener('keydown', onKey);
+    };
+  }, [menuId]);
+
   const groupName = useMemo(() => new Map(groups.map((g) => [g.id, g.name])), [groups]);
   const visible = useMemo(() => filterProjects(projects, filters), [projects, filters]);
-  const canReorder = !hasFilters(filters);
 
   /** Run a change, then refresh so the screen always matches the database. */
   async function run(action: () => Promise<void>) {
@@ -156,13 +191,14 @@ export function ProjectsPage() {
 
   function onDragEnd(event: DragEndEvent) {
     const { active, over } = event;
-    if (!over || active.id === over.id || !canReorder) return;
-    const next = reorder(projects, String(active.id), String(over.id));
+    if (!over || active.id === over.id) return;
+    const next = reorderWithinVisible(projects, visible, String(active.id), String(over.id));
     setProjects(next);
     void run(() => saveProjectOrder(next.map((p) => p.id)));
   }
 
   function onDelete(p: ProjectSummary) {
+    setMenuId(null);
     const message =
       `Delete “${p.title}”? Its ${p.imageCount} ${p.imageCount === 1 ? 'image' : 'images'}` +
       ' and video files are deleted too. This cannot be undone.';
@@ -188,7 +224,7 @@ export function ProjectsPage() {
       </div>
       <p className="muted">
         {projects.length} total · {projects.filter((p) => p.status === 'published').length}{' '}
-        published · Drag the handle to change the order on your site.
+        published · Drag a project to change its order on your site.
       </p>
 
       <CategoryChips
@@ -222,6 +258,21 @@ export function ProjectsPage() {
             Clear
           </button>
         )}
+        <span className="view-switch" role="group" aria-label="View">
+          {(['grid', 'list'] as const).map((mode) => (
+            <button
+              key={mode}
+              type="button"
+              aria-pressed={view === mode}
+              onClick={() => {
+                setView(mode);
+                saveView(mode);
+              }}
+            >
+              {mode === 'grid' ? 'Grid' : 'List'}
+            </button>
+          ))}
+        </span>
       </div>
 
       {actionError && (
@@ -238,23 +289,53 @@ export function ProjectsPage() {
         <EmptyState title="No projects match">Try clearing the filters.</EmptyState>
       ) : (
         <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={onDragEnd}>
-          <SortableContext items={visible.map((p) => p.id)} strategy={verticalListSortingStrategy}>
-            <ul className="list list-wide">
-              {visible.map((p) => (
-                <ProjectRow
-                  key={p.id}
-                  project={p}
-                  categoryName={(p.group_id && groupName.get(p.group_id)) || 'No category'}
-                  busy={busy}
-                  canReorder={canReorder}
-                  onTogglePublished={() => {
-                    const publish = p.status !== 'published';
-                    void run(() => setPublished(p.id, publish));
-                  }}
-                  onToggleFeatured={() => void run(() => setFeatured(p.id, !p.featured))}
-                  onDelete={() => onDelete(p)}
-                />
-              ))}
+          <SortableContext
+            items={visible.map((p) => p.id)}
+            strategy={view === 'grid' ? rectSortingStrategy : verticalListSortingStrategy}
+          >
+            <ul className={view === 'grid' ? 'card-grid' : 'list list-wide'}>
+              {visible.map((p) => {
+                const categoryName = (p.group_id && groupName.get(p.group_id)) || 'No category';
+                const togglePublished = () => {
+                  setMenuId(null);
+                  void run(() => setPublished(p.id, p.status !== 'published'));
+                };
+                const toggleFeatured = () => {
+                  setMenuId(null);
+                  void run(() => setFeatured(p.id, !p.featured));
+                };
+                return view === 'grid' ? (
+                  <ProjectCard
+                    key={p.id}
+                    project={p}
+                    categoryName={categoryName}
+                    busy={busy}
+                    menuOpen={menuId === p.id}
+                    onToggleMenu={() => setMenuId(menuId === p.id ? null : p.id)}
+                    onTogglePublished={togglePublished}
+                    onToggleFeatured={toggleFeatured}
+                    onDelete={() => onDelete(p)}
+                  />
+                ) : (
+                  <ProjectRow
+                    key={p.id}
+                    project={p}
+                    categoryName={categoryName}
+                    busy={busy}
+                    onTogglePublished={togglePublished}
+                    onToggleFeatured={toggleFeatured}
+                    onDelete={() => onDelete(p)}
+                  />
+                );
+              })}
+              {view === 'grid' && (
+                <li className="card card-add">
+                  <a href={NEW_PROJECT_HREF}>
+                    <span className="card-add-plus">+</span>
+                    <span>Add project</span>
+                  </a>
+                </li>
+              )}
             </ul>
           </SortableContext>
         </DndContext>

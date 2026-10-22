@@ -36,7 +36,7 @@ export function AdminLayout() {
         </div>
       </aside>
       <main className="content">
-        {page === 'projects' && !editor && <ProjectsPage />}
+        {page === 'projects' && <ProjectsPage />}
         {page === 'projects' && editor && (
           <ProjectEditorPage key={editor.kind === 'edit' ? editor.id : 'new'} route={editor} />
         )}

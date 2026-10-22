@@ -16,6 +16,7 @@ import {
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
+import { PROJECTS_CHANGED } from '../data/events';
 import { listGroups } from '../data/groups';
 import type { GroupWithCount } from '../data/groups';
 import {
@@ -154,6 +155,12 @@ export function ProjectsPage() {
 
   useEffect(() => {
     void load();
+  }, [load]);
+
+  useEffect(() => {
+    const refresh = () => void load();
+    window.addEventListener(PROJECTS_CHANGED, refresh);
+    return () => window.removeEventListener(PROJECTS_CHANGED, refresh);
   }, [load]);
 
   useEffect(() => {

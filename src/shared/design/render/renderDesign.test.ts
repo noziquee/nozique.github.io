@@ -163,7 +163,8 @@ describe('layouts', () => {
     const design = makeDesign({ mobile: phone });
     expect(pickLayout(design, 'mobile')).toMatchObject({ name: 'mobile' });
     const registry = createRegistry();
-    const root = asNode(renderDesign(design, { document: fakeDocument, registry, layout: 'mobile' }));
+    const settings = { document: fakeDocument, registry, layout: 'mobile' } as const;
+    const root = asNode(renderDesign(design, settings));
     expect(root.attributes['data-layout']).toBe('mobile');
     expect(root.styles['width']).toBe('390px');
   });

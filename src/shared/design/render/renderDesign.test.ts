@@ -4,25 +4,7 @@ import type { Design } from '../types';
 import { createRegistry } from './registry';
 import type { ElementDefinition } from './registry';
 import { pickLayout, renderDesign } from './renderDesign';
-
-/** A tiny stand-in for the browser's document, enough for the renderer. */
-class FakeNode {
-  children: FakeNode[] = [];
-  attributes: Record<string, string> = {};
-  styles: Record<string, string> = {};
-  textContent = '';
-  style = { setProperty: (name: string, value: string) => void (this.styles[name] = value) };
-  constructor(public tagName: string) {}
-  setAttribute(name: string, value: string) {
-    this.attributes[name] = value;
-  }
-  appendChild(child: FakeNode) {
-    this.children.push(child);
-    return child;
-  }
-}
-const fakeDocument = { createElement: (tag: string) => new FakeNode(tag) } as unknown as Document;
-const asNode = (value: unknown) => value as FakeNode;
+import { asNode, fakeDocument } from './testDom';
 
 /** A test-only element type: a div whose text is the element's text content. */
 const labelDefinition: ElementDefinition = {

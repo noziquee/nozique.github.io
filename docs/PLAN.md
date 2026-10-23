@@ -17,7 +17,7 @@ top are updated after each step is tested. Nothing gets ticked until you have te
 | 3 | Admin shell and login | 4 | ✅ |
 | 4 | Project manager (posts, categories, uploads) | 7 | ✅ |
 | 4R | Projects admin layout rework (grid, category chips, dialog editor) | 5 | ✅ |
-| 5 | Design engine: data model, renderer, element registry | 6 | 🟦 5 of 6 done |
+| 5 | Design engine: data model, renderer, element registry | 6 | ✅ |
 | 6 | Visual editor core | 8 | ⬜ |
 | 7 | More elements, one at a time | 8 | ⬜ |
 | 8 | Editor power tools | 8 | ⬜ |
@@ -26,7 +26,7 @@ top are updated after each step is tested. Nothing gets ticked until you have te
 | 11 | Animation and interaction | 5 | ⬜ |
 | 12 | Hardening: security, accessibility, performance | 6 | ⬜ |
 
-**Current step:** 5.6 (written, awaiting your test)
+**Current step:** Phase 6 planning (Phase 5 complete)
 
 ### Changelog
 - 2026-10-18: Plan drafted.
@@ -63,6 +63,7 @@ top are updated after each step is tested. Nothing gets ticked until you have te
 - 2026-10-23: Phase 5.3 tested by user and ticked. Phase 5.4 written (decision D2: separate desktop and phone layouts): a design with no hand-made phone layout gets one made automatically by stacking elements in reading order (shapes behind other elements stay behind them and grow to wrap them); mountDesign() picks the layout by host width (700 px breakpoint), shrinks wide layouts to fit and redraws on resize. The dev test page now shows a desktop preview and a 390 px phone preview. Verified in a real headless browser at 1200, 900 and 390 px. Known limit: text keeps its box height, so a heading that wraps onto more lines can run into the element below; fix by hand-making the phone layout (editor, Phase 6). Awaiting test.
 - 2026-10-23: Phase 5.4 tested by user and ticked. Phase 5.5 written: supabase/migrations/0002_section_drafts.sql. Drafts live in a separate admin-only table (site_section_drafts) because site_sections is readable by everyone; site_sections.content stays the published content and gains published_at; publish_section(key) copies the draft over the live content and removes the draft in one step. Smoke tests added to prove visitors cannot read, write or publish drafts. The Supabase connector cancelled the migration at confirmation, so the user must run the SQL in the Supabase SQL Editor. Awaiting that.
 - 2026-10-23: Phase 5.5 tested by user (ran the SQL in the SQL Editor, smoke tests pass) and ticked; database state verified. Phase 5.6 written: the public site reads site_sections (src/site/data/sections.ts) and, when the hero has a valid design in content.design, draws it with mountDesign in place of the built-in hero (invalid or missing design = built-in hero, enabled=false hides it). Example SQL in supabase/examples/hero_design.sql. Awaiting test.
+- 2026-10-23: Phase 5.6 tested by user (check passes, hero changes from the database, falls back when invalid or removed) and ticked. Phase 5 complete. Next: Phase 6 (visual editor core).
 - Live site: https://noziquee.github.io/nozique.github.io/ (project-site address, not nozique.github.io).
 
 ---
@@ -250,7 +251,7 @@ types and lint pass, build succeeds, tested by you, tracker updated.
 - [x] **5.3 (M)** Text and Shape elements (first two definitions). *Done when:* both render identically in a test page.
 - [x] **5.4 (M)** **Responsive strategy decision implemented** (see decision D2). *Done when:* a design renders correctly at desktop and phone width.
 - [x] **5.5 (M)** Migration `0002`: draft vs published content for sections (`draft_content`, publish timestamp). *Done when:* saving a draft does not change the live site.
-- [ ] **5.6 (M)** Public site renders sections from `site_sections` (hero first) with fallback to the built-in version. *Done when:* editing JSON in Supabase changes the hero.
+- [x] **5.6 (M)** Public site renders sections from `site_sections` (hero first) with fallback to the built-in version. *Done when:* editing JSON in Supabase changes the hero.
 
 ### Phase 6 — Visual editor core
 - [ ] **6.1 (M)** Website page in admin: section list (enable/disable, reorder, pinned header/footer).

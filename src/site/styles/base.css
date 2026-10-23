@@ -228,3 +228,4 @@ main>*{animation:pgIn .55s var(--ease) both}
 .hc .im img{object-fit:contain;background:var(--s1)}
 
 .design-section{position:relative;width:100%;overflow:hidden}
+a[hidden]{display:none!important}

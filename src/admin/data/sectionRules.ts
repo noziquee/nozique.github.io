@@ -1,8 +1,15 @@
 /**
- * Sections the public site already obeys (on/off and design). The others are listed in the admin
- * but their switches do not change the public site yet; the page says so.
+ * Sections the public site obeys: on/off for all of them, order for the home page ones.
+ * (About and Contact also switch their menu links.) A section outside this list would show a
+ * "not connected" note in the admin.
  */
-export const LIVE_SECTION_KEYS: readonly string[] = ['hero'];
+export const LIVE_SECTION_KEYS: readonly string[] = [
+  'hero',
+  'categories',
+  'gallery',
+  'about',
+  'contact',
+];
 
 export function isLiveSection(key: string): boolean {
   return LIVE_SECTION_KEYS.includes(key);

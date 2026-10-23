@@ -1,7 +1,7 @@
 import { parseHash, pageTitle } from '../router/route';
 import { loadSiteData } from '../data/source';
 import { loadSections } from '../data/sections';
-import { mountSectionDesigns, useSections } from './sections.js';
+import { applyNavVisibility, mountSectionDesigns, useSections } from './sections.js';
 import { getSupabase } from '../../shared/supabase/client';
 import { CAT, P, useSiteData } from './data.js';
 import { $, M, HD, WP, plural, soc, featured } from './helpers.js';
@@ -16,7 +16,7 @@ import { foot } from './pages/footer.js';
 function paint(){const rt=parseHash(location.hash,P.map(x=>x.id)),pg=rt.page=='home'?'':rt.page,id=rt.id;clearInterval(STATE.timer);STATE.slideFn=null;
 M.innerHTML=(pg=='work'?(id?proj(id):work()):pg=='about'?about():pg=='contact'?contact():home())+foot();
 document.querySelectorAll('[data-p]').forEach(a=>{const o=a.dataset.p==pg;a.classList.toggle('on',o);o?a.setAttribute('aria-current','page'):a.removeAttribute('aria-current')});closeMenu();
-const t=id&&P.find(x=>x.id==id);document.title=pageTitle(rt,t&&t.t);mountSectionDesigns();init(pg,id);fx();if(!STATE.first)M.focus({preventScroll:true})}
+const t=id&&P.find(x=>x.id==id);document.title=pageTitle(rt,t&&t.t);mountSectionDesigns();applyNavVisibility();init(pg,id);fx();if(!STATE.first)M.focus({preventScroll:true})}
 function route(){if(!STATE.ready)return;closeLB(1);if(STATE.first){paint();STATE.first=0;return}if(matchMedia('(prefers-reduced-motion:reduce)').matches){paint();scrollTo({top:0,behavior:'instant'});return}WP.classList.add('on');setTimeout(()=>{paint();scrollTo({top:0,behavior:'instant'});WP.classList.remove('on')},360)}
 addEventListener('hashchange',route);
 document.addEventListener('click',e=>{const f=e.target.closest('[data-f]');if(f){STATE.flt=f.dataset.f;if(location.hash=='#/work'){e.preventDefault();route()}}});

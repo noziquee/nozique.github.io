@@ -56,6 +56,7 @@ describe('changedOrders', () => {
 describe('isLiveSection', () => {
   it('knows which sections the public site obeys', () => {
     expect(isLiveSection('hero')).toBe(true);
-    expect(isLiveSection('gallery')).toBe(false);
+    expect(isLiveSection('gallery')).toBe(true);
+    expect(isLiveSection('somethingNew')).toBe(false);
   });
 });

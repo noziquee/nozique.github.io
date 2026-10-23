@@ -17,7 +17,7 @@ top are updated after each step is tested. Nothing gets ticked until you have te
 | 3 | Admin shell and login | 4 | ✅ |
 | 4 | Project manager (posts, categories, uploads) | 7 | ✅ |
 | 4R | Projects admin layout rework (grid, category chips, dialog editor) | 5 | ✅ |
-| 5 | Design engine: data model, renderer, element registry | 6 | 🟦 3 of 6 done |
+| 5 | Design engine: data model, renderer, element registry | 6 | 🟦 4 of 6 done |
 | 6 | Visual editor core | 8 | ⬜ |
 | 7 | More elements, one at a time | 8 | ⬜ |
 | 8 | Editor power tools | 8 | ⬜ |
@@ -26,7 +26,7 @@ top are updated after each step is tested. Nothing gets ticked until you have te
 | 11 | Animation and interaction | 5 | ⬜ |
 | 12 | Hardening: security, accessibility, performance | 6 | ⬜ |
 
-**Current step:** 5.4 (written, awaiting your test)
+**Current step:** 5.5 (migration written, waiting for you to run it in Supabase)
 
 ### Changelog
 - 2026-10-18: Plan drafted.
@@ -61,6 +61,7 @@ top are updated after each step is tested. Nothing gets ticked until you have te
 - 2026-10-23: CI was red since 4.1 because of formatting; fixed by running npm run format (user's Format commit). CI green again; 5.1 ticked (its unit tests ran in CI). Phase 5.2 written: element registry and framework-free renderDesign() in src/shared/design/render (positions, sizes, rotation, opacity, hidden, stacking; no innerHTML; unknown types skipped with a warning; phone layout falls back to desktop). Tests use a tiny fake DOM, no new packages. Awaiting test.
 - 2026-10-23: Phase 5.2 tested by user and ticked. Phase 5.3 written: Text and Shape element definitions (registered through registerBuiltInElements), unit tests, and a developer test page at /dev/design-test.html (npm run dev only, not part of the built site) where you can edit a design as JSON and see it checked and drawn. Rendering was also verified here in a real headless browser. Awaiting test.
 - 2026-10-23: Phase 5.3 tested by user and ticked. Phase 5.4 written (decision D2: separate desktop and phone layouts): a design with no hand-made phone layout gets one made automatically by stacking elements in reading order (shapes behind other elements stay behind them and grow to wrap them); mountDesign() picks the layout by host width (700 px breakpoint), shrinks wide layouts to fit and redraws on resize. The dev test page now shows a desktop preview and a 390 px phone preview. Verified in a real headless browser at 1200, 900 and 390 px. Known limit: text keeps its box height, so a heading that wraps onto more lines can run into the element below; fix by hand-making the phone layout (editor, Phase 6). Awaiting test.
+- 2026-10-23: Phase 5.4 tested by user and ticked. Phase 5.5 written: supabase/migrations/0002_section_drafts.sql. Drafts live in a separate admin-only table (site_section_drafts) because site_sections is readable by everyone; site_sections.content stays the published content and gains published_at; publish_section(key) copies the draft over the live content and removes the draft in one step. Smoke tests added to prove visitors cannot read, write or publish drafts. The Supabase connector cancelled the migration at confirmation, so the user must run the SQL in the Supabase SQL Editor. Awaiting that.
 - Live site: https://noziquee.github.io/nozique.github.io/ (project-site address, not nozique.github.io).
 
 ---
@@ -246,7 +247,7 @@ types and lint pass, build succeeds, tested by you, tracker updated.
 - [x] **5.1 (M)** Design types + Zod schema + versioning + migration framework. *Done when:* unit tests validate good and bad designs.
 - [x] **5.2 (M)** Element registry + shared framework-free `renderDesign()`. *Done when:* a hand-written design renders.
 - [x] **5.3 (M)** Text and Shape elements (first two definitions). *Done when:* both render identically in a test page.
-- [ ] **5.4 (M)** **Responsive strategy decision implemented** (see decision D2). *Done when:* a design renders correctly at desktop and phone width.
+- [x] **5.4 (M)** **Responsive strategy decision implemented** (see decision D2). *Done when:* a design renders correctly at desktop and phone width.
 - [ ] **5.5 (M)** Migration `0002`: draft vs published content for sections (`draft_content`, publish timestamp). *Done when:* saving a draft does not change the live site.
 - [ ] **5.6 (M)** Public site renders sections from `site_sections` (hero first) with fallback to the built-in version. *Done when:* editing JSON in Supabase changes the hero.
 

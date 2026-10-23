@@ -68,6 +68,33 @@ describe('anonymous visitor: blocked', () => {
   });
 });
 
+// Phase 5.5: drafts of website sections must stay private; only published content is public.
+// (Untyped client: the generated types are refreshed when the draft table is first used.)
+const anonUntyped = createClient(env.supabaseUrl, env.supabaseKey, {
+  auth: { persistSession: false },
+});
+
+describe('section drafts', () => {
+  it('visitors cannot read drafts', async () => {
+    const { data } = await anonUntyped.from('site_section_drafts').select('*');
+    expect(data ?? []).toHaveLength(0);
+  });
+  it('visitors cannot save a draft', async () => {
+    const { error } = await anonUntyped
+      .from('site_section_drafts')
+      .insert({ section_key: 'hero', draft_content: { heading: 'smoke-test-should-fail' } });
+    expect(error).not.toBeNull();
+  });
+  it('visitors cannot publish', async () => {
+    const { error } = await anonUntyped.rpc('publish_section', { p_key: 'hero' });
+    expect(error).not.toBeNull();
+  });
+  it('the public sections table has no draft column', async () => {
+    const { data } = await anonUntyped.from('site_sections').select('*').limit(1);
+    expect(Object.keys(data?.[0] ?? {})).not.toContain('draft_content');
+  });
+});
+
 describe('newsletter', () => {
   it('rejects an invalid email address', async () => {
     const { error } = await anon.from('newsletter_subscribers').insert({ email: 'not-an-email' });

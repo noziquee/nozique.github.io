@@ -67,8 +67,9 @@ export function Canvas({ design, selectedId, onSelect }: Props) {
   // Wheel: Ctrl/Cmd + scroll (and trackpad pinch) zooms, plain scroll pans. This needs a native
   // listener because React's wheel events cannot cancel the browser's own page zoom.
   useEffect(() => {
-    const box = viewportRef.current;
-    if (!box) return;
+    const found = viewportRef.current;
+    if (!found) return;
+    const box: HTMLDivElement = found;
     function onWheel(event: WheelEvent) {
       event.preventDefault();
       const rect = box.getBoundingClientRect();

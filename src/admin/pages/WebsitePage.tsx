@@ -15,7 +15,13 @@ import {
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import { changedOrders, isLiveSection, reorderSections } from '../data/sectionRules';
+import {
+  changedOrders,
+  isDesignable,
+  isLiveSection,
+  reorderSections,
+} from '../data/sectionRules';
+import { sectionHref } from '../routing';
 import { listSections, saveSectionOrder, setSectionEnabled } from '../data/siteSections';
 import type { SectionSummary } from '../data/siteSections';
 import { EmptyState, ErrorMessage, Loading } from '../ui/states';
@@ -40,7 +46,11 @@ function SectionRow({ section, busy, onToggle }: RowProps) {
     transition,
     opacity: isDragging ? 0.5 : 1,
   };
-  const classes = ['section-row', section.enabled ? '' : 'off', section.reorderable ? '' : 'pinned'];
+  const classes = [
+    'section-row',
+    section.enabled ? '' : 'off',
+    section.reorderable ? '' : 'pinned',
+  ];
   return (
     <li ref={setNodeRef} style={style} className={classes.filter(Boolean).join(' ')}>
       {section.reorderable ? (
@@ -77,9 +87,15 @@ function SectionRow({ section, busy, onToggle }: RowProps) {
         />
         <span>{section.enabled ? 'Shown' : 'Hidden'}</span>
       </label>
-      <button type="button" disabled title="The visual editor arrives in the next steps">
-        Edit
-      </button>
+      {isDesignable(section.section_key) ? (
+        <a className="button" href={sectionHref(section.section_key)}>
+          Edit
+        </a>
+      ) : (
+        <button type="button" disabled title="This section is built in; visual editing comes later">
+          Edit
+        </button>
+      )}
     </li>
   );
 }

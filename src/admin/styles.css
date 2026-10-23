@@ -1067,3 +1067,94 @@ button.badge-btn:hover:not(:disabled) {
 .switch input {
   width: auto;
 }
+
+a.button {
+  display: inline-block;
+  padding: 8px 14px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--panel);
+  color: var(--text);
+  text-decoration: none;
+}
+
+a.button:hover {
+  border-color: var(--muted);
+}
+
+.back-link {
+  display: inline-block;
+  margin-bottom: 8px;
+  color: var(--muted);
+  text-decoration: none;
+}
+
+.canvas {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.canvas-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.canvas-zoom {
+  min-width: 48px;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+
+.canvas-hint {
+  margin-left: auto;
+  font-size: 13px;
+}
+
+.canvas-viewport {
+  position: relative;
+  height: calc(100vh - 300px);
+  min-height: 360px;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background-color: #0e0e10;
+  background-image: radial-gradient(#26262b 1px, transparent 1px);
+  background-size: 20px 20px;
+  cursor: grab;
+  touch-action: none;
+  user-select: none;
+}
+
+.canvas-viewport.panning {
+  cursor: grabbing;
+}
+
+.canvas-viewport:focus-visible {
+  outline: 2px solid var(--muted);
+}
+
+.canvas-stage {
+  position: absolute;
+  top: 0;
+  left: 0;
+  transform-origin: 0 0;
+  box-shadow: 0 0 0 1px var(--line);
+  background: #fff;
+}
+
+.canvas-content .design-element {
+  cursor: pointer;
+}
+
+.canvas-selection {
+  position: absolute;
+  outline: 2px solid #4c8dff;
+  pointer-events: none;
+}
+
+.canvas-status {
+  margin: 4px 0 0;
+  font-size: 14px;
+}

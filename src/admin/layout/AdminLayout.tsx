@@ -1,7 +1,14 @@
 import { useAuth } from '../auth/AuthProvider';
-import { ADMIN_PAGES, adminHref, useAdminPage, useProjectRoute } from '../routing';
+import {
+  ADMIN_PAGES,
+  adminHref,
+  useAdminPage,
+  useProjectRoute,
+  useSectionRoute,
+} from '../routing';
 import { ProjectEditorPage } from '../pages/ProjectEditorPage';
 import { ProjectsPage } from '../pages/ProjectsPage';
+import { SectionEditorPage } from '../pages/SectionEditorPage';
 import { SettingsPage } from '../pages/SettingsPage';
 import { WebsitePage } from '../pages/WebsitePage';
 
@@ -9,6 +16,7 @@ export function AdminLayout() {
   const { email, signOut } = useAuth();
   const page = useAdminPage();
   const editor = useProjectRoute();
+  const sectionKey = useSectionRoute();
 
   return (
     <div className="shell">
@@ -39,7 +47,10 @@ export function AdminLayout() {
         {page === 'projects' && editor && (
           <ProjectEditorPage key={editor.kind === 'edit' ? editor.id : 'new'} route={editor} />
         )}
-        {page === 'website' && <WebsitePage />}
+        {page === 'website' && !sectionKey && <WebsitePage />}
+        {page === 'website' && sectionKey && (
+          <SectionEditorPage key={sectionKey} sectionKey={sectionKey} />
+        )}
         {page === 'settings' && <SettingsPage />}
       </main>
     </div>

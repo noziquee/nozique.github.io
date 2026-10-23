@@ -1,5 +1,12 @@
 import { describe, expect, it } from 'vitest';
-import { adminHref, parseAdminHash, parseProjectRoute, projectHref } from './routing';
+import {
+  adminHref,
+  parseAdminHash,
+  parseProjectRoute,
+  parseSectionRoute,
+  projectHref,
+  sectionHref,
+} from './routing';
 
 describe('parseAdminHash', () => {
   it('opens Projects by default', () => {
@@ -33,5 +40,17 @@ describe('parseProjectRoute', () => {
     expect(parseProjectRoute('#/projects')).toBeNull();
     expect(parseProjectRoute('#/projects/not-an-id')).toBeNull();
     expect(parseProjectRoute('#/categories/new')).toBeNull();
+  });
+});
+
+describe('parseSectionRoute', () => {
+  it('opens the editor for a section', () => {
+    expect(parseSectionRoute('#/website/hero')).toBe('hero');
+    expect(parseSectionRoute(sectionHref('about'))).toBe('about');
+  });
+  it('returns null for the list and for anything else', () => {
+    expect(parseSectionRoute('#/website')).toBeNull();
+    expect(parseSectionRoute('#/projects/hero')).toBeNull();
+    expect(parseSectionRoute('#/website/Bad Key!')).toBeNull();
   });
 });

@@ -35,6 +35,17 @@ export function projectHref(id: string): string {
   return `#/projects/${id}`;
 }
 
+/** "#/website/hero" opens the visual editor for that section. Anything else returns null. */
+export function parseSectionRoute(hash: string): string | null {
+  const [page, key] = hash.replace(/^#\/?/, '').split('/');
+  if (page !== 'website' || !key) return null;
+  return /^[a-z0-9_-]{1,40}$/.test(key) ? key : null;
+}
+
+export function sectionHref(key: string): string {
+  return `#/website/${key}`;
+}
+
 function subscribe(onChange: () => void): () => void {
   window.addEventListener('hashchange', onChange);
   return () => window.removeEventListener('hashchange', onChange);
@@ -50,4 +61,10 @@ export function useAdminPage(): AdminPage {
 export function useProjectRoute(): ProjectRoute | null {
   const hash = useSyncExternalStore(subscribe, () => window.location.hash);
   return parseProjectRoute(hash);
+}
+
+/** The section whose visual editor is open, or null when showing the section list. */
+export function useSectionRoute(): string | null {
+  const hash = useSyncExternalStore(subscribe, () => window.location.hash);
+  return parseSectionRoute(hash);
 }

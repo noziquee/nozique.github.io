@@ -51,3 +51,10 @@ export function changedOrders(
     .map((section, index) => ({ key: section.section_key, sortOrder: index }))
     .filter((update) => old.get(update.key) !== update.sortOrder);
 }
+
+/** Sections whose public version can be drawn from a design, so the visual editor may open them. */
+export const DESIGNABLE_SECTION_KEYS: readonly string[] = ['hero'];
+
+export function isDesignable(key: string): boolean {
+  return DESIGNABLE_SECTION_KEYS.includes(key);
+}

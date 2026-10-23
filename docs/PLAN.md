@@ -18,7 +18,7 @@ top are updated after each step is tested. Nothing gets ticked until you have te
 | 4 | Project manager (posts, categories, uploads) | 7 | ✅ |
 | 4R | Projects admin layout rework (grid, category chips, dialog editor) | 5 | ✅ |
 | 5 | Design engine: data model, renderer, element registry | 6 | ✅ |
-| 6 | Visual editor core | 8 | 🟦 0 of 8 done |
+| 6 | Visual editor core | 8 | 🟦 1 of 8 done |
 | 7 | More elements, one at a time | 8 | ⬜ |
 | 8 | Editor power tools | 8 | ⬜ |
 | 9 | Design system: colors, text styles, templates | 5 | ⬜ |
@@ -26,7 +26,7 @@ top are updated after each step is tested. Nothing gets ticked until you have te
 | 11 | Animation and interaction | 5 | ⬜ |
 | 12 | Hardening: security, accessibility, performance | 6 | ⬜ |
 
-**Current step:** 6.1 (written, awaiting your test)
+**Current step:** 6.2 (written, awaiting your test)
 
 ### Changelog
 - 2026-10-18: Plan drafted.
@@ -254,7 +254,7 @@ types and lint pass, build succeeds, tested by you, tracker updated.
 - [x] **5.6 (M)** Public site renders sections from `site_sections` (hero first) with fallback to the built-in version. *Done when:* editing JSON in Supabase changes the hero.
 
 ### Phase 6 — Visual editor core
-- [ ] **6.1 (M)** Website page in admin: section list (enable/disable, reorder, pinned header/footer).
+- [x] **6.1 (M)** Website page in admin: section list (enable/disable, reorder, pinned header/footer).
 - [ ] **6.2 (L)** Canvas with zoom/pan and the shared renderer; select one element.
 - [ ] **6.3 (L)** Move, resize, rotate with handles (Shift to constrain).
 - [ ] **6.4 (M)** Elements panel (add Text, Shape) and Delete.
@@ -342,3 +342,5 @@ Audio element, table element, container/frame element, auto-layout, minimap,
 collaboration/roles, scheduled publishing, analytics.
 - 2026-10-23: Phase 6.1 written: Website page lists the sections from site_sections (drag to reorder, Shown/Hidden switch, Pinned header and footer, "Unpublished changes" badge when a draft exists). Only the hero is connected to the public site so far; other rows say so. Regenerated database types (site_section_drafts, published_at, publish_section). Edit buttons are disabled until 6.2. Awaiting test.
 - 2026-10-23: 6.1 test feedback: only the hero switch changed the public site, but the user expected every row to work. Fixed: the home page now follows the Website page order and Shown/Hidden for Hero, Art Categories, Featured Work and Contact (the "Have a project in mind?" band); About switches the "About me" button and the About menu link; Contact also switches its menu link. Pages stay reachable by direct URL. Removed the "not connected" notes. Awaiting re-test.
+- 2026-10-23: Phase 6.1 re-tested by user (order and show/hide now change the public home page) and ticked.
+- 2026-10-23: Phase 6.2 written: opening Website > Hero > Edit shows the canvas (#/website/hero). It draws the section's draft or published design (or a blank one if it has none) with the same renderer as the public site; zoom (buttons, Ctrl+scroll, pinch), Fit and 100%, pan (scroll or drag the background), click to select one element (blue outline and a status line), click empty space or Esc to deselect. Read-only: nothing is saved yet (6.8). Edit is only enabled for the hero, the one section the public site can draw from a design. Pure view math (zoom around cursor, fit) is unit-tested. Awaiting test.

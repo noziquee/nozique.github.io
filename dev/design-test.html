@@ -19,7 +19,8 @@
       textarea { width: 100%; height: 520px; box-sizing: border-box; padding: 10px; background: #151517; color: #f2f2f2; border: 1px solid #2a2a2e; border-radius: 8px; font: 12px/1.5 ui-monospace, monospace; }
       #errors { color: #ff7a73; padding-left: 18px; font-size: 14px; }
       #status { color: #3fb67a; font-size: 14px; min-height: 20px; }
-      #stage { border: 1px solid #2a2a2e; border-radius: 8px; overflow: hidden; background: #151517; }
+      h2 { margin: 16px 0 8px; font-size: 15px; font-weight: 600; }
+      #stage, #phone { border: 1px solid #2a2a2e; border-radius: 8px; overflow: hidden; background: #151517; }
     </style>
   </head>
   <body>
@@ -32,7 +33,10 @@
         <ul id="errors" role="alert"></ul>
       </section>
       <section>
+        <h2>Desktop (full width)</h2>
         <div id="stage"></div>
+        <h2>Phone (390 px wide, stacked automatically)</h2>
+        <div id="phone" style="width: 390px; max-width: 100%"></div>
       </section>
     </div>
     <script type="module" src="/src/dev/design-test.ts"></script>

@@ -1,9 +1,10 @@
-import type { Design, DesignElement, Layout, LayoutName } from '../types';
+import type { Design, DesignElement, LayoutName } from '../types';
 import { defaultRegistry } from './registry';
 import type { ElementRegistry } from './registry';
+import { pickLayout } from './responsive';
 
 export interface RenderOptions {
-  /** Which layout to draw. A missing phone layout falls back to the desktop one. */
+  /** Which layout to draw. A missing phone layout is made by stacking the desktop one. */
   layout?: LayoutName;
   /** Draw elements marked hidden too (the editor does; the public site does not). */
   includeHidden?: boolean;
@@ -12,14 +13,6 @@ export interface RenderOptions {
   document?: Document;
   /** Called for problems that skip an element, such as an unregistered type. */
   onWarning?: (message: string) => void;
-}
-
-/** The layout to draw: the phone one if asked for and present, otherwise the desktop one. */
-export function pickLayout(design: Design, name: LayoutName): { name: LayoutName; layout: Layout } {
-  if (name === 'mobile' && design.layouts.mobile) {
-    return { name: 'mobile', layout: design.layouts.mobile };
-  }
-  return { name: 'desktop', layout: design.layouts.desktop };
 }
 
 function px(value: number): string {

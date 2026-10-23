@@ -1,5 +1,7 @@
 import { loadDesign } from '../shared/design';
-import { registerBuiltInElements, renderDesign } from '../shared/design/render';
+import type { Design } from '../shared/design';
+import { mountDesign, registerBuiltInElements } from '../shared/design/render';
+import type { MountedDesign } from '../shared/design/render';
 
 const SAMPLE = {
   version: 1,
@@ -63,6 +65,9 @@ const input = document.getElementById('json') as HTMLTextAreaElement;
 const errors = document.getElementById('errors') as HTMLUListElement;
 const status = document.getElementById('status') as HTMLParagraphElement;
 const stage = document.getElementById('stage') as HTMLDivElement;
+const phone = document.getElementById('phone') as HTMLDivElement;
+
+let mounted: MountedDesign[] = [];
 
 registerBuiltInElements();
 
@@ -93,21 +98,18 @@ function update() {
   }
   showErrors([]);
   status.textContent = 'Valid design.';
-  const root = renderDesign(result.design, {
-    onWarning: (message) => showErrors([message]),
-  });
-  // Scale the design to fit the width of the stage.
-  const scale = Math.min(1, stage.clientWidth / result.design.layouts.desktop.width);
-  const holder = document.createElement('div');
-  holder.style.width = `${result.design.layouts.desktop.width * scale}px`;
-  holder.style.height = `${result.design.layouts.desktop.height * scale}px`;
-  root.style.transformOrigin = 'top left';
-  root.style.transform = `scale(${scale})`;
-  holder.appendChild(root);
-  stage.replaceChildren(holder);
+  draw(result.design);
+}
+
+function draw(design: Design) {
+  const onWarning = (message: string) => showErrors([message]);
+  if (mounted.length > 0) {
+    mounted.forEach((item) => item.update(design));
+    return;
+  }
+  mounted = [stage, phone].map((host) => mountDesign(host, design, { onWarning }));
 }
 
 input.value = JSON.stringify(SAMPLE, null, 2);
 input.addEventListener('input', update);
-window.addEventListener('resize', update);
 update();

@@ -3,7 +3,8 @@ import { parseDesign } from '../parse';
 import type { Design } from '../types';
 import { createRegistry } from './registry';
 import type { ElementDefinition } from './registry';
-import { pickLayout, renderDesign } from './renderDesign';
+import { renderDesign } from './renderDesign';
+import { pickLayout } from './responsive';
 import { asNode, fakeDocument } from './testDom';
 
 /** A test-only element type: a div whose text is the element's text content. */
@@ -137,13 +138,15 @@ describe('renderDesign', () => {
 });
 
 describe('layouts', () => {
-  it('uses the desktop layout when there is no phone layout', () => {
-    expect(pickLayout(makeDesign(), 'mobile').name).toBe('desktop');
+  it('makes a phone layout automatically when there is none', () => {
+    const picked = pickLayout(makeDesign(), 'mobile');
+    expect(picked).toMatchObject({ name: 'mobile', derived: true });
+    expect(picked.layout.width).toBe(390);
   });
   it('uses the phone layout when there is one', () => {
     const phone = { width: 390, height: 800, elements: [] };
     const design = makeDesign({ mobile: phone });
-    expect(pickLayout(design, 'mobile')).toMatchObject({ name: 'mobile' });
+    expect(pickLayout(design, 'mobile')).toMatchObject({ name: 'mobile', derived: false });
     const registry = createRegistry();
     const settings = { document: fakeDocument, registry, layout: 'mobile' } as const;
     const root = asNode(renderDesign(design, settings));

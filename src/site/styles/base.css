@@ -226,3 +226,5 @@ main>*{animation:pgIn .55s var(--ease) both}
 @media(max-width:860px){.hr{padding-right:10px}.hs{gap:22px}.st{font-size:clamp(40px,11vw,60px)}}
 /* Project page: show a whole image in the hero instead of cropping it. */
 .hc .im img{object-fit:contain;background:var(--s1)}
+
+.design-section{position:relative;width:100%;overflow:hidden}

@@ -1,5 +1,7 @@
 import { parseHash, pageTitle } from '../router/route';
 import { loadSiteData } from '../data/source';
+import { loadSections } from '../data/sections';
+import { mountSectionDesigns, useSections } from './sections.js';
 import { getSupabase } from '../../shared/supabase/client';
 import { CAT, P, useSiteData } from './data.js';
 import { $, M, HD, WP, plural, soc, featured } from './helpers.js';
@@ -14,13 +16,13 @@ import { foot } from './pages/footer.js';
 function paint(){const rt=parseHash(location.hash,P.map(x=>x.id)),pg=rt.page=='home'?'':rt.page,id=rt.id;clearInterval(STATE.timer);STATE.slideFn=null;
 M.innerHTML=(pg=='work'?(id?proj(id):work()):pg=='about'?about():pg=='contact'?contact():home())+foot();
 document.querySelectorAll('[data-p]').forEach(a=>{const o=a.dataset.p==pg;a.classList.toggle('on',o);o?a.setAttribute('aria-current','page'):a.removeAttribute('aria-current')});closeMenu();
-const t=id&&P.find(x=>x.id==id);document.title=pageTitle(rt,t&&t.t);init(pg,id);fx();if(!STATE.first)M.focus({preventScroll:true})}
+const t=id&&P.find(x=>x.id==id);document.title=pageTitle(rt,t&&t.t);mountSectionDesigns();init(pg,id);fx();if(!STATE.first)M.focus({preventScroll:true})}
 function route(){if(!STATE.ready)return;closeLB(1);if(STATE.first){paint();STATE.first=0;return}if(matchMedia('(prefers-reduced-motion:reduce)').matches){paint();scrollTo({top:0,behavior:'instant'});return}WP.classList.add('on');setTimeout(()=>{paint();scrollTo({top:0,behavior:'instant'});WP.classList.remove('on')},360)}
 addEventListener('hashchange',route);
 document.addEventListener('click',e=>{const f=e.target.closest('[data-f]');if(f){STATE.flt=f.dataset.f;if(location.hash=='#/work'){e.preventDefault();route()}}});
 /* page behaviours */
 function init(pg,id){
-if(pg==''||pg=='home'){const sl=document.querySelectorAll('.sl'),F=featured(),hv=$('.hv');let k=0;
+if((pg==''||pg=='home')&&$('.hv')){const sl=document.querySelectorAll('.sl'),F=featured(),hv=$('.hv');let k=0;
 const ch=document.querySelectorAll('.chips button'),go=n=>{sl[k].classList.remove('on');ch[k].classList.remove('on');k=n;sl[k].classList.add('on');ch[k].classList.add('on');$('#cp').textContent=F[k].t;$('#cp').href=$('.hvl').href='#/work/'+F[k].id;$('#ct').textContent=`${k+1} / ${sl.length}`;sl.forEach((s,j)=>s.setAttribute('aria-hidden',j!=k));ch.forEach((b,j)=>b.setAttribute('aria-pressed',j==k));const g=$('.pg');g.style.animation='none';g.offsetWidth;g.style.animation=''},st=()=>{clearInterval(STATE.timer);if(sl.length>1&&!matchMedia('(prefers-reduced-motion:reduce)').matches)STATE.timer=setInterval(()=>{if(!document.hidden)go((k+1)%sl.length)},4500)};ch.forEach((b,n)=>b.onclick=()=>{go(n);st()});st();const hr=$('.hr');hr.onmouseenter=hr.onfocusin=()=>{clearInterval(STATE.timer);$('.pg').style.animationPlayState='paused'};hr.onmouseleave=hr.onfocusout=()=>{$('.pg').style.animationPlayState='';st()};
 hv.onmousemove=e=>{const b=hv.getBoundingClientRect(),x=(e.clientX-b.left)/b.width-.5,y=(e.clientY-b.top)/b.height-.5;hv.style.transform=`perspective(900px) rotateY(${x*9}deg) rotateX(${-y*9}deg)`};hv.onmouseleave=()=>hv.style.transform=''}
 if(pg=='work'&&!id){const cs=[...document.querySelectorAll('.mas .card')],bs=document.querySelectorAll('.fl button');let ft;
@@ -53,4 +55,4 @@ $('.mm').insertAdjacentHTML('beforeend',`<div class="so" style="margin-top:28px"
 $('.bg').onclick=()=>{const o=$('.mm').classList.toggle('o'),b=$('.bg');b.setAttribute('aria-expanded',o);b.setAttribute('aria-label',o?'Close menu':'Open menu');b.innerHTML=o?'&#10005;':'&#9776;';document.body.classList.toggle('lock',o);if(o){HD.classList.remove('h');$('.mm a').focus()}};document.querySelectorAll('.mm a').forEach(a=>a.onclick=()=>closeMenu());addEventListener('resize',()=>{if(innerWidth>860&&$('.mm.o'))closeMenu()});
 if(matchMedia('(hover:hover) and (pointer:fine)').matches&&!matchMedia('(prefers-reduced-motion:reduce)').matches){const c=$('.cur');document.body.classList.add('cc');
 addEventListener('mousemove',e=>{c.style.left=e.clientX+'px';c.style.top=e.clientY+'px';const t=e.target.closest('[data-cur]');c.classList.toggle('big',!!t);c.textContent=t?t.dataset.cur:''})}
-loadSiteData(getSupabase).then(data=>{useSiteData(data);STATE.ready=true;route()});
+Promise.all([loadSiteData(getSupabase),loadSections(getSupabase)]).then(([data,sections])=>{useSiteData(data);useSections(sections);STATE.ready=true;route()});

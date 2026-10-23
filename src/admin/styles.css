@@ -999,3 +999,71 @@ button.badge-btn:hover:not(:disabled) {
   border-radius: 10px;
   background: var(--panel);
 }
+
+.section-list {
+  display: grid;
+  gap: 8px;
+  margin: 16px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.section-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 12px 14px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--panel);
+}
+
+.section-row.off .section-main strong {
+  color: var(--muted);
+  text-decoration: line-through;
+}
+
+.section-row.pinned {
+  border-style: dashed;
+}
+
+.section-main {
+  display: flex;
+  flex: 1;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 10px;
+  min-width: 0;
+}
+
+.section-main .row-sub {
+  flex-basis: 100%;
+  margin-top: 0;
+}
+
+.drag-handle {
+  width: 28px;
+  padding: 4px 0;
+  border: 0;
+  background: none;
+  color: var(--muted);
+  text-align: center;
+  cursor: grab;
+  touch-action: none;
+}
+
+.pinned-mark {
+  cursor: default;
+}
+
+.switch {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 84px;
+  font-size: 13px;
+}
+
+.switch input {
+  width: auto;
+}

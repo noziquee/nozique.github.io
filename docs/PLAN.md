@@ -18,7 +18,7 @@ top are updated after each step is tested. Nothing gets ticked until you have te
 | 4 | Project manager (posts, categories, uploads) | 7 | ✅ |
 | 4R | Projects admin layout rework (grid, category chips, dialog editor) | 5 | ✅ |
 | 5 | Design engine: data model, renderer, element registry | 6 | ✅ |
-| 6 | Visual editor core | 8 | ⬜ |
+| 6 | Visual editor core | 8 | 🟦 0 of 8 done |
 | 7 | More elements, one at a time | 8 | ⬜ |
 | 8 | Editor power tools | 8 | ⬜ |
 | 9 | Design system: colors, text styles, templates | 5 | ⬜ |
@@ -26,7 +26,7 @@ top are updated after each step is tested. Nothing gets ticked until you have te
 | 11 | Animation and interaction | 5 | ⬜ |
 | 12 | Hardening: security, accessibility, performance | 6 | ⬜ |
 
-**Current step:** Phase 6 planning (Phase 5 complete)
+**Current step:** 6.1 (written, awaiting your test)
 
 ### Changelog
 - 2026-10-18: Plan drafted.
@@ -340,3 +340,4 @@ types and lint pass, build succeeds, tested by you, tracker updated.
 ## 8. Backlog (parked ideas)
 Audio element, table element, container/frame element, auto-layout, minimap,
 collaboration/roles, scheduled publishing, analytics.
+- 2026-10-23: Phase 6.1 written: Website page lists the sections from site_sections (drag to reorder, Shown/Hidden switch, Pinned header and footer, "Unpublished changes" badge when a draft exists). Only the hero is connected to the public site so far; other rows say so. Regenerated database types (site_section_drafts, published_at, publish_section). Edit buttons are disabled until 6.2. Awaiting test.

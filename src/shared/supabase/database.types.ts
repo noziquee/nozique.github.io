@@ -132,6 +132,38 @@ export type Database = {
           },
         ];
       };
+      site_section_drafts: {
+        Row: {
+          based_on: string;
+          created_at: string;
+          draft_content: Json;
+          section_key: string;
+          updated_at: string;
+        };
+        Insert: {
+          based_on?: string;
+          created_at?: string;
+          draft_content?: Json;
+          section_key: string;
+          updated_at?: string;
+        };
+        Update: {
+          based_on?: string;
+          created_at?: string;
+          draft_content?: Json;
+          section_key?: string;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'site_section_drafts_section_key_fkey';
+            columns: ['section_key'];
+            isOneToOne: true;
+            referencedRelation: 'site_sections';
+            referencedColumns: ['section_key'];
+          },
+        ];
+      };
       site_sections: {
         Row: {
           content: Json;
@@ -139,6 +171,7 @@ export type Database = {
           enabled: boolean;
           id: string;
           name: string;
+          published_at: string;
           reorderable: boolean;
           section_key: string;
           sort_order: number;
@@ -150,6 +183,7 @@ export type Database = {
           enabled?: boolean;
           id?: string;
           name: string;
+          published_at?: string;
           reorderable?: boolean;
           section_key: string;
           sort_order?: number;
@@ -161,6 +195,7 @@ export type Database = {
           enabled?: boolean;
           id?: string;
           name?: string;
+          published_at?: string;
           reorderable?: boolean;
           section_key?: string;
           sort_order?: number;
@@ -172,6 +207,7 @@ export type Database = {
     Views: { [_ in never]: never };
     Functions: {
       is_admin: { Args: never; Returns: boolean };
+      publish_section: { Args: { p_key: string }; Returns: undefined };
     };
     Enums: { [_ in never]: never };
     CompositeTypes: { [_ in never]: never };

@@ -18,7 +18,7 @@ top are updated after each step is tested. Nothing gets ticked until you have te
 | 4 | Project manager (posts, categories, uploads) | 7 | ✅ |
 | 4R | Projects admin layout rework (grid, category chips, dialog editor) | 5 | ✅ |
 | 5 | Design engine: data model, renderer, element registry | 6 | ✅ |
-| 6 | Visual editor core | 8 | 🟦 7 of 8 done |
+| 6 | Visual editor core | 8 | ✅ |
 | 7 | More elements, one at a time | 8 | ⬜ |
 | 8 | Editor power tools | 8 | ⬜ |
 | 9 | Design system: colors, text styles, templates | 5 | ⬜ |
@@ -26,7 +26,7 @@ top are updated after each step is tested. Nothing gets ticked until you have te
 | 11 | Animation and interaction | 5 | ⬜ |
 | 12 | Hardening: security, accessibility, performance | 6 | ⬜ |
 
-**Current step:** 6.8 (written, awaiting your test)
+**Current step:** Phase 7 planning (Phase 6 complete)
 
 ### Changelog
 - 2026-10-18: Plan drafted.
@@ -261,7 +261,7 @@ types and lint pass, build succeeds, tested by you, tracker updated.
 - [x] **6.5 (L)** Properties panel generated from each element's declarative fields.
 - [x] **6.6 (M)** Layers panel: select, show/hide, lock, drag to reorder, bring forward/back.
 - [x] **6.7 (M)** Undo/redo (Ctrl+Z / Ctrl+Shift+Z) with a unit-tested history engine.
-- [ ] **6.8 (M)** Save draft / Publish / Discard, unsaved-changes warning, validation messages. *Done when:* publish updates the public hero.
+- [x] **6.8 (M)** Save draft / Publish / Discard, unsaved-changes warning, validation messages. *Done when:* publish updates the public hero.
 
 ### Phase 7 — More elements (one per step)
 - [ ] **7.1 (M)** Image (upload, fit, opacity, radius, alt text) + crop mode
@@ -352,3 +352,4 @@ collaboration/roles, scheduled publishing, analytics.
 - 2026-10-24: Phase 6.5 tested by user (properties panel) and ticked. Phase 6.6 written: a Layers panel (top layer first) to select, hide, lock and drag to reorder, plus To front / Forward / Backward / To back buttons for the selected element. Locked elements can be selected but not dragged or resized on the canvas; hidden ones are not drawn. Stacking operations are unit-tested. Still unsaved until 6.8. Awaiting test.
 - 2026-10-24: Phase 6.6 tested by user (layers panel, stacking buttons) and ticked. Phase 6.7 written: Undo and Redo (buttons and Ctrl+Z, Ctrl+Shift+Z, Ctrl+Y) from a unit-tested history engine (src/admin/editor/history.ts): up to 100 steps; a whole drag, resize or rotate is one step, and typing in one field is one step; a new change clears Redo. Text boxes keep the browser's own undo while you are typing in them. Still unsaved until 6.8. Awaiting test.
 - 2026-10-24: Phase 6.7 tested by user (undo/redo) and ticked. Phase 6.8 written: a bar above the editor with a status badge (Unsaved changes / Draft saved, not live / Live), Save draft (stores the draft; the live site is untouched), Publish (saves then calls publish_section; warns if the design has no elements), Discard changes (back to the live version, deletes the draft) and Use built-in version (removes the design from the live section so the old hero returns). Leaving with unsaved changes asks first (tab close/reload and admin links; the browser Back button is not covered). Invalid designs are refused with a message. Awaiting test: publishing should change the public hero.
+- 2026-10-24: Phase 6.8 tested by user (save draft, publish, discard, built-in fallback) and ticked. Phase 6 complete: the hero can be designed visually and published. (Lint fix: a function named useBuiltIn was renamed because the lint rule treats use* names as hooks.)

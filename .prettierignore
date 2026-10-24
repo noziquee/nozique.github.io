@@ -6,3 +6,7 @@ package-lock.json
 src/site/legacy
 src/site/styles
 index.html
+src/shared/supabase/database.types.ts
+docs
+src/site/data/placeholders.ts
+dev

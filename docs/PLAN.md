@@ -1,0 +1,355 @@
+# Nozique — Build Plan (Public Site + Admin Website Builder)
+
+Living document. Every step has a checkbox; the tracker table and changelog at the
+top are updated after each step is tested. Nothing gets ticked until you have tested it.
+
+**Status legend:** ⬜ not started · 🟦 in progress · ✅ done and tested · ⏸ blocked / waiting on a decision
+
+---
+
+## 0. Progress tracker
+
+| Phase | Name | Steps | Status |
+|---|---|---|---|
+| 0 | Foundations: repo, tooling, deploy | 5 | ✅ |
+| 1 | Database and connection | 4 | ✅ |
+| 2 | Public site in TypeScript | 6 | ✅ |
+| 3 | Admin shell and login | 4 | ✅ |
+| 4 | Project manager (posts, categories, uploads) | 7 | ✅ |
+| 4R | Projects admin layout rework (grid, category chips, dialog editor) | 5 | ✅ |
+| 5 | Design engine: data model, renderer, element registry | 6 | ✅ |
+| 6 | Visual editor core | 8 | ✅ |
+| 7 | More elements, one at a time | 8 | ⬜ |
+| 8 | Editor power tools | 8 | ⬜ |
+| 9 | Design system: colors, text styles, templates | 5 | ⬜ |
+| 10 | Versions, preview and responsive layouts | 5 | ⬜ |
+| 11 | Animation and interaction | 5 | ⬜ |
+| 12 | Hardening: security, accessibility, performance | 6 | ⬜ |
+
+**Current step:** Phase 7 planning (Phase 6 complete)
+
+### Changelog
+- 2026-10-18: Plan drafted.
+- 2026-10-20: D1, D2 (separate desktop/mobile layouts), D3, D4, D5 approved (recommended defaults).
+- 2026-10-20: Phase 0 done and tested (scaffold, lint/format/tests, baseline page split, env config, CI + Pages deploy).
+- 2026-10-20: Phase 1: database live (1.1), types and client (1.3), security smoke test 12/12 passing (1.4). 1.2: admin row added; sign-up switch-off pending confirmation.
+- 2026-10-20: Phase 2.1: typed hash router (src/site/router) with tests; old single script split into data, helpers, state, one module per page and a shell. Verified identical to the old page in a browser comparison.
+- 2026-10-21: Phase 2.2: typed data layer (src/site/data): placeholders as fallback, database loader with 4s timeout, safe links/escaping. Page code reads through a temporary adapter until each page is rewritten (2.3-2.6). Note: 2.3 is now mostly verification, since the loader already reads categories and published projects.
+- 2026-10-21: Phase 2.3 tested live: a published test project appeared (Home, Work, project page), a draft did not. Two TEST rows (slugs test-published-project, test-hidden-draft) still in the database; to be removed.
+- 2026-10-21: Phase 2.4 in progress: fixed Work/About/Contact side padding (CSS), project hero shows whole image (no crop), fake Process / Wireframe / Animation placeholders only on sample projects, prev/next hidden with one project. Finding: original artwork files are 7-8 MB PNGs; Phase 4 upload manager must resize and compress (WebP/JPEG) before upload.
+- 2026-10-21: Phase 2.4 tested with real images (hero fit, gallery, lightbox). Phase 2.5: home page handles no featured projects (falls back to first three) and hides categories with no published projects (home carousel, stats, Work filters). Verified in browser with 3 data scenarios, no JS errors; sample content unchanged.
+- 2026-10-21: Phase 2.6: About and Contact checked at desktop and phone widths (no overflow, form validation unchanged); About hides the sample-only "How a piece comes together" art for real projects. Phase 2 complete pending user check.
+- 2026-10-21: Phase 3.1 + 3.2 written together (admin layout, hash routing, Supabase login, admin-only gate, sign out). Not yet tested by user.
+- 2026-10-21: Phase 3.1 and 3.2 tested by user (login, sidebar, sign out). Phase 3.3 + 3.4 written: session-ended notice, shared Loading/Error/Empty components, error boundary, site fonts in admin. Awaiting test.
+- 2026-10-21: Phases 2.6, 3.3 and 3.4 tested by user; Phase 3 complete.
+- 2026-10-22: Phase 4.1 written: Categories page (add, rename, delete with project count warning, drag to reorder with dnd-kit). New dependency: @dnd-kit (user must run npm install and commit package-lock.json). Awaiting test.
+- 2026-10-22: Phase 4.1 tested by user and ticked. Phase 4.2 written: projects list with search, category and status filters, thumbnails, Published/Draft/Featured badges (read-only; editing comes in 4.3). Awaiting test.
+- 2026-10-22: Phase 4.2 tested by user and ticked. Phase 4.3 written: project editor (title, description, category, year, tools, role, card shape), New project button, click a project to edit; new projects start as drafts. Awaiting test.
+- 2026-10-22: Phase 4.3 tested by user and ticked. Phase 4.4 written: image upload on the project editor (multiple files or drag-and-drop, resized to max 2400 px and compressed to WebP in the browser, first image is the thumbnail, drag to reorder, alt text and captions, remove deletes the file). Awaiting test.
+- 2026-10-22: Phase 4.4 tested by user and ticked. Phase 4.5 written: video on the project editor (upload MP4/WebM up to 50 MB, or paste a direct .mp4/.webm link; preview; replace and remove clean up the old stored file). YouTube/Vimeo links are not supported yet because the site uses a plain video player (could be added in Phase 7.6). Awaiting test.
+- 2026-10-22: Phase 4.5 tested by user and ticked. Phase 4.6 written: Draft/Published and Featured toggles on the Projects list and in the editor (Visibility panel). Awaiting test (check the public site too).
+- 2026-10-22: Phase 4.6 bug found by user: drafts visible on the public site. Cause: when you are signed in to the admin in the same browser, the database lets your admin session read drafts. Fix: the public site now asks only for published projects and also filters drafts itself. To check the visitor view, use a private window or sign out.
+- 2026-10-22: Phase 4.6 tested by user and ticked. Phase 4.7 written: delete project (removes its image and video files too) from the list and the editor; drag to reorder projects on the list (disabled while filters are active). Awaiting test.
+- 2026-10-22: User supplied admin_phase_10.html (old Nica admin) and asked for a layout-only rework of the Projects admin, keeping all built functions. Inspected its Gallery admin (chip bar, card grid, two-column dialog editor). Added Phase 4R plan before Phase 5. Step 4.7 is still awaiting its test.
+- 2026-10-22: Phase 4.7 tested by user and ticked; Phase 4 complete. Phase 4R.1 written: category chips (filter, drag to reorder, rename inline, delete, add inline) replace the category dropdown on the Projects page. Awaiting test.
+- 2026-10-22: Phase 4R.1 tested by user and ticked. Phase 4R.2 written: square project cards with thumbnail, title, category, image count, Draft/Featured badges and a ⋮ menu (Edit, Publish/Unpublish, Feature, Delete); drag cards to reorder (also inside a filtered view: only the visible cards move); Add project card; Grid/List switch (remembered). Awaiting test.
+- 2026-10-22: Phase 4R.2 tested by user and ticked. Phase 4R.3 written: project editor is now a two-column dialog over the project grid (images and video left; details, visibility and Save/Cancel/Delete right). Esc and × close it (asks if unsaved), focus stays inside, the grid behind refreshes after changes, one column on phones. Awaiting test.
+- 2026-10-22: Phase 4R.3 tested by user and ticked. Phase 4R.4 written: images in the dialog are a grid of square thumbnails (first one badged Thumbnail, × to remove, drag to reorder, + Add files and drop zone); click a thumbnail to edit its alt text and caption underneath. Awaiting test.
+- 2026-10-22: Phase 4R.4 tested by user and ticked. Phase 4R.5 written: removed the separate Categories page and sidebar entry (categories are managed with the chips on Projects; an old #/categories link opens Projects), removed unused list/editor CSS. Awaiting test. After 4R.5 passes, Phase 5 starts.
+- 2026-10-22: Phase 4R.5 tested by user and ticked; Phase 4R complete.
+- 2026-10-22: Phase 5 started. 5.1 written: design format in src/shared/design (version 1: desktop layout + optional phone layout; text and shape elements; strict validation of colours, ids, numbers and limits; version upgrade framework; 25+ unit tests). New dependency: zod (user must run npm install and commit package-lock.json). Awaiting test.
+- 2026-10-23: CI was red since 4.1 because of formatting; fixed by running npm run format (user's Format commit). CI green again; 5.1 ticked (its unit tests ran in CI). Phase 5.2 written: element registry and framework-free renderDesign() in src/shared/design/render (positions, sizes, rotation, opacity, hidden, stacking; no innerHTML; unknown types skipped with a warning; phone layout falls back to desktop). Tests use a tiny fake DOM, no new packages. Awaiting test.
+- 2026-10-23: Phase 5.2 tested by user and ticked. Phase 5.3 written: Text and Shape element definitions (registered through registerBuiltInElements), unit tests, and a developer test page at /dev/design-test.html (npm run dev only, not part of the built site) where you can edit a design as JSON and see it checked and drawn. Rendering was also verified here in a real headless browser. Awaiting test.
+- 2026-10-23: Phase 5.3 tested by user and ticked. Phase 5.4 written (decision D2: separate desktop and phone layouts): a design with no hand-made phone layout gets one made automatically by stacking elements in reading order (shapes behind other elements stay behind them and grow to wrap them); mountDesign() picks the layout by host width (700 px breakpoint), shrinks wide layouts to fit and redraws on resize. The dev test page now shows a desktop preview and a 390 px phone preview. Verified in a real headless browser at 1200, 900 and 390 px. Known limit: text keeps its box height, so a heading that wraps onto more lines can run into the element below; fix by hand-making the phone layout (editor, Phase 6). Awaiting test.
+- 2026-10-23: Phase 5.4 tested by user and ticked. Phase 5.5 written: supabase/migrations/0002_section_drafts.sql. Drafts live in a separate admin-only table (site_section_drafts) because site_sections is readable by everyone; site_sections.content stays the published content and gains published_at; publish_section(key) copies the draft over the live content and removes the draft in one step. Smoke tests added to prove visitors cannot read, write or publish drafts. The Supabase connector cancelled the migration at confirmation, so the user must run the SQL in the Supabase SQL Editor. Awaiting that.
+- 2026-10-23: Phase 5.5 tested by user (ran the SQL in the SQL Editor, smoke tests pass) and ticked; database state verified. Phase 5.6 written: the public site reads site_sections (src/site/data/sections.ts) and, when the hero has a valid design in content.design, draws it with mountDesign in place of the built-in hero (invalid or missing design = built-in hero, enabled=false hides it). Example SQL in supabase/examples/hero_design.sql. Awaiting test.
+- 2026-10-23: Phase 5.6 tested by user (check passes, hero changes from the database, falls back when invalid or removed) and ticked. Phase 5 complete. Next: Phase 6 (visual editor core).
+- Live site: https://noziquee.github.io/nozique.github.io/ (project-site address, not nozique.github.io).
+
+---
+
+## 1. Goals
+
+1. **Public site (`index`)** shows exactly what you build in the admin: projects from the database, plus website sections designed in the editor.
+2. **Admin** is a Carrd/Figma/Canva-style builder: manage projects and categories, and visually edit page sections with elements, layers, properties, undo/redo, alignment and more.
+3. **Extensible:** new tools and elements are added by writing one new file, not by growing one giant HTML file.
+4. **Built gradually:** one or a few features at a time, each tested and ticked before the next begins.
+
+---
+
+## 2. Technology decisions
+
+| Concern | Choice | Why |
+|---|---|---|
+| Language | **TypeScript** | Types catch mistakes in complex editor state (elements, layouts, saved designs) and make adding features safer. |
+| Build tool | **Vite** (two entry points: public site and admin) | Fast dev server, splits code into small modules, outputs static files for GitHub Pages. |
+| Admin UI | **React** | Panels, layers list and property forms are state-driven UI, which React handles well. |
+| Admin state | **Zustand + Immer** | Simple store; Immer patches give clean undo/redo. |
+| Lists drag and drop | **dnd-kit** | Reordering layers, project images, categories. |
+| Public site | **Vanilla TypeScript** (no framework) | Small and fast; keeps your current design and code style. |
+| Canvas rendering | **Plain DOM, framework-free renderer shared by site and admin** | The admin canvas and public site run the same code, so what you edit is what visitors see. Konva was rejected because it would need a second renderer for the public site. |
+| Data validation | **Zod** | One schema validates saved designs in the editor, on load, and in tests. |
+| Backend | **Supabase** (already written: `supabase_setup.sql`) | Auth, Postgres, Storage. |
+| Tests | **Vitest** for logic, a manual checklist per UI step, **Playwright** later for critical flows | |
+| Quality | ESLint + Prettier + `tsc --noEmit` | |
+| Hosting | **GitHub Pages**, deployed by GitHub Actions (build, then publish `dist/`) | Same host as now. The existing workflow uploads the raw repo, so it must change to upload the build output. |
+
+**What changes for you:** you will need Node.js installed and will run `npm run dev` to work locally. You can no longer double-click an HTML file to open it. In return, the code is split into many small, typed files.
+
+### Hybrid section model (recommended)
+- **Canvas sections** (hero, about, contact, banners): freely designed in the visual editor.
+- **System sections** (project grid with filters, category carousel, lightbox): built in code so they stay reliable; the editor controls their content, spacing, colors and where they sit.
+- A **gallery-grid element** lets a canvas section embed live projects.
+
+---
+
+## 3. Architecture
+
+```
+nozique/
+├─ index.html                    public entry
+├─ admin/index.html              admin entry
+├─ supabase/migrations/          SQL files (0001 = supabase_setup.sql)
+├─ src/
+│  ├─ shared/                    used by BOTH site and admin
+│  │  ├─ supabase/               client, generated DB types, queries
+│  │  ├─ design/                 types, zod schema, version migrations, tokens
+│  │  ├─ elements/               ONE FILE PER ELEMENT TYPE (see below)
+│  │  └─ render/                 renderDesign(), scaling, hover/animation runtime
+│  ├─ site/                      public site: router, pages, components, styles
+│  └─ admin/
+│     ├─ auth/                   login, session guard
+│     ├─ features/projects/      project + category manager
+│     └─ features/editor/        canvas, tools, panels, history, store
+├─ tests/
+└─ .github/workflows/deploy.yml
+```
+
+### Element registry (how new elements get added)
+Each element type is one module that exports a single definition:
+
+```
+export const buttonElement: ElementDefinition = {
+  type: 'button',
+  label: 'Button',
+  defaults(),            // starting size, style, content
+  schema,                // zod schema for its content/style
+  render(el, ctx),       // framework-free DOM output (site + admin canvas)
+  panel: [ ...fields ],  // declarative property fields; the admin builds the form from this
+}
+```
+
+Register it in `registry.ts` and it appears in the Elements panel, renders on the
+public site, validates on save, and gets a properties form automatically.
+**Adding an element later = one new file + one registry line.**
+
+### Tool registry (same idea for editor tools)
+Select, move, text-edit, crop, etc. are small modules with `onPointerDown/Move/Up`
+handlers, so new tools do not touch existing ones.
+
+### Saved design format
+Versioned JSON stored in `site_sections.content`:
+`{ version, canvas, elements[] }` with explicit migrations between versions, so
+old designs never break when the format evolves.
+
+### Reused from your existing admin (ported to TypeScript, not rewritten from scratch)
+Undo/redo snapshot idea, alignment/distribute math, resize/rotate math, color
+picker + palettes, layers behavior, image crop model, design validation rules, and
+the lessons recorded in your comments (shadow-DOM preview, anchor links, gallery
+auto-height). **Dropped:** Nica-specific parts (belt swatches, crochet sections, hard-coded Nica SVGs).
+
+---
+
+## 4. How we work (progress check protocol)
+
+For every step below:
+
+1. I state the step and what "done" means.
+2. I implement only that step (or a small related group).
+3. I run the automated checks (`tsc`, lint, unit tests, build).
+4. I give you a short **"test this" checklist** (what to click, what you should see).
+5. You reply ✅ or ❌ with notes. Failures are fixed before moving on.
+6. I tick the box, update the tracker table and changelog, and name the next step.
+
+**Definition of done (every step):** works in the browser, no console errors,
+types and lint pass, build succeeds, tested by you, tracker updated.
+
+**Size tags:** S = small, M = medium, L = large.
+
+---
+
+## 5. Phases and steps
+
+### Phase 0 — Foundations
+- [x] **0.1 (S)** Scaffold Vite + TypeScript project with the folder structure above. *Done when:* `npm run dev` shows a blank page for both `/` and `/admin/`.
+- [x] **0.2 (S)** ESLint, Prettier, `tsc`, Vitest wired up with one sample test. *Done when:* `npm run check` passes.
+- [x] **0.3 (M)** Move the current `index.html` look in as the baseline (split CSS into files, keep the design). *Done when:* the page looks the same as today.
+- [x] **0.4 (S)** Environment config for Supabase URL and anon key (`.env`, with `.env.example` committed). *Done when:* values load in code, no keys hard-coded.
+- [x] **0.5 (M)** Replace `static.yml` with a build-and-deploy workflow. *Done when:* a push to `main` publishes the built site to GitHub Pages.
+
+### Phase 1 — Database and connection
+- [x] **1.1 (S)** Create the new Supabase project and run `supabase_setup.sql`. *Done when:* tables, policies and buckets exist.
+- [x] **1.2 (S)** Create your admin user and add it to `admins`; disable public sign-ups. *Done when:* `select public.is_admin()` is true for you.
+- [x] **1.3 (M)** Supabase client + generated DB types in `src/shared/supabase`. *Done when:* a typed query for groups works.
+- [x] **1.4 (M)** Security smoke test: automated script proves an anonymous visitor can read published content and cannot write or upload anything. *Done when:* test passes and fails if a policy is removed.
+
+### Phase 2 — Public site in TypeScript
+- [x] **2.1 (M)** Hash router and page shell (Home, Work, Project, About, Contact) as modules. *Done when:* navigation works as today.
+- [x] **2.2 (M)** Data layer with the placeholder projects as fallback when the database is empty. *Done when:* the site works with an empty database.
+- [x] **2.3 (M)** Work page reads projects and categories from Supabase (filtering, draft projects hidden). *Done when:* a project added in the SQL editor appears; a draft does not.
+- [x] **2.4 (M)** Project page: gallery, lightbox, prev/next, video, details from the database.
+- [x] **2.5 (M)** Home page: featured projects and category carousel from the database.
+- [x] **2.6 (S)** About and Contact pages (existing contact validation kept). *Done when:* all pages match the current design on desktop and mobile.
+
+### Phase 3 — Admin shell and login
+- [x] **3.1 (M)** React app scaffold, admin layout (sidebar: Projects, Website, Settings), route guard.
+- [x] **3.2 (M)** Login/logout with Supabase Auth; non-admin accounts are shown "no access". *Done when:* only your account gets in.
+- [x] **3.3 (S)** Session expiry handling and friendly error/loading/empty states (shared components).
+- [x] **3.4 (S)** Admin styling that matches the Nozique palette (dark, red accent).
+
+### Phase 4 — Project manager
+- [x] **4.1 (M)** Categories (groups): create, rename, delete, drag to reorder.
+- [x] **4.2 (M)** Projects list with category filter, search, status badges.
+- [x] **4.3 (L)** Project editor: title, description, category, year, tools, role, cover aspect.
+- [x] **4.4 (L)** Image upload (multiple), drag to reorder, first image is the thumbnail, alt text and captions.
+- [x] **4.5 (M)** Video: upload or link for animation projects.
+- [x] **4.6 (S)** Draft/published toggle and "Featured" toggle. *Done when:* changes show on the public site correctly.
+- [x] **4.7 (S)** Delete project (also removes its files from storage) and drag to reorder projects.
+
+> After Phase 4 you can run your real portfolio from the admin, before the visual editor exists.
+
+### Phase 4R — Projects admin layout rework (before Phase 5)
+
+**Goal:** change only the *layout* of the Projects admin to the gallery-admin layout in your `admin_phase_10.html` (category chips on top, square project cards, editor in a two-column dialog). **Every element and function built in Phase 4 stays**: search, status filter, thumbnails, Published/Draft and Featured toggles, drag-to-reorder, delete with file cleanup, the editor fields, image upload with resize/compress, alt text and captions, video upload/link. The database layer (`src/admin/data/*`) is not touched; only components and CSS change. We keep our dark/red Nozique look; we borrow the template's structure, not its brown/cream colours.
+
+**What the template does (inspected):**
+- *Category chip bar:* "All" plus one pill per group. Click filters the grid. Each pill has a ⋮ menu (Rename, Delete), pills drag to reorder, and a dashed "+ Add Group" pill opens an inline name field.
+- *Post grid:* responsive square cards (image, title, "Group · N images"), a ⋮ menu on each card (Edit, Delete), drag cards to reorder, and a dashed "+ Add Post" card at the end. Clicking a card opens the editor. Reordering inside a group only moves that group's cards and leaves the rest where they were.
+- *Editor dialog:* a centered overlay, two columns. Left: image thumbnails (first one badged "Thumbnail", × to remove, drag to reorder, "+ Add files"). Right: group, title, description, then Save / Cancel / Delete. Stacks to one column on phones.
+
+**Differences I will deliberately NOT copy (they would remove things you like):**
+- The template saves images only when you press "Save Post". Ours saves each upload, reorder, remove and alt/caption edit immediately, so nothing is lost. This stays.
+- The template has no status, featured, year, tools, role, card shape, video, alt text or captions. All of those stay and get a place in the new layout.
+
+**Steps** (each tested by you before the next, same protocol):
+- [x] **4R.1 (M)** Category chips on the Projects page. "All" + a pill per category with project counts replaces the category dropdown. Pills drag to reorder, ⋮ menu has Rename (inline, not a pop-up) and Delete (same confirmation as now), dashed "+ Add category" pill opens an inline field. Search and the status filter stay. Uses the existing category functions.
+- [x] **4R.2 (M)** Card grid instead of rows. Square cards with the thumbnail, title, "Category · N images", and Draft/Featured badges on the image corner. ⋮ menu: Edit, Publish/Unpublish, Feature/Unfeature, Delete. Drag cards to reorder, and reordering now also works while a category chip is selected (only that category's cards move, as in the template). Dashed "+ Add project" card at the end. A small Grid/List switch keeps the current list view available.
+- [x] **4R.3 (L)** Editor as a two-column dialog over the grid. Left column: images. Right column: category, title, description, year, tools, role, card shape, Visibility (Published/Featured), then Save / Cancel / Delete. Video moves into a section under the images. Esc and × close it, unsaved changes still ask first, focus stays inside the dialog, the address (`#/projects/<id>`) and browser Back still work, one column on phones.
+- [x] **4R.4 (M)** Image thumbnails inside the dialog. A grid of square thumbnails (first one badged "Thumbnail", × to remove, drag to reorder, "+ Add files" and drop zone). Clicking a thumbnail shows its alt text and caption fields underneath, because the tiles are too small to hold inputs.
+- [x] **4R.5 (S)** Polish and cleanup. Empty and loading states, keyboard use, phone widths, remove the old row/list-only CSS and the separate Categories page once the chips are confirmed good (decision below), update tests and this plan.
+
+**Decisions (I will go with the recommended option unless you say otherwise):**
+- **R1 Categories page:** keep it in the sidebar until the chips are tested; then remove it in 4R.5 (recommended) or keep both.
+- **R2 Image saving:** keep instant saving (recommended) or switch to the template's "Save Post commits everything".
+- **R3 Grid/List switch:** include it (recommended, costs little) or grid only.
+
+**Not part of this phase:** the visual website editor (Phases 5 onward). The Website tab layout in the template belongs to those phases.
+
+### Phase 5 — Design engine
+- [x] **5.1 (M)** Design types + Zod schema + versioning + migration framework. *Done when:* unit tests validate good and bad designs.
+- [x] **5.2 (M)** Element registry + shared framework-free `renderDesign()`. *Done when:* a hand-written design renders.
+- [x] **5.3 (M)** Text and Shape elements (first two definitions). *Done when:* both render identically in a test page.
+- [x] **5.4 (M)** **Responsive strategy decision implemented** (see decision D2). *Done when:* a design renders correctly at desktop and phone width.
+- [x] **5.5 (M)** Migration `0002`: draft vs published content for sections (`draft_content`, publish timestamp). *Done when:* saving a draft does not change the live site.
+- [x] **5.6 (M)** Public site renders sections from `site_sections` (hero first) with fallback to the built-in version. *Done when:* editing JSON in Supabase changes the hero.
+
+### Phase 6 — Visual editor core
+- [x] **6.1 (M)** Website page in admin: section list (enable/disable, reorder, pinned header/footer).
+- [x] **6.2 (L)** Canvas with zoom/pan and the shared renderer; select one element.
+- [x] **6.3 (L)** Move, resize, rotate with handles (Shift to constrain).
+- [x] **6.4 (M)** Elements panel (add Text, Shape) and Delete.
+- [x] **6.5 (L)** Properties panel generated from each element's declarative fields.
+- [x] **6.6 (M)** Layers panel: select, show/hide, lock, drag to reorder, bring forward/back.
+- [x] **6.7 (M)** Undo/redo (Ctrl+Z / Ctrl+Shift+Z) with a unit-tested history engine.
+- [x] **6.8 (M)** Save draft / Publish / Discard, unsaved-changes warning, validation messages. *Done when:* publish updates the public hero.
+
+### Phase 7 — More elements (one per step)
+- [ ] **7.1 (M)** Image (upload, fit, opacity, radius, alt text) + crop mode
+- [ ] **7.2 (M)** Button (colors, border, hover styles, link)
+- [ ] **7.3 (M)** Link and social icons (circular icons, accessible labels, internal anchors)
+- [ ] **7.4 (M)** SVG / icon (library + upload, safe sanitizing, recolor that actually works)
+- [ ] **7.5 (S)** Dividers (dashed, scalloped, line/arrow)
+- [ ] **7.6 (M)** Video / animation embed (uses the project-videos bucket)
+- [ ] **7.7 (M)** Gallery-grid / project showcase element (live projects, columns, gap, category filter)
+- [ ] **7.8 (M)** Form element (contact / newsletter, validated, writes to `newsletter_subscribers`)
+
+*Future elements (audio, table, embed, container/frame) follow the same one-file recipe.*
+
+### Phase 8 — Editor power tools
+- [ ] **8.1 (M)** Multi-select (Shift-click) and marquee selection
+- [ ] **8.2 (M)** Move, scale and rotate a multi-selection
+- [ ] **8.3 (M)** Align and distribute tools
+- [ ] **8.4 (M)** Snapping and smart guides
+- [ ] **8.5 (M)** Duplicate, copy/paste (also between sections), keyboard nudge
+- [ ] **8.6 (L)** True groups: group, ungroup, nested move/scale
+- [ ] **8.7 (S)** Keyboard shortcut set + a shortcuts help panel
+- [ ] **8.8 (S)** Fit-to-view, zoom to selection, rulers and grid overlay
+
+### Phase 9 — Design system
+- [ ] **9.1 (M)** Color picker (HSV, hex, eyedropper, transparency) and saved palettes
+- [ ] **9.2 (S)** Nozique palette seeded (black, greys, white, red accent)
+- [ ] **9.3 (M)** Design tokens: site colors/fonts/spacing editable in one place
+- [ ] **9.4 (M)** Reusable text styles and element styles (copy/paste style, reset style)
+- [ ] **9.5 (M)** Section templates and "save as reusable section"; add/duplicate/delete sections
+
+### Phase 10 — Versions, preview and responsive
+- [ ] **10.1 (M)** Preview before publish (desktop/tablet/phone sizes)
+- [ ] **10.2 (L)** Version history: snapshots on publish, restore any version
+- [ ] **10.3 (M)** Per-breakpoint editing (mobile layout editor), per decision D2
+- [ ] **10.4 (S)** Export/import a section design as JSON
+- [ ] **10.5 (S)** Page title/description/social-preview settings
+
+### Phase 11 — Animation and interaction
+- [ ] **11.1 (M)** Reliable hover states and transitions for all interactive elements
+- [ ] **11.2 (M)** Entrance animations (fade, slide, scale) with scroll trigger
+- [ ] **11.3 (S)** Animation preview in the editor
+- [ ] **11.4 (S)** Reduced-motion support enforced everywhere
+- [ ] **11.5 (M)** Page transitions and cursor effects controlled from admin settings
+
+### Phase 12 — Hardening
+- [ ] **12.1 (M)** Automated RLS/Storage policy tests in CI
+- [ ] **12.2 (M)** Accessibility audit (keyboard, focus, contrast, alt text, labels) for site and admin
+- [ ] **12.3 (M)** Image optimization (resized thumbnails/variants, lazy loading)
+- [ ] **12.4 (S)** Error reporting and graceful failure of a bad element (never blank the page)
+- [ ] **12.5 (S)** Backup and restore procedure documented
+- [ ] **12.6 (S)** Developer docs: how to add an element, add a tool, run migrations
+
+---
+
+## 6. Decisions
+
+| # | Decision | Recommended default | Needed by |
+|---|---|---|---|
+| D1 | Approve the stack: Vite + TypeScript, React for admin, vanilla TS for the public site | Approve as written | Phase 0 |
+| D2 | **Responsive approach** for canvas sections: (a) one layout scaled down (simple, but text gets tiny on phones) or (b) separate desktop and mobile layouts per section | **(b)**: build the data model for it in 5.4, add the mobile editor in 10.3 | Phase 5 |
+| D3 | Hybrid sections: system sections coded, canvas sections visual | Approve | Phase 5 |
+| D4 | Draft/publish from the start (the old admin saved straight to live) | Yes: added in 5.5 and 6.8 | Phase 5 |
+| D5 | Public site stays vanilla TS (vs React for both) | Vanilla TS | Phase 0 |
+
+## 7. Risks and how the plan handles them
+
+| Risk | Handling |
+|---|---|
+| Editor gets slow or buggy as features pile up | Registry pattern, small modules, unit tests for math/history, one feature per step |
+| Saved designs break after a format change | Versioned schema + migrations + validation on load (5.1) |
+| Mobile layouts retrofitted too late | Decision D2 forced in Phase 5, before elements multiply |
+| Security relies on the admin page being hidden | Real enforcement is Supabase RLS + Storage policies; tested automatically (1.4, 12.1) |
+| New build workflow is unfamiliar | Step 0.5 documents it; I walk you through running it |
+| Scope creep | Feature ideas go to a backlog list; the current step finishes first |
+
+## 8. Backlog (parked ideas)
+Audio element, table element, container/frame element, auto-layout, minimap,
+collaboration/roles, scheduled publishing, analytics.
+- 2026-10-23: Phase 6.1 written: Website page lists the sections from site_sections (drag to reorder, Shown/Hidden switch, Pinned header and footer, "Unpublished changes" badge when a draft exists). Only the hero is connected to the public site so far; other rows say so. Regenerated database types (site_section_drafts, published_at, publish_section). Edit buttons are disabled until 6.2. Awaiting test.
+- 2026-10-23: 6.1 test feedback: only the hero switch changed the public site, but the user expected every row to work. Fixed: the home page now follows the Website page order and Shown/Hidden for Hero, Art Categories, Featured Work and Contact (the "Have a project in mind?" band); About switches the "About me" button and the About menu link; Contact also switches its menu link. Pages stay reachable by direct URL. Removed the "not connected" notes. Awaiting re-test.
+- 2026-10-23: Phase 6.1 re-tested by user (order and show/hide now change the public home page) and ticked.
+- 2026-10-23: Phase 6.2 written: opening Website > Hero > Edit shows the canvas (#/website/hero). It draws the section's draft or published design (or a blank one if it has none) with the same renderer as the public site; zoom (buttons, Ctrl+scroll, pinch), Fit and 100%, pan (scroll or drag the background), click to select one element (blue outline and a status line), click empty space or Esc to deselect. Read-only: nothing is saved yet (6.8). Edit is only enabled for the hero, the one section the public site can draw from a design. Pure view math (zoom around cursor, fit) is unit-tested. Awaiting test.
+- 2026-10-23: Phase 6.2 tested by user (check passes; canvas works) and ticked.
+- 2026-10-24: Phase 6.3 written: drag an element to move it, drag the 8 handles to resize (the opposite side stays put, also when rotated), drag the round handle above to rotate. Shift constrains: move along one axis, keep the shape on corners, snap rotation to 15°. Pure geometry (moveBox, resizeBox, rotationFor) and the design edit helper are unit-tested. Changes live only in the open editor (no saving until 6.8; reloading undoes them). Awaiting test.
+- 2026-10-24: Phase 6.3 tested by user (move, resize, rotate, Shift) and ticked.
+- 2026-10-24: Phase 6.4 written: an Elements panel beside the canvas with Add Text / Rectangle / Ellipse (new element appears in the middle, on top, selected) and Delete (button, or Delete/Backspace on the canvas). Add and delete are unit-tested, including the 500-element limit and that results stay valid. Still unsaved until 6.8. Awaiting test.
+- 2026-10-24: Phase 6.4 tested by user (add Text/Rectangle/Ellipse, Delete) and ticked. Phase 6.5 written: a Properties panel on the right built from field lists (src/admin/editor/fields.ts): common position, size, rotation, opacity and name, plus text (content, font, weight, size, line height, letter spacing, align, italic, underline, colour) and shape (shape, corner radius, fill, outline colour and width). Every edit is checked against the design format; refused values show a message and are not stored. A new element type only adds a field list. Unit-tested. Still unsaved until 6.8. Awaiting test.
+- 2026-10-24: Phase 6.5 tested by user (properties panel) and ticked. Phase 6.6 written: a Layers panel (top layer first) to select, hide, lock and drag to reorder, plus To front / Forward / Backward / To back buttons for the selected element. Locked elements can be selected but not dragged or resized on the canvas; hidden ones are not drawn. Stacking operations are unit-tested. Still unsaved until 6.8. Awaiting test.
+- 2026-10-24: Phase 6.6 tested by user (layers panel, stacking buttons) and ticked. Phase 6.7 written: Undo and Redo (buttons and Ctrl+Z, Ctrl+Shift+Z, Ctrl+Y) from a unit-tested history engine (src/admin/editor/history.ts): up to 100 steps; a whole drag, resize or rotate is one step, and typing in one field is one step; a new change clears Redo. Text boxes keep the browser's own undo while you are typing in them. Still unsaved until 6.8. Awaiting test.
+- 2026-10-24: Phase 6.7 tested by user (undo/redo) and ticked. Phase 6.8 written: a bar above the editor with a status badge (Unsaved changes / Draft saved, not live / Live), Save draft (stores the draft; the live site is untouched), Publish (saves then calls publish_section; warns if the design has no elements), Discard changes (back to the live version, deletes the draft) and Use built-in version (removes the design from the live section so the old hero returns). Leaving with unsaved changes asks first (tab close/reload and admin links; the browser Back button is not covered). Invalid designs are refused with a message. Awaiting test: publishing should change the public hero.
+- 2026-10-24: Phase 6.8 tested by user (save draft, publish, discard, built-in fallback) and ticked. Phase 6 complete: the hero can be designed visually and published. (Lint fix: a function named useBuiltIn was renamed because the lint rule treats use* names as hooks.)

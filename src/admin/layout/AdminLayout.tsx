@@ -1,11 +1,5 @@
 import { useAuth } from '../auth/AuthProvider';
-import {
-  ADMIN_PAGES,
-  adminHref,
-  useAdminPage,
-  useProjectRoute,
-  useSectionRoute,
-} from '../routing';
+import { ADMIN_PAGES, adminHref, useAdminPage, useProjectRoute, useSectionRoute } from '../routing';
 import { ProjectEditorPage } from '../pages/ProjectEditorPage';
 import { ProjectsPage } from '../pages/ProjectsPage';
 import { SectionEditorPage } from '../pages/SectionEditorPage';

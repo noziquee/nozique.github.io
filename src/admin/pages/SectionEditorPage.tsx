@@ -2,13 +2,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { Canvas } from '../editor/Canvas';
 import { PropertiesPanel } from '../editor/PropertiesPanel';
 import { LayersPanel } from '../editor/LayersPanel';
-import {
-  addElement,
-  canStep,
-  deleteElement,
-  findElement,
-  stepElement,
-} from '../editor/designOps';
+import { addElement, canStep, deleteElement, findElement, stepElement } from '../editor/designOps';
 import { canRedo, canUndo, createHistory, endGroup, record, redo, undo } from '../editor/history';
 import type { History } from '../editor/history';
 import type { NewElementKind, StackStep } from '../editor/designOps';
@@ -230,7 +224,9 @@ export function SectionEditorPage({ sectionKey }: { sectionKey: string }) {
 
   const discard = () =>
     run(async () => {
-      const sure = window.confirm('Throw away your unpublished changes and go back to the live one?');
+      const sure = window.confirm(
+        'Throw away your unpublished changes and go back to the live one?',
+      );
       if (!sure) return null;
       await discardSectionDraft(sectionKey);
       const fresh = await loadSectionForEditing(sectionKey);
@@ -278,9 +274,7 @@ export function SectionEditorPage({ sectionKey }: { sectionKey: string }) {
     <section className="editor-page">
       <Back />
       <h1>{section.name}</h1>
-      <p className="muted">
-        {SOURCE_NOTE[source]}
-      </p>
+      <p className="muted">{SOURCE_NOTE[source]}</p>
       <div className="editor-bar">
         <span className={`badge${dirty ? ' badge-draft' : ''}`}>{state}</span>
         <button type="button" disabled={busy || !dirty} onClick={() => void saveDraft()}>

@@ -29,10 +29,7 @@ const raw = {
     desktop: {
       width: 800,
       height: 400,
-      elements: [
-        shape('a', 0, 10, '#fff'),
-        shape('b', 5, 20, '#000'),
-      ],
+      elements: [shape('a', 0, 10, '#fff'), shape('b', 5, 20, '#000')],
     },
   },
 };

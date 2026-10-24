@@ -28,8 +28,7 @@ export function withoutDesign(content: unknown): Record<string, unknown> {
 }
 
 export type DraftContent =
-  | { ok: true; content: Record<string, unknown> }
-  | { ok: false; errors: string[] };
+  { ok: true; content: Record<string, unknown> } | { ok: false; errors: string[] };
 
 /**
  * The content to store as a draft: the section's current content with the edited design in it.

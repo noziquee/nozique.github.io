@@ -116,10 +116,7 @@ export async function publishSection(key: string): Promise<void> {
 }
 
 export async function discardSectionDraft(key: string): Promise<void> {
-  const { error } = await getSupabase()
-    .from('site_section_drafts')
-    .delete()
-    .eq('section_key', key);
+  const { error } = await getSupabase().from('site_section_drafts').delete().eq('section_key', key);
   if (error) throw new Error(error.message);
 }
 
@@ -131,4 +128,3 @@ export async function removePublishedDesign(key: string, content: unknown): Prom
     .eq('section_key', key);
   if (error) throw new Error(error.message);
 }
-

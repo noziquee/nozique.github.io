@@ -15,12 +15,7 @@ import {
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import {
-  changedOrders,
-  isDesignable,
-  isLiveSection,
-  reorderSections,
-} from '../data/sectionRules';
+import { changedOrders, isDesignable, isLiveSection, reorderSections } from '../data/sectionRules';
 import { sectionHref } from '../routing';
 import { listSections, saveSectionOrder, setSectionEnabled } from '../data/siteSections';
 import type { SectionSummary } from '../data/siteSections';

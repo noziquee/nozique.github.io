@@ -16,8 +16,8 @@ export function updateElement(design: Design, id: string, patch: ElementPatch): 
       ...design.layouts,
       desktop: {
         ...desktop,
-        elements: desktop.elements.map(
-          (element): DesignElement => (element.id === id ? { ...element, ...patch } : element),
+        elements: desktop.elements.map((element): DesignElement =>
+          element.id === id ? { ...element, ...patch } : element,
         ),
       },
     },

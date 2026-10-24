@@ -206,10 +206,7 @@ export function Canvas({ design, selectedId, onSelect, onChange, onDelete }: Pro
 
     if (g.mode === 'move') {
       const next = moveBox(g.origin, stageDx, stageDy, event.shiftKey);
-      onChange(
-        updateElement(design, g.elementId, { position: { x: next.x, y: next.y } }),
-        g.group,
-      );
+      onChange(updateElement(design, g.elementId, { position: { x: next.x, y: next.y } }), g.group);
     } else if (g.mode === 'resize' && g.handle) {
       const next = resizeBox(g.origin, g.handle, stageDx, stageDy, event.shiftKey);
       onChange(

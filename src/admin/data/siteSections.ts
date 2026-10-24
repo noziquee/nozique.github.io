@@ -1,6 +1,6 @@
 import { getSupabase } from '../../shared/supabase/client';
-import type { Row } from '../../shared/supabase/database.types';
-import { pickSectionDesign } from './sectionDesign';
+import type { Json, Row } from '../../shared/supabase/database.types';
+import { hasDesign, pickSectionDesign, withoutDesign } from './sectionDesign';
 import type { PickedDesign } from './sectionDesign';
 
 export type SectionSummary = Pick<
@@ -54,18 +54,81 @@ export interface SectionForEditing {
   key: string;
   name: string;
   picked: PickedDesign;
+  /** The published content (what visitors get). */
+  content: unknown;
+  publishedAt: string;
+  /** True when an unpublished draft is saved. */
+  hasDraft: boolean;
+  /** True when the live section is drawn from a design (not the built-in version). */
+  hasPublishedDesign: boolean;
 }
 
 /** Read one section and its draft (if any) for the visual editor. */
 export async function loadSectionForEditing(key: string): Promise<SectionForEditing> {
   const db = getSupabase();
   const [section, draft] = await Promise.all([
-    db.from('site_sections').select('name, content').eq('section_key', key).maybeSingle(),
+    db
+      .from('site_sections')
+      .select('name, content, published_at')
+      .eq('section_key', key)
+      .maybeSingle(),
     db.from('site_section_drafts').select('draft_content').eq('section_key', key).maybeSingle(),
   ]);
   if (section.error) throw new Error(section.error.message);
   if (draft.error) throw new Error(draft.error.message);
   if (!section.data) throw new Error('That section does not exist.');
   const picked = pickSectionDesign(section.data.content, draft.data?.draft_content);
-  return { key, name: section.data.name, picked };
+  return {
+    key,
+    name: section.data.name,
+    picked,
+    content: section.data.content,
+    publishedAt: section.data.published_at,
+    hasDraft: draft.data !== null,
+    hasPublishedDesign: hasDesign(section.data.content),
+  };
 }
+
+/** Plain JSON for the database: drops anything that is not data (such as undefined). */
+function toJson(value: unknown): Json {
+  return JSON.parse(JSON.stringify(value)) as Json;
+}
+
+/** Save the work in progress. The live site does not change. */
+export async function saveSectionDraft(
+  key: string,
+  content: Record<string, unknown>,
+  basedOn: string,
+): Promise<void> {
+  const { error } = await getSupabase()
+    .from('site_section_drafts')
+    .upsert(
+      { section_key: key, draft_content: toJson(content), based_on: basedOn },
+      { onConflict: 'section_key' },
+    );
+  if (error) throw new Error(error.message);
+}
+
+/** Make the saved draft the live version (done inside the database in one step). */
+export async function publishSection(key: string): Promise<void> {
+  const { error } = await getSupabase().rpc('publish_section', { p_key: key });
+  if (error) throw new Error(error.message);
+}
+
+export async function discardSectionDraft(key: string): Promise<void> {
+  const { error } = await getSupabase()
+    .from('site_section_drafts')
+    .delete()
+    .eq('section_key', key);
+  if (error) throw new Error(error.message);
+}
+
+/** Take the design off the live section so the built-in version is used again. */
+export async function removePublishedDesign(key: string, content: unknown): Promise<void> {
+  const { error } = await getSupabase()
+    .from('site_sections')
+    .update({ content: toJson(withoutDesign(content)), published_at: new Date().toISOString() })
+    .eq('section_key', key);
+  if (error) throw new Error(error.message);
+}
+

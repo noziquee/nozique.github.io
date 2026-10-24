@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { createEmptyDesign } from '../../shared/design';
-import { pickSectionDesign } from './sectionDesign';
+import { buildDraftContent, hasDesign, pickSectionDesign, withoutDesign } from './sectionDesign';
 
 const live = { version: 1, layouts: { desktop: { width: 800, height: 300, elements: [] } } };
 const draft = { version: 1, layouts: { desktop: { width: 900, height: 400, elements: [] } } };
@@ -40,5 +40,38 @@ describe('pickSectionDesign', () => {
     const picked = pickSectionDesign({ design: live }, { design: { nope: true } });
     expect(picked.ok).toBe(false);
     expect(picked.source).toBe('draft');
+  });
+});
+
+describe('buildDraftContent', () => {
+  it('puts the design into the existing content and keeps the rest', () => {
+    const built = buildDraftContent({ title: 'Hi', design: draft }, live);
+    expect(built.ok).toBe(true);
+    if (!built.ok) return;
+    expect(built.content.title).toBe('Hi');
+    expect(built.content.design).toEqual(live);
+  });
+
+  it('works when the content is empty or not an object', () => {
+    for (const content of [null, undefined, 'x', [], {}]) {
+      const built = buildDraftContent(content, live);
+      expect(built.ok && Object.keys(built.content)).toEqual(['design']);
+    }
+  });
+
+  it('refuses an invalid design', () => {
+    const built = buildDraftContent({}, { version: 1, layouts: {} });
+    expect(built.ok).toBe(false);
+    expect(!built.ok && built.errors.length).toBeGreaterThan(0);
+  });
+});
+
+describe('hasDesign and withoutDesign', () => {
+  it('tell whether content holds a design and remove it', () => {
+    expect(hasDesign({ design: live })).toBe(true);
+    expect(hasDesign({})).toBe(false);
+    expect(hasDesign(null)).toBe(false);
+    expect(withoutDesign({ a: 1, design: live })).toEqual({ a: 1 });
+    expect(withoutDesign('x')).toEqual({});
   });
 });

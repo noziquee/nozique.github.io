@@ -1351,3 +1351,20 @@ a.button:hover {
   color: #ff7a73;
   font-size: 12px;
 }
+
+.editor-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin: 8px 0 12px;
+}
+
+.editor-bar .badge {
+  margin-right: 4px;
+}
+
+.success {
+  color: #3fb67a;
+  margin: 8px 0;
+}

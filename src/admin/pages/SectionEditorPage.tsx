@@ -12,8 +12,16 @@ import {
 import { canRedo, canUndo, createHistory, endGroup, record, redo, undo } from '../editor/history';
 import type { History } from '../editor/history';
 import type { NewElementKind, StackStep } from '../editor/designOps';
+import { useUnsavedGuard } from '../editor/useUnsavedGuard';
 import type { Design } from '../../shared/design';
-import { loadSectionForEditing } from '../data/siteSections';
+import { buildDraftContent } from '../data/sectionDesign';
+import {
+  discardSectionDraft,
+  loadSectionForEditing,
+  publishSection,
+  removePublishedDesign,
+  saveSectionDraft,
+} from '../data/siteSections';
 import type { SectionForEditing } from '../data/siteSections';
 import { isDesignable } from '../data/sectionRules';
 import { adminHref } from '../routing';
@@ -24,6 +32,10 @@ const SOURCE_NOTE = {
   published: 'Opened from the published design.',
   none: 'No design yet, so this is a blank canvas. The built-in section stays live.',
 } as const;
+
+function messageOf(problem: unknown): string {
+  return problem instanceof Error ? problem.message : 'Something went wrong.';
+}
 
 function Back() {
   return (
@@ -39,6 +51,9 @@ export function SectionEditorPage({ sectionKey }: { sectionKey: string }) {
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [history, setHistory] = useState<History<Design> | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
+  const [success, setSuccess] = useState<string | null>(null);
+  const [baseline, setBaseline] = useState<Design | null>(null);
+  const [busy, setBusy] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -46,12 +61,16 @@ export function SectionEditorPage({ sectionKey }: { sectionKey: string }) {
     setError(null);
     setSelectedId(null);
     setHistory(null);
+    setBaseline(null);
     setNotice(null);
+    setSuccess(null);
     loadSectionForEditing(sectionKey).then(
       (loaded) => {
         if (cancelled) return;
         setSection(loaded);
-        setHistory(loaded.picked.ok ? createHistory(loaded.picked.design) : null);
+        const opened = loaded.picked.ok ? loaded.picked.design : null;
+        setHistory(opened ? createHistory(opened) : null);
+        setBaseline(opened);
       },
       (problem: unknown) => {
         if (!cancelled) setError(problem instanceof Error ? problem.message : 'Could not load.');
@@ -63,6 +82,8 @@ export function SectionEditorPage({ sectionKey }: { sectionKey: string }) {
   }, [sectionKey]);
 
   const design = history ? history.present : null;
+  const dirty = Boolean(design && baseline && design !== baseline);
+  useUnsavedGuard(dirty);
 
   /** Store a change. Changes sharing a `group` (one drag, one field) undo as one step. */
   const change = useCallback((next: Design, group?: string) => {
@@ -162,6 +183,84 @@ export function SectionEditorPage({ sectionKey }: { sectionKey: string }) {
   const can = (direction: StackStep) =>
     Boolean(design && selectedId && canStep(design, selectedId, direction));
 
+  /** Run a save-type action: block the buttons meanwhile and report what happened. */
+  async function run(task: () => Promise<string | null>) {
+    setBusy(true);
+    setNotice(null);
+    setSuccess(null);
+    try {
+      setSuccess(await task());
+    } catch (problem) {
+      setNotice(messageOf(problem));
+    }
+    setBusy(false);
+  }
+
+  /** Store the current design as the draft (the live site is not touched). */
+  async function persistDraft() {
+    if (!design || !section) return;
+    const built = buildDraftContent(section.content, design);
+    if (!built.ok) {
+      throw new Error(`The design is not valid: ${built.errors.slice(0, 3).join('; ')}`);
+    }
+    await saveSectionDraft(sectionKey, built.content, section.publishedAt);
+    setBaseline(design);
+  }
+
+  const saveDraft = () =>
+    run(async () => {
+      await persistDraft();
+      setSection(await loadSectionForEditing(sectionKey));
+      return 'Draft saved. The public site is unchanged until you publish.';
+    });
+
+  const publish = () =>
+    run(async () => {
+      if (!design || design.layouts.desktop.elements.length === 0) {
+        const ok = window.confirm(
+          'This design has no elements, so the home page would show an empty hero. Publish anyway?',
+        );
+        if (!ok) return null;
+      }
+      await persistDraft();
+      await publishSection(sectionKey);
+      setSection(await loadSectionForEditing(sectionKey));
+      return 'Published. The home page now uses this design.';
+    });
+
+  const discard = () =>
+    run(async () => {
+      const sure = window.confirm('Throw away your unpublished changes and go back to the live one?');
+      if (!sure) return null;
+      await discardSectionDraft(sectionKey);
+      const fresh = await loadSectionForEditing(sectionKey);
+      if (fresh.picked.ok) {
+        setHistory(createHistory(fresh.picked.design));
+        setBaseline(fresh.picked.design);
+      }
+      setSelectedId(null);
+      setSection(fresh);
+      return 'Back to the live version.';
+    });
+
+  const useBuiltIn = () =>
+    run(async () => {
+      const sure = window.confirm('Switch the home page back to the built-in version?');
+      if (!sure) return null;
+      await removePublishedDesign(sectionKey, section?.content);
+      setSection(await loadSectionForEditing(sectionKey));
+      return 'The home page uses the built-in version again. Your design is still here to edit.';
+    });
+
+  const state = dirty
+    ? 'Unsaved changes'
+    : section?.hasDraft
+      ? 'Draft saved, not live'
+      : section?.hasPublishedDesign
+        ? 'Live'
+        : 'Built-in version is live';
+  const hasUnpublished = dirty || Boolean(section?.hasDraft);
+
   function remove() {
     if (!design || !selectedId) return;
     change(deleteElement(design, selectedId));
@@ -180,12 +279,38 @@ export function SectionEditorPage({ sectionKey }: { sectionKey: string }) {
       <Back />
       <h1>{section.name}</h1>
       <p className="muted">
-        {SOURCE_NOTE[source]} Changes are not saved yet (saving comes in a later step), so reloading
-        discards them.
+        {SOURCE_NOTE[source]}
       </p>
+      <div className="editor-bar">
+        <span className={`badge${dirty ? ' badge-draft' : ''}`}>{state}</span>
+        <button type="button" disabled={busy || !dirty} onClick={() => void saveDraft()}>
+          Save draft
+        </button>
+        <button
+          type="button"
+          className="primary"
+          disabled={busy || !hasUnpublished}
+          onClick={() => void publish()}
+        >
+          Publish
+        </button>
+        <button type="button" disabled={busy || !hasUnpublished} onClick={() => void discard()}>
+          Discard changes
+        </button>
+        {section?.hasPublishedDesign && (
+          <button type="button" disabled={busy} onClick={() => void useBuiltIn()}>
+            Use built-in version
+          </button>
+        )}
+      </div>
       {notice && (
         <p className="error" role="alert">
           {notice}
+        </p>
+      )}
+      {success && (
+        <p className="success" role="status">
+          {success}
         </p>
       )}
       <div className="editor-layout">

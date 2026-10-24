@@ -243,7 +243,7 @@ export function SectionEditorPage({ sectionKey }: { sectionKey: string }) {
       return 'Back to the live version.';
     });
 
-  const useBuiltIn = () =>
+  const switchToBuiltIn = () =>
     run(async () => {
       const sure = window.confirm('Switch the home page back to the built-in version?');
       if (!sure) return null;
@@ -298,7 +298,7 @@ export function SectionEditorPage({ sectionKey }: { sectionKey: string }) {
           Discard changes
         </button>
         {section?.hasPublishedDesign && (
-          <button type="button" disabled={busy} onClick={() => void useBuiltIn()}>
+          <button type="button" disabled={busy} onClick={() => void switchToBuiltIn()}>
             Use built-in version
           </button>
         )}

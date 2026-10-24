@@ -1,8 +1,16 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { Canvas } from '../editor/Canvas';
 import { PropertiesPanel } from '../editor/PropertiesPanel';
 import { LayersPanel } from '../editor/LayersPanel';
-import { addElement, canStep, deleteElement, stepElement } from '../editor/designOps';
+import {
+  addElement,
+  canStep,
+  deleteElement,
+  findElement,
+  stepElement,
+} from '../editor/designOps';
+import { canRedo, canUndo, createHistory, endGroup, record, redo, undo } from '../editor/history';
+import type { History } from '../editor/history';
 import type { NewElementKind, StackStep } from '../editor/designOps';
 import type { Design } from '../../shared/design';
 import { loadSectionForEditing } from '../data/siteSections';
@@ -29,7 +37,7 @@ export function SectionEditorPage({ sectionKey }: { sectionKey: string }) {
   const [section, setSection] = useState<SectionForEditing | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [selectedId, setSelectedId] = useState<string | null>(null);
-  const [design, setDesign] = useState<Design | null>(null);
+  const [history, setHistory] = useState<History<Design> | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
 
   useEffect(() => {
@@ -37,13 +45,13 @@ export function SectionEditorPage({ sectionKey }: { sectionKey: string }) {
     setSection(null);
     setError(null);
     setSelectedId(null);
-    setDesign(null);
+    setHistory(null);
     setNotice(null);
     loadSectionForEditing(sectionKey).then(
       (loaded) => {
         if (cancelled) return;
         setSection(loaded);
-        setDesign(loaded.picked.ok ? loaded.picked.design : null);
+        setHistory(loaded.picked.ok ? createHistory(loaded.picked.design) : null);
       },
       (problem: unknown) => {
         if (!cancelled) setError(problem instanceof Error ? problem.message : 'Could not load.');
@@ -53,6 +61,39 @@ export function SectionEditorPage({ sectionKey }: { sectionKey: string }) {
       cancelled = true;
     };
   }, [sectionKey]);
+
+  const design = history ? history.present : null;
+
+  /** Store a change. Changes sharing a `group` (one drag, one field) undo as one step. */
+  const change = useCallback((next: Design, group?: string) => {
+    setHistory((current) => (current ? record(current, next, group) : current));
+  }, []);
+
+  const select = useCallback((id: string | null) => {
+    setSelectedId(id);
+    setHistory((current) => (current ? endGroup(current) : current));
+  }, []);
+
+  // Ctrl+Z undoes, Ctrl+Shift+Z or Ctrl+Y redoes (text boxes keep their own undo).
+  useEffect(() => {
+    function onKey(event: KeyboardEvent) {
+      if (!event.ctrlKey && !event.metaKey) return;
+      const target = event.target as HTMLElement | null;
+      if (target?.closest('input, textarea, select, [contenteditable="true"]')) return;
+      const key = event.key.toLowerCase();
+      if (key !== 'z' && key !== 'y') return;
+      event.preventDefault();
+      const forward = key === 'y' || event.shiftKey;
+      setHistory((current) => (current ? (forward ? redo(current) : undo(current)) : current));
+    }
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, []);
+
+  // After Undo or Redo the selected element may not exist any more.
+  useEffect(() => {
+    if (design && selectedId && !findElement(design, selectedId)) setSelectedId(null);
+  }, [design, selectedId]);
 
   if (!isDesignable(sectionKey)) {
     return (
@@ -98,7 +139,7 @@ export function SectionEditorPage({ sectionKey }: { sectionKey: string }) {
   }
 
   const { source } = section.picked;
-  if (!design) return <Loading />;
+  if (!history || !design) return <Loading />;
   const selected = selectedId
     ? design.layouts.desktop.elements.find((element) => element.id === selectedId)
     : undefined;
@@ -110,12 +151,12 @@ export function SectionEditorPage({ sectionKey }: { sectionKey: string }) {
       return;
     }
     setNotice(null);
-    setDesign(result.design);
-    setSelectedId(result.id);
+    change(result.design);
+    select(result.id);
   }
 
   function step(direction: StackStep) {
-    if (design && selectedId) setDesign(stepElement(design, selectedId, direction));
+    if (design && selectedId) change(stepElement(design, selectedId, direction));
   }
 
   const can = (direction: StackStep) =>
@@ -123,8 +164,8 @@ export function SectionEditorPage({ sectionKey }: { sectionKey: string }) {
 
   function remove() {
     if (!design || !selectedId) return;
-    setDesign(deleteElement(design, selectedId));
-    setSelectedId(null);
+    change(deleteElement(design, selectedId));
+    select(null);
   }
 
   const count = design.layouts.desktop.elements.length;
@@ -140,7 +181,7 @@ export function SectionEditorPage({ sectionKey }: { sectionKey: string }) {
       <h1>{section.name}</h1>
       <p className="muted">
         {SOURCE_NOTE[source]} Changes are not saved yet (saving comes in a later step), so reloading
-        undoes them.
+        discards them.
       </p>
       {notice && (
         <p className="error" role="alert">
@@ -149,6 +190,23 @@ export function SectionEditorPage({ sectionKey }: { sectionKey: string }) {
       )}
       <div className="editor-layout">
         <aside className="editor-panel" aria-label="Elements">
+          <h2>History</h2>
+          <button
+            type="button"
+            disabled={!canUndo(history)}
+            title="Ctrl + Z"
+            onClick={() => setHistory(undo(history))}
+          >
+            Undo
+          </button>
+          <button
+            type="button"
+            disabled={!canRedo(history)}
+            title="Ctrl + Shift + Z"
+            onClick={() => setHistory(redo(history))}
+          >
+            Redo
+          </button>
           <h2>Add</h2>
           <button type="button" onClick={() => add('text')}>
             Text
@@ -182,18 +240,18 @@ export function SectionEditorPage({ sectionKey }: { sectionKey: string }) {
         <Canvas
           design={design}
           selectedId={selectedId}
-          onSelect={setSelectedId}
-          onChange={setDesign}
+          onSelect={select}
+          onChange={change}
           onDelete={remove}
         />
         <div className="editor-side">
           <LayersPanel
             design={design}
             selectedId={selectedId}
-            onSelect={setSelectedId}
-            onChange={setDesign}
+            onSelect={select}
+            onChange={change}
           />
-          <PropertiesPanel design={design} selectedId={selectedId} onChange={setDesign} />
+          <PropertiesPanel design={design} selectedId={selectedId} onChange={change} />
         </div>
       </div>
       <p className="canvas-status" aria-live="polite">

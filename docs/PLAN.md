@@ -18,7 +18,7 @@ top are updated after each step is tested. Nothing gets ticked until you have te
 | 4 | Project manager (posts, categories, uploads) | 7 | ✅ |
 | 4R | Projects admin layout rework (grid, category chips, dialog editor) | 5 | ✅ |
 | 5 | Design engine: data model, renderer, element registry | 6 | ✅ |
-| 6 | Visual editor core | 8 | 🟦 5 of 8 done |
+| 6 | Visual editor core | 8 | 🟦 6 of 8 done |
 | 7 | More elements, one at a time | 8 | ⬜ |
 | 8 | Editor power tools | 8 | ⬜ |
 | 9 | Design system: colors, text styles, templates | 5 | ⬜ |
@@ -26,7 +26,7 @@ top are updated after each step is tested. Nothing gets ticked until you have te
 | 11 | Animation and interaction | 5 | ⬜ |
 | 12 | Hardening: security, accessibility, performance | 6 | ⬜ |
 
-**Current step:** 6.6 (written, awaiting your test)
+**Current step:** 6.7 (written, awaiting your test)
 
 ### Changelog
 - 2026-10-18: Plan drafted.
@@ -259,7 +259,7 @@ types and lint pass, build succeeds, tested by you, tracker updated.
 - [x] **6.3 (L)** Move, resize, rotate with handles (Shift to constrain).
 - [x] **6.4 (M)** Elements panel (add Text, Shape) and Delete.
 - [x] **6.5 (L)** Properties panel generated from each element's declarative fields.
-- [ ] **6.6 (M)** Layers panel: select, show/hide, lock, drag to reorder, bring forward/back.
+- [x] **6.6 (M)** Layers panel: select, show/hide, lock, drag to reorder, bring forward/back.
 - [ ] **6.7 (M)** Undo/redo (Ctrl+Z / Ctrl+Shift+Z) with a unit-tested history engine.
 - [ ] **6.8 (M)** Save draft / Publish / Discard, unsaved-changes warning, validation messages. *Done when:* publish updates the public hero.
 
@@ -350,3 +350,4 @@ collaboration/roles, scheduled publishing, analytics.
 - 2026-10-24: Phase 6.4 written: an Elements panel beside the canvas with Add Text / Rectangle / Ellipse (new element appears in the middle, on top, selected) and Delete (button, or Delete/Backspace on the canvas). Add and delete are unit-tested, including the 500-element limit and that results stay valid. Still unsaved until 6.8. Awaiting test.
 - 2026-10-24: Phase 6.4 tested by user (add Text/Rectangle/Ellipse, Delete) and ticked. Phase 6.5 written: a Properties panel on the right built from field lists (src/admin/editor/fields.ts): common position, size, rotation, opacity and name, plus text (content, font, weight, size, line height, letter spacing, align, italic, underline, colour) and shape (shape, corner radius, fill, outline colour and width). Every edit is checked against the design format; refused values show a message and are not stored. A new element type only adds a field list. Unit-tested. Still unsaved until 6.8. Awaiting test.
 - 2026-10-24: Phase 6.5 tested by user (properties panel) and ticked. Phase 6.6 written: a Layers panel (top layer first) to select, hide, lock and drag to reorder, plus To front / Forward / Backward / To back buttons for the selected element. Locked elements can be selected but not dragged or resized on the canvas; hidden ones are not drawn. Stacking operations are unit-tested. Still unsaved until 6.8. Awaiting test.
+- 2026-10-24: Phase 6.6 tested by user (layers panel, stacking buttons) and ticked. Phase 6.7 written: Undo and Redo (buttons and Ctrl+Z, Ctrl+Shift+Z, Ctrl+Y) from a unit-tested history engine (src/admin/editor/history.ts): up to 100 steps; a whole drag, resize or rotate is one step, and typing in one field is one step; a new change clears Redo. Text boxes keep the browser's own undo while you are typing in them. Still unsaved until 6.8. Awaiting test.

@@ -151,7 +151,7 @@ function FieldInput({ spec, value, onCommit }: FieldProps) {
 interface Props {
   design: Design;
   selectedId: string | null;
-  onChange: (design: Design) => void;
+  onChange: (design: Design, group?: string) => void;
 }
 
 /** The properties of the selected element, built from the field lists in fields.ts. */
@@ -171,7 +171,8 @@ export function PropertiesPanel({ design, selectedId, onChange }: Props) {
   function commit(spec: FieldSpec, value: FieldValue): string | null {
     const result = applyField(design, elementId, spec, value);
     if (!result.ok) return result.error;
-    onChange(result.design);
+    // Typing in one field is one undo step, not one per keystroke.
+    onChange(result.design, `${elementId}:${spec.key}`);
     return null;
   }
 

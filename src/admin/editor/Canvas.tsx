@@ -13,7 +13,7 @@ interface Props {
   selectedId: string | null;
   onSelect: (id: string | null) => void;
   /** Called many times while dragging, with the design as it looks right now. */
-  onChange: (design: Design) => void;
+  onChange: (design: Design, group?: string) => void;
   /** Called when the Delete or Backspace key is pressed on the canvas. */
   onDelete: () => void;
 }
@@ -29,6 +29,8 @@ interface Gesture {
   origin: Box | null;
   handle: Handle | null;
   moved: boolean;
+  /** Names this drag, so all its steps undo together. */
+  group: string;
 }
 
 const CLICK_SLOP = 4;
@@ -70,6 +72,7 @@ export function Canvas({ design, selectedId, onSelect, onChange, onDelete }: Pro
   const contentRef = useRef<HTMLDivElement>(null);
   const gesture = useRef<Gesture | null>(null);
   const fitted = useRef(false);
+  const drags = useRef(0);
   const [view, setView] = useState<View>({ zoom: 1, x: 40, y: 40 });
   const [panning, setPanning] = useState(false);
   const layout = design.layouts.desktop;
@@ -151,7 +154,9 @@ export function Canvas({ design, selectedId, onSelect, onChange, onDelete }: Pro
     const target = event.target as HTMLElement;
     const handleName = target.closest<HTMLElement>('[data-handle]')?.dataset.handle;
     const hitId = target.closest<HTMLElement>('[data-element-id]')?.dataset.elementId ?? null;
-    const base = { start: { x: event.clientX, y: event.clientY }, view, moved: false };
+    drags.current += 1;
+    const group = `drag-${drags.current}`;
+    const base = { start: { x: event.clientX, y: event.clientY }, view, moved: false, group };
 
     let next: Gesture = { ...base, mode: 'pan', elementId: null, origin: null, handle: null };
     const selectedElement = selectedId ? findElement(design, selectedId) : undefined;
@@ -201,7 +206,10 @@ export function Canvas({ design, selectedId, onSelect, onChange, onDelete }: Pro
 
     if (g.mode === 'move') {
       const next = moveBox(g.origin, stageDx, stageDy, event.shiftKey);
-      onChange(updateElement(design, g.elementId, { position: { x: next.x, y: next.y } }));
+      onChange(
+        updateElement(design, g.elementId, { position: { x: next.x, y: next.y } }),
+        g.group,
+      );
     } else if (g.mode === 'resize' && g.handle) {
       const next = resizeBox(g.origin, g.handle, stageDx, stageDy, event.shiftKey);
       onChange(
@@ -209,12 +217,13 @@ export function Canvas({ design, selectedId, onSelect, onChange, onDelete }: Pro
           position: { x: next.x, y: next.y },
           size: { width: next.width, height: next.height },
         }),
+        g.group,
       );
     } else if (g.mode === 'rotate') {
       const from = stagePoint(g.start.x, g.start.y, g.view);
       const to = stagePoint(event.clientX, event.clientY, g.view);
       const rotation = rotationFor(g.origin, from, to, event.shiftKey);
-      onChange(updateElement(design, g.elementId, { rotation }));
+      onChange(updateElement(design, g.elementId, { rotation }), g.group);
     }
   }
 

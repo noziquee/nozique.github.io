@@ -18,7 +18,7 @@ top are updated after each step is tested. Nothing gets ticked until you have te
 | 4 | Project manager (posts, categories, uploads) | 7 | ✅ |
 | 4R | Projects admin layout rework (grid, category chips, dialog editor) | 5 | ✅ |
 | 5 | Design engine: data model, renderer, element registry | 6 | ✅ |
-| 6 | Visual editor core | 8 | 🟦 3 of 8 done |
+| 6 | Visual editor core | 8 | 🟦 4 of 8 done |
 | 7 | More elements, one at a time | 8 | ⬜ |
 | 8 | Editor power tools | 8 | ⬜ |
 | 9 | Design system: colors, text styles, templates | 5 | ⬜ |
@@ -26,7 +26,7 @@ top are updated after each step is tested. Nothing gets ticked until you have te
 | 11 | Animation and interaction | 5 | ⬜ |
 | 12 | Hardening: security, accessibility, performance | 6 | ⬜ |
 
-**Current step:** 6.4 (written, awaiting your test)
+**Current step:** 6.5 (written, awaiting your test)
 
 ### Changelog
 - 2026-10-18: Plan drafted.
@@ -257,7 +257,7 @@ types and lint pass, build succeeds, tested by you, tracker updated.
 - [x] **6.1 (M)** Website page in admin: section list (enable/disable, reorder, pinned header/footer).
 - [x] **6.2 (L)** Canvas with zoom/pan and the shared renderer; select one element.
 - [x] **6.3 (L)** Move, resize, rotate with handles (Shift to constrain).
-- [ ] **6.4 (M)** Elements panel (add Text, Shape) and Delete.
+- [x] **6.4 (M)** Elements panel (add Text, Shape) and Delete.
 - [ ] **6.5 (L)** Properties panel generated from each element's declarative fields.
 - [ ] **6.6 (M)** Layers panel: select, show/hide, lock, drag to reorder, bring forward/back.
 - [ ] **6.7 (M)** Undo/redo (Ctrl+Z / Ctrl+Shift+Z) with a unit-tested history engine.
@@ -348,3 +348,4 @@ collaboration/roles, scheduled publishing, analytics.
 - 2026-10-24: Phase 6.3 written: drag an element to move it, drag the 8 handles to resize (the opposite side stays put, also when rotated), drag the round handle above to rotate. Shift constrains: move along one axis, keep the shape on corners, snap rotation to 15°. Pure geometry (moveBox, resizeBox, rotationFor) and the design edit helper are unit-tested. Changes live only in the open editor (no saving until 6.8; reloading undoes them). Awaiting test.
 - 2026-10-24: Phase 6.3 tested by user (move, resize, rotate, Shift) and ticked.
 - 2026-10-24: Phase 6.4 written: an Elements panel beside the canvas with Add Text / Rectangle / Ellipse (new element appears in the middle, on top, selected) and Delete (button, or Delete/Backspace on the canvas). Add and delete are unit-tested, including the 500-element limit and that results stay valid. Still unsaved until 6.8. Awaiting test.
+- 2026-10-24: Phase 6.4 tested by user (add Text/Rectangle/Ellipse, Delete) and ticked. Phase 6.5 written: a Properties panel on the right built from field lists (src/admin/editor/fields.ts): common position, size, rotation, opacity and name, plus text (content, font, weight, size, line height, letter spacing, align, italic, underline, colour) and shape (shape, corner radius, fill, outline colour and width). Every edit is checked against the design format; refused values show a message and are not stored. A new element type only adds a field list. Unit-tested. Still unsaved until 6.8. Awaiting test.

@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Canvas } from '../editor/Canvas';
+import { PropertiesPanel } from '../editor/PropertiesPanel';
 import { addElement, deleteElement } from '../editor/designOps';
 import type { NewElementKind } from '../editor/designOps';
 import type { Design } from '../../shared/design';
@@ -165,6 +166,7 @@ export function SectionEditorPage({ sectionKey }: { sectionKey: string }) {
           onChange={setDesign}
           onDelete={remove}
         />
+        <PropertiesPanel design={design} selectedId={selectedId} onChange={setDesign} />
       </div>
       <p className="canvas-status" aria-live="polite">
         {status}

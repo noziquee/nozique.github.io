@@ -1179,7 +1179,7 @@ a.button:hover {
 
 .editor-layout {
   display: grid;
-  grid-template-columns: 170px minmax(0, 1fr);
+  grid-template-columns: 150px minmax(0, 1fr) 270px;
   gap: 16px;
   align-items: start;
 }
@@ -1199,6 +1199,16 @@ a.button:hover {
   color: var(--muted);
 }
 
+@media (max-width: 1100px) {
+  .editor-layout {
+    grid-template-columns: 150px minmax(0, 1fr);
+  }
+
+  .props-panel {
+    grid-column: 1 / -1;
+  }
+}
+
 @media (max-width: 760px) {
   .editor-layout {
     grid-template-columns: 1fr;
@@ -1208,4 +1218,76 @@ a.button:hover {
     flex-flow: row wrap;
     align-items: center;
   }
+}
+
+.props-panel {
+  max-height: calc(100vh - 220px);
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+.props-panel h2 {
+  margin: 0 0 4px;
+  font-size: 13px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--muted);
+}
+
+.props-group {
+  margin: 14px 0 0;
+  padding: 0;
+  border: 0;
+}
+
+.props-group legend {
+  padding: 0;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.props-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0 10px;
+}
+
+.prop label {
+  margin: 10px 0 4px;
+  font-size: 13px;
+}
+
+.prop input,
+.prop select,
+.prop textarea {
+  padding: 6px 8px;
+}
+
+.prop-toggle label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.prop-toggle input {
+  width: auto;
+}
+
+.prop-colour {
+  display: flex;
+  gap: 6px;
+}
+
+.prop-colour input[type='color'] {
+  width: 40px;
+  flex: none;
+  padding: 2px;
+}
+
+.prop-error {
+  display: block;
+  margin-top: 4px;
+  color: #ff7a73;
+  font-size: 12px;
 }

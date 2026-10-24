@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react';
 import { Canvas } from '../editor/Canvas';
 import { PropertiesPanel } from '../editor/PropertiesPanel';
-import { addElement, deleteElement } from '../editor/designOps';
-import type { NewElementKind } from '../editor/designOps';
+import { LayersPanel } from '../editor/LayersPanel';
+import { addElement, canStep, deleteElement, stepElement } from '../editor/designOps';
+import type { NewElementKind, StackStep } from '../editor/designOps';
 import type { Design } from '../../shared/design';
 import { loadSectionForEditing } from '../data/siteSections';
 import type { SectionForEditing } from '../data/siteSections';
@@ -113,6 +114,13 @@ export function SectionEditorPage({ sectionKey }: { sectionKey: string }) {
     setSelectedId(result.id);
   }
 
+  function step(direction: StackStep) {
+    if (design && selectedId) setDesign(stepElement(design, selectedId, direction));
+  }
+
+  const can = (direction: StackStep) =>
+    Boolean(design && selectedId && canStep(design, selectedId, direction));
+
   function remove() {
     if (!design || !selectedId) return;
     setDesign(deleteElement(design, selectedId));
@@ -152,6 +160,18 @@ export function SectionEditorPage({ sectionKey }: { sectionKey: string }) {
             Ellipse
           </button>
           <h2>Selected</h2>
+          <button type="button" disabled={!can('front')} onClick={() => step('front')}>
+            To front
+          </button>
+          <button type="button" disabled={!can('forward')} onClick={() => step('forward')}>
+            Forward
+          </button>
+          <button type="button" disabled={!can('backward')} onClick={() => step('backward')}>
+            Backward
+          </button>
+          <button type="button" disabled={!can('back')} onClick={() => step('back')}>
+            To back
+          </button>
           <button type="button" className="danger" disabled={!selectedId} onClick={remove}>
             Delete
           </button>
@@ -166,7 +186,15 @@ export function SectionEditorPage({ sectionKey }: { sectionKey: string }) {
           onChange={setDesign}
           onDelete={remove}
         />
-        <PropertiesPanel design={design} selectedId={selectedId} onChange={setDesign} />
+        <div className="editor-side">
+          <LayersPanel
+            design={design}
+            selectedId={selectedId}
+            onSelect={setSelectedId}
+            onChange={setDesign}
+          />
+          <PropertiesPanel design={design} selectedId={selectedId} onChange={setDesign} />
+        </div>
       </div>
       <p className="canvas-status" aria-live="polite">
         {status}

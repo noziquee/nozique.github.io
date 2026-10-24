@@ -2,7 +2,16 @@ import { describe, expect, it } from 'vitest';
 import { parseDesign } from '../../shared/design';
 import type { Design } from '../../shared/design';
 import { LIMITS, createEmptyDesign } from '../../shared/design';
-import { addElement, deleteElement, findElement, uniqueId, updateElement } from './designOps';
+import {
+  addElement,
+  canStep,
+  deleteElement,
+  findElement,
+  moveElementOnto,
+  stepElement,
+  uniqueId,
+  updateElement,
+} from './designOps';
 
 function shape(id: string, at: number, size: number, fill: string) {
   return {
@@ -121,5 +130,64 @@ describe('deleteElement and uniqueId', () => {
     const design = load();
     expect(uniqueId(design, 'a')).toBe('a-1');
     expect(uniqueId(design, 'b')).toBe('b-1');
+  });
+});
+
+describe('stacking order', () => {
+  function stack(count: number): Design {
+    let design = createEmptyDesign();
+    for (let i = 0; i < count; i += 1) {
+      const result = addElement(design, 'rectangle');
+      if (!result.ok) throw new Error('add failed');
+      design = result.design;
+    }
+    return design;
+  }
+  const ids = (design: Design) => design.layouts.desktop.elements.map((e) => e.id);
+
+  it('brings an element forward and sends it backward', () => {
+    const design = stack(3); // rectangle-1 is at the bottom, rectangle-3 on top
+    expect(ids(stepElement(design, 'rectangle-1', 'forward'))).toEqual([
+      'rectangle-2',
+      'rectangle-1',
+      'rectangle-3',
+    ]);
+    expect(ids(stepElement(design, 'rectangle-3', 'backward'))).toEqual([
+      'rectangle-1',
+      'rectangle-3',
+      'rectangle-2',
+    ]);
+  });
+
+  it('sends to the very back or front', () => {
+    const design = stack(3);
+    expect(ids(stepElement(design, 'rectangle-3', 'back'))[0]).toBe('rectangle-3');
+    expect(ids(stepElement(design, 'rectangle-1', 'front')).pop()).toBe('rectangle-1');
+  });
+
+  it('knows when a step is not possible', () => {
+    const design = stack(2);
+    expect(canStep(design, 'rectangle-2', 'forward')).toBe(false);
+    expect(canStep(design, 'rectangle-2', 'front')).toBe(false);
+    expect(canStep(design, 'rectangle-2', 'backward')).toBe(true);
+    expect(canStep(design, 'rectangle-1', 'back')).toBe(false);
+    expect(canStep(design, 'nope', 'forward')).toBe(false);
+    expect(stepElement(design, 'rectangle-2', 'forward')).toBe(design);
+  });
+
+  it('moves an element onto another one (drag and drop)', () => {
+    const design = stack(3);
+    expect(ids(moveElementOnto(design, 'rectangle-1', 'rectangle-3'))).toEqual([
+      'rectangle-2',
+      'rectangle-3',
+      'rectangle-1',
+    ]);
+    expect(ids(moveElementOnto(design, 'rectangle-3', 'rectangle-1'))).toEqual([
+      'rectangle-3',
+      'rectangle-1',
+      'rectangle-2',
+    ]);
+    expect(moveElementOnto(design, 'rectangle-1', 'rectangle-1')).toBe(design);
+    expect(moveElementOnto(design, 'x', 'rectangle-1')).toBe(design);
   });
 });

@@ -1220,10 +1220,70 @@ a.button:hover {
   }
 }
 
-.props-panel {
+.editor-side {
   max-height: calc(100vh - 220px);
   overflow-y: auto;
   padding-right: 4px;
+}
+
+.layers-panel {
+  margin-bottom: 18px;
+}
+
+.layers-panel h2 {
+  margin: 0 0 6px;
+  font-size: 13px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--muted);
+}
+
+.layer-list {
+  display: grid;
+  gap: 4px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.layer-row {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--panel);
+}
+
+.layer-row.selected {
+  border-color: #4c8dff;
+}
+
+.layer-row.dim .layer-name {
+  opacity: 0.5;
+}
+
+.layer-name {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  padding: 6px 4px;
+  border: 0;
+  background: none;
+  text-align: left;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.layer-toggle {
+  padding: 4px 6px;
+  border: 0;
+  background: none;
+}
+
+.layer-toggle[aria-pressed='true'] {
+  opacity: 0.8;
 }
 
 .props-panel h2 {

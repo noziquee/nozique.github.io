@@ -58,6 +58,12 @@ const SHAPE_OPTIONS: readonly Option[] = [
   { value: 'ellipse', label: 'Ellipse' },
 ];
 
+const FIT_OPTIONS: readonly Option[] = [
+  { value: 'cover', label: 'Fill the frame (crops)' },
+  { value: 'contain', label: 'Show all (may leave gaps)' },
+  { value: 'fill', label: 'Stretch' },
+];
+
 /** Fields every element has. */
 export const COMMON_GROUPS: readonly FieldGroup[] = [
   {
@@ -143,12 +149,6 @@ export const TYPE_GROUPS: Record<ElementType, readonly FieldGroup[]> = {
     },
   ],
 };
-
-const FIT_OPTIONS: readonly Option[] = [
-  { value: 'cover', label: 'Fill the frame (crops)' },
-  { value: 'contain', label: 'Show all (may leave gaps)' },
-  { value: 'fill', label: 'Stretch' },
-];
 
 export const NAME_FIELD: FieldSpec = {
   kind: 'text',

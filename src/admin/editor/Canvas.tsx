@@ -14,6 +14,8 @@ interface Props {
   onSelect: (id: string | null) => void;
   /** Called many times while dragging, with the design as it looks right now. */
   onChange: (design: Design) => void;
+  /** Called when the Delete or Backspace key is pressed on the canvas. */
+  onDelete: () => void;
 }
 
 type Mode = 'pan' | 'move' | 'resize' | 'rotate';
@@ -63,7 +65,7 @@ function boxOf(element: Framed): Box {
  * zoom (Ctrl + scroll, pinch or the buttons) and pan (scroll, or drag the empty background),
  * and select one element by clicking it.
  */
-export function Canvas({ design, selectedId, onSelect, onChange }: Props) {
+export function Canvas({ design, selectedId, onSelect, onChange, onDelete }: Props) {
   const viewportRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
   const gesture = useRef<Gesture | null>(null);
@@ -261,6 +263,10 @@ export function Canvas({ design, selectedId, onSelect, onChange }: Props) {
         onPointerCancel={onPointerUp}
         onKeyDown={(event) => {
           if (event.key === 'Escape') onSelect(null);
+          if (event.key === 'Delete' || event.key === 'Backspace') {
+            event.preventDefault();
+            onDelete();
+          }
         }}
       >
         <div

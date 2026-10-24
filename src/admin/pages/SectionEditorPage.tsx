@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Canvas } from '../editor/Canvas';
+import { addElement, deleteElement } from '../editor/designOps';
+import type { NewElementKind } from '../editor/designOps';
 import type { Design } from '../../shared/design';
 import { loadSectionForEditing } from '../data/siteSections';
 import type { SectionForEditing } from '../data/siteSections';
@@ -26,6 +28,7 @@ export function SectionEditorPage({ sectionKey }: { sectionKey: string }) {
   const [error, setError] = useState<string | null>(null);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [design, setDesign] = useState<Design | null>(null);
+  const [notice, setNotice] = useState<string | null>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -33,6 +36,7 @@ export function SectionEditorPage({ sectionKey }: { sectionKey: string }) {
     setError(null);
     setSelectedId(null);
     setDesign(null);
+    setNotice(null);
     loadSectionForEditing(sectionKey).then(
       (loaded) => {
         if (cancelled) return;
@@ -96,6 +100,25 @@ export function SectionEditorPage({ sectionKey }: { sectionKey: string }) {
   const selected = selectedId
     ? design.layouts.desktop.elements.find((element) => element.id === selectedId)
     : undefined;
+  function add(kind: NewElementKind) {
+    if (!design) return;
+    const result = addElement(design, kind);
+    if (!result.ok) {
+      setNotice(result.error);
+      return;
+    }
+    setNotice(null);
+    setDesign(result.design);
+    setSelectedId(result.id);
+  }
+
+  function remove() {
+    if (!design || !selectedId) return;
+    setDesign(deleteElement(design, selectedId));
+    setSelectedId(null);
+  }
+
+  const count = design.layouts.desktop.elements.length;
   const status = selected
     ? `Selected: ${selected.name ?? selected.id} (${selected.type}) at ` +
       `${selected.position.x}, ${selected.position.y}, size ` +
@@ -110,12 +133,39 @@ export function SectionEditorPage({ sectionKey }: { sectionKey: string }) {
         {SOURCE_NOTE[source]} Changes are not saved yet (saving comes in a later step), so reloading
         undoes them.
       </p>
-      <Canvas
-        design={design}
-        selectedId={selectedId}
-        onSelect={setSelectedId}
-        onChange={setDesign}
-      />
+      {notice && (
+        <p className="error" role="alert">
+          {notice}
+        </p>
+      )}
+      <div className="editor-layout">
+        <aside className="editor-panel" aria-label="Elements">
+          <h2>Add</h2>
+          <button type="button" onClick={() => add('text')}>
+            Text
+          </button>
+          <button type="button" onClick={() => add('rectangle')}>
+            Rectangle
+          </button>
+          <button type="button" onClick={() => add('ellipse')}>
+            Ellipse
+          </button>
+          <h2>Selected</h2>
+          <button type="button" className="danger" disabled={!selectedId} onClick={remove}>
+            Delete
+          </button>
+          <p className="muted">
+            {count} {count === 1 ? 'element' : 'elements'}
+          </p>
+        </aside>
+        <Canvas
+          design={design}
+          selectedId={selectedId}
+          onSelect={setSelectedId}
+          onChange={setDesign}
+          onDelete={remove}
+        />
+      </div>
       <p className="canvas-status" aria-live="polite">
         {status}
       </p>

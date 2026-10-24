@@ -1176,3 +1176,36 @@ a.button:hover {
 .canvas-content .design-element {
   cursor: move;
 }
+
+.editor-layout {
+  display: grid;
+  grid-template-columns: 170px minmax(0, 1fr);
+  gap: 16px;
+  align-items: start;
+}
+
+.editor-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.editor-panel h2 {
+  margin: 8px 0 0;
+  font-size: 13px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--muted);
+}
+
+@media (max-width: 760px) {
+  .editor-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .editor-panel {
+    flex-flow: row wrap;
+    align-items: center;
+  }
+}

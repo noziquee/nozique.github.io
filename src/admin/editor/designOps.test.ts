@@ -4,6 +4,7 @@ import type { Design } from '../../shared/design';
 import { LIMITS, createEmptyDesign } from '../../shared/design';
 import {
   addElement,
+  addImageElement,
   canStep,
   deleteElement,
   findElement,
@@ -11,6 +12,7 @@ import {
   stepElement,
   uniqueId,
   updateElement,
+  updateImageStyle,
 } from './designOps';
 
 function shape(id: string, at: number, size: number, fill: string) {
@@ -186,5 +188,41 @@ describe('stacking order', () => {
     ]);
     expect(moveElementOnto(design, 'rectangle-1', 'rectangle-1')).toBe(design);
     expect(moveElementOnto(design, 'x', 'rectangle-1')).toBe(design);
+  });
+});
+
+describe('image elements', () => {
+  const photo = { src: 'https://example.com/a.webp', alt: 'A drawing', width: 2400, height: 1200 };
+
+  it('adds a picture that keeps its proportions and fits the starting box', () => {
+    const result = addImageElement(createEmptyDesign(), photo);
+    expect(result.ok).toBe(true);
+    if (!result.ok) return;
+    const element = findElement(result.design, result.id);
+    expect(element?.type).toBe('image');
+    expect(element?.size).toEqual({ width: 480, height: 240 });
+    expect(parseDesign(result.design).ok).toBe(true);
+  });
+
+  it('makes tall pictures fit by height, and small ones are not stretched wildly', () => {
+    const tall = addImageElement(createEmptyDesign(), { ...photo, width: 600, height: 1800 });
+    expect(tall.ok && findElement(tall.design, tall.id)?.size).toEqual({ width: 120, height: 360 });
+  });
+
+  it('does not accept a picture address that is not https', () => {
+    const result = addImageElement(createEmptyDesign(), { ...photo, src: 'http://example.com/a' });
+    // The element is built, but the whole design must then fail validation when saved.
+    expect(result.ok && parseDesign(result.design).ok).toBe(false);
+  });
+
+  it('changes only the crop of picture elements', () => {
+    const added = addImageElement(createEmptyDesign(), photo);
+    if (!added.ok) throw new Error('add failed');
+    const next = updateImageStyle(added.design, added.id, { zoom: 2, focusX: 10 });
+    const element = findElement(next, added.id);
+    expect(element?.type === 'image' && element.style).toMatchObject({ zoom: 2, focusX: 10 });
+    const shape = addElement(next, 'rectangle');
+    if (!shape.ok) throw new Error('add failed');
+    expect(updateImageStyle(shape.design, shape.id, { zoom: 3 })).toEqual(shape.design);
   });
 });

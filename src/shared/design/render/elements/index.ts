@@ -1,5 +1,6 @@
 import type { ElementDefinition, ElementRegistry } from '../registry';
 import { defaultRegistry } from '../registry';
+import { imageElement } from './image';
 import { shapeElement } from './shape';
 import { textElement } from './text';
 
@@ -7,6 +8,7 @@ import { textElement } from './text';
 export const builtInElements: readonly ElementDefinition[] = [
   textElement as unknown as ElementDefinition,
   shapeElement as unknown as ElementDefinition,
+  imageElement as unknown as ElementDefinition,
 ];
 
 /** Make the built-in element types available. Safe to call more than once. */
@@ -16,4 +18,4 @@ export function registerBuiltInElements(registry: ElementRegistry = defaultRegis
   }
 }
 
-export { shapeElement, textElement };
+export { imageElement, shapeElement, textElement };

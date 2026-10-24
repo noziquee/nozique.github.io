@@ -125,3 +125,27 @@ export function rotationFor(box: Box, from: Point, to: Point, snap = false): num
   if (snap) rotation = normalizeAngle(Math.round(rotation / ROTATE_SNAP) * ROTATE_SNAP);
   return round1(rotation);
 }
+
+export interface CropStyle {
+  focusX: number;
+  focusY: number;
+  zoom: number;
+}
+
+/**
+ * Drag the picture inside its frame by (dx, dy) screen-space design pixels: the picture follows
+ * the pointer, so the focus moves the other way. This is a close approximation, not exact.
+ */
+export function panCrop(
+  crop: CropStyle,
+  dx: number,
+  dy: number,
+  frame: { width: number; height: number },
+): CropStyle {
+  const sensitivity = 100 / crop.zoom;
+  return {
+    ...crop,
+    focusX: round1(clamp(crop.focusX - (dx / Math.max(1, frame.width)) * sensitivity, 0, 100)),
+    focusY: round1(clamp(crop.focusY - (dy / Math.max(1, frame.height)) * sensitivity, 0, 100)),
+  };
+}

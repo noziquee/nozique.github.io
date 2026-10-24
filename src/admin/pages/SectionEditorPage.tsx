@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { Canvas } from '../editor/Canvas';
 import { PropertiesPanel } from '../editor/PropertiesPanel';
 import { LayersPanel } from '../editor/LayersPanel';
@@ -9,6 +9,7 @@ import type { NewElementKind, StackStep } from '../editor/designOps';
 import { useUnsavedGuard } from '../editor/useUnsavedGuard';
 import type { Design } from '../../shared/design';
 import { buildDraftContent } from '../data/sectionDesign';
+import { uploadDesignImage } from '../data/siteImages';
 import {
   discardSectionDraft,
   loadSectionForEditing,
@@ -48,6 +49,10 @@ export function SectionEditorPage({ sectionKey }: { sectionKey: string }) {
   const [success, setSuccess] = useState<string | null>(null);
   const [baseline, setBaseline] = useState<Design | null>(null);
   const [busy, setBusy] = useState(false);
+  const [cropId, setCropId] = useState<string | null>(null);
+  const [uploading, setUploading] = useState(false);
+  const fileInput = useRef<HTMLInputElement>(null);
+  const latest = useRef<Design | null>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -79,6 +84,11 @@ export function SectionEditorPage({ sectionKey }: { sectionKey: string }) {
   const dirty = Boolean(design && baseline && design !== baseline);
   useUnsavedGuard(dirty);
 
+  // Remember the newest design, for work that finishes later (an upload).
+  useEffect(() => {
+    latest.current = design;
+  }, [design]);
+
   /** Store a change. Changes sharing a `group` (one drag, one field) undo as one step. */
   const change = useCallback((next: Design, group?: string) => {
     setHistory((current) => (current ? record(current, next, group) : current));
@@ -86,6 +96,7 @@ export function SectionEditorPage({ sectionKey }: { sectionKey: string }) {
 
   const select = useCallback((id: string | null) => {
     setSelectedId(id);
+    setCropId((current) => (current === id ? current : null));
     setHistory((current) => (current ? endGroup(current) : current));
   }, []);
 
@@ -168,6 +179,25 @@ export function SectionEditorPage({ sectionKey }: { sectionKey: string }) {
     setNotice(null);
     change(result.design);
     select(result.id);
+  }
+
+  async function addPicture(file: File) {
+    setUploading(true);
+    setNotice(null);
+    setSuccess(null);
+    try {
+      const uploaded = await uploadDesignImage(file);
+      const current = latest.current;
+      if (!current) return;
+      const result = addImageElement(current, uploaded);
+      if (!result.ok) throw new Error(result.error);
+      change(result.design);
+      select(result.id);
+      setSuccess('Picture added. Describe it in the Alt text box so everyone can follow it.');
+    } catch (problem) {
+      setNotice(messageOf(problem));
+    }
+    setUploading(false);
   }
 
   function step(direction: StackStep) {
@@ -336,6 +366,20 @@ export function SectionEditorPage({ sectionKey }: { sectionKey: string }) {
           <button type="button" onClick={() => add('ellipse')}>
             Ellipse
           </button>
+          <button type="button" disabled={uploading} onClick={() => fileInput.current?.click()}>
+            {uploading ? 'Uploading…' : 'Image…'}
+          </button>
+          <input
+            ref={fileInput}
+            type="file"
+            accept="image/jpeg,image/png,image/webp"
+            hidden
+            onChange={(event) => {
+              const file = event.target.files?.[0];
+              event.target.value = '';
+              if (file) void addPicture(file);
+            }}
+          />
           <h2>Selected</h2>
           <button type="button" disabled={!can('front')} onClick={() => step('front')}>
             To front
@@ -362,6 +406,8 @@ export function SectionEditorPage({ sectionKey }: { sectionKey: string }) {
           onSelect={select}
           onChange={change}
           onDelete={remove}
+          cropId={cropId}
+          onCrop={setCropId}
         />
         <div className="editor-side">
           <LayersPanel

@@ -3,6 +3,9 @@ import { MAX_SIDE, WEBP_QUALITY, fitWithin } from './imageRules';
 export interface ProcessedImage {
   blob: Blob;
   ext: 'webp' | 'jpg';
+  /** The size of the saved picture, in pixels. */
+  width: number;
+  height: number;
 }
 
 function toBlob(canvas: HTMLCanvasElement, type: string, quality: number): Promise<Blob | null> {
@@ -22,7 +25,7 @@ export async function processImage(file: File): Promise<ProcessedImage> {
     context.drawImage(bitmap, 0, 0, width, height);
 
     const webp = await toBlob(canvas, 'image/webp', WEBP_QUALITY);
-    if (webp && webp.type === 'image/webp') return { blob: webp, ext: 'webp' };
+    if (webp && webp.type === 'image/webp') return { blob: webp, ext: 'webp', width, height };
 
     // Older browsers cannot write WebP. JPG has no transparency, so paint white behind it.
     context.globalCompositeOperation = 'destination-over';
@@ -30,7 +33,7 @@ export async function processImage(file: File): Promise<ProcessedImage> {
     context.fillRect(0, 0, width, height);
     const jpg = await toBlob(canvas, 'image/jpeg', 0.88);
     if (!jpg) throw new Error('Your browser could not compress the image.');
-    return { blob: jpg, ext: 'jpg' };
+    return { blob: jpg, ext: 'jpg', width, height };
   } finally {
     bitmap.close();
   }

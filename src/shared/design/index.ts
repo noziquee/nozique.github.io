@@ -7,6 +7,7 @@ export type {
   Design,
   DesignElement,
   ElementType,
+  ImageElement,
   Layout,
   LayoutName,
   ShapeElement,

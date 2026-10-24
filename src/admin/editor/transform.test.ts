@@ -1,5 +1,12 @@
 import { describe, expect, it } from 'vitest';
-import { MIN_SIZE, moveBox, normalizeAngle, resizeBox, rotationFor } from './transform';
+import {
+  MIN_SIZE,
+  moveBox,
+  normalizeAngle,
+  panCrop,
+  resizeBox,
+  rotationFor,
+} from './transform';
 import type { Box } from './transform';
 
 const box: Box = { x: 100, y: 100, width: 200, height: 100, rotation: 0 };
@@ -89,5 +96,24 @@ describe('normalizeAngle', () => {
     expect(normalizeAngle(-270)).toBe(90);
     expect(normalizeAngle(180)).toBe(180);
     expect(normalizeAngle(720)).toBe(0);
+  });
+});
+
+describe('panCrop', () => {
+  const crop = { focusX: 50, focusY: 50, zoom: 1 };
+  const frame = { width: 200, height: 100 };
+
+  it('moves the focus the opposite way to the drag', () => {
+    expect(panCrop(crop, 20, 0, frame)).toMatchObject({ focusX: 40, focusY: 50 });
+    expect(panCrop(crop, 0, -10, frame)).toMatchObject({ focusX: 50, focusY: 60 });
+  });
+
+  it('moves more slowly when zoomed in', () => {
+    expect(panCrop({ ...crop, zoom: 2 }, 20, 0, frame).focusX).toBe(45);
+  });
+
+  it('never leaves 0 to 100 and keeps the zoom', () => {
+    const far = panCrop(crop, -99999, 99999, frame);
+    expect(far).toEqual({ focusX: 100, focusY: 0, zoom: 1 });
   });
 });

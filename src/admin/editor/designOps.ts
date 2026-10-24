@@ -1,5 +1,11 @@
 import { LIMITS } from '../../shared/design';
-import type { Design, DesignElement, ShapeElement, TextElement } from '../../shared/design';
+import type {
+  Design,
+  DesignElement,
+  ImageElement,
+  ShapeElement,
+  TextElement,
+} from '../../shared/design';
 
 export interface ElementPatch {
   position?: DesignElement['position'];
@@ -29,6 +35,9 @@ export function findElement(design: Design, id: string): DesignElement | undefin
 }
 
 export type NewElementKind = 'text' | 'rectangle' | 'ellipse';
+
+/** The biggest a newly added picture is on the canvas. */
+const NEW_IMAGE_BOX = { width: 480, height: 360 };
 
 export type AddResult = { ok: true; design: Design; id: string } | { ok: false; error: string };
 
@@ -170,4 +179,59 @@ export function moveElementOnto(design: Design, activeId: string, overId: string
   const to = elements.findIndex((element) => element.id === overId);
   if (from < 0 || to < 0 || from === to) return design;
   return withElements(design, moved(elements, from, to));
+}
+
+export interface NewImage {
+  src: string;
+  alt: string;
+  /** The picture's own size, used to give the new element the right proportions. */
+  width: number;
+  height: number;
+}
+
+/** Add a picture on top of the others, as big as fits in a 480 x 360 box, keeping its shape. */
+export function addImageElement(design: Design, image: NewImage): AddResult {
+  const { elements } = design.layouts.desktop;
+  if (elements.length >= LIMITS.maxElementsPerLayout) {
+    const error = `A section can have at most ${LIMITS.maxElementsPerLayout} elements.`;
+    return { ok: false, error };
+  }
+  const scale = Math.min(
+    NEW_IMAGE_BOX.width / Math.max(1, image.width),
+    NEW_IMAGE_BOX.height / Math.max(1, image.height),
+  );
+  const width = Math.max(20, Math.round(image.width * scale));
+  const height = Math.max(20, Math.round(image.height * scale));
+  const id = uniqueId(design, 'image');
+  const element: ImageElement = {
+    ...common(design, id, width, height),
+    type: 'image',
+    name: 'Image',
+    content: { src: image.src, alt: image.alt },
+    style: { fit: 'cover', radius: 0, focusX: 50, focusY: 50, zoom: 1 },
+  };
+  const { desktop } = design.layouts;
+  const next: Design = {
+    ...design,
+    layouts: { ...design.layouts, desktop: { ...desktop, elements: [...elements, element] } },
+  };
+  return { ok: true, design: next, id };
+}
+
+/** Change the crop or fit of a picture element. Other elements are left alone. */
+export function updateImageStyle(
+  design: Design,
+  id: string,
+  patch: Partial<ImageElement['style']>,
+): Design {
+  const { desktop } = design.layouts;
+  return withElements(
+    design,
+    desktop.elements.map(
+      (element): DesignElement =>
+        element.id === id && element.type === 'image'
+          ? { ...element, style: { ...element.style, ...patch } }
+          : element,
+    ),
+  );
 }

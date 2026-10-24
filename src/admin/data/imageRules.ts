@@ -3,6 +3,8 @@ export const WEBP_QUALITY = 0.85;
 export const MAX_INPUT_BYTES = 40 * 1024 * 1024;
 export const ACCEPTED_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
 export const GALLERY_BUCKET = 'gallery-images';
+/** Pictures used in website designs (not tied to a project). */
+export const SITE_BUCKET = 'site-images';
 
 /** Scale a size down so its longer side is at most `max`. Never scales up. */
 export function fitWithin(

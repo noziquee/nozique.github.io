@@ -21,7 +21,9 @@ export type FieldSpec =
   | (Base & { kind: 'text'; multiline?: boolean; optional?: boolean })
   | (Base & { kind: 'colour'; optional?: boolean })
   | (Base & { kind: 'select'; options: readonly Option[]; numeric?: boolean })
-  | (Base & { kind: 'toggle' });
+  | (Base & { kind: 'toggle' })
+  /** A picture: shows a button that uploads a new file and stores its address. */
+  | (Base & { kind: 'image' });
 
 export interface FieldGroup {
   title: string;
@@ -101,6 +103,32 @@ export const TYPE_GROUPS: Record<ElementType, readonly FieldGroup[]> = {
       ],
     },
   ],
+  image: [
+    {
+      title: 'Picture',
+      fields: [
+        { kind: 'image', key: 'content.src', label: 'Picture' },
+        { kind: 'text', key: 'content.alt', label: 'Alt text (describe the picture)' },
+      ],
+    },
+    {
+      title: 'Display',
+      grid: true,
+      fields: [
+        { kind: 'select', key: 'style.fit', label: 'Fit', options: FIT_OPTIONS },
+        { kind: 'number', key: 'style.radius', label: 'Corner radius', step: 1 },
+      ],
+    },
+    {
+      title: 'Crop',
+      grid: true,
+      fields: [
+        { kind: 'number', key: 'style.zoom', label: 'Zoom (1 to 5)', step: 0.1 },
+        { kind: 'number', key: 'style.focusX', label: 'Left to right (%)', step: 1 },
+        { kind: 'number', key: 'style.focusY', label: 'Top to bottom (%)', step: 1 },
+      ],
+    },
+  ],
   shape: [
     {
       title: 'Shape',
@@ -115,6 +143,12 @@ export const TYPE_GROUPS: Record<ElementType, readonly FieldGroup[]> = {
     },
   ],
 };
+
+const FIT_OPTIONS: readonly Option[] = [
+  { value: 'cover', label: 'Fill the frame (crops)' },
+  { value: 'contain', label: 'Show all (may leave gaps)' },
+  { value: 'fill', label: 'Stretch' },
+];
 
 export const NAME_FIELD: FieldSpec = {
   kind: 'text',

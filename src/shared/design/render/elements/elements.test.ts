@@ -96,11 +96,63 @@ describe('shape element', () => {
   });
 });
 
+const image = (extra: Record<string, unknown> = {}, style: Record<string, unknown> = {}) => ({
+  ...base,
+  id: 'i',
+  type: 'image',
+  content: { src: 'https://example.com/a.webp', alt: 'A drawing' },
+  style,
+  ...extra,
+});
+
+describe('image element', () => {
+  it('draws a picture that fills its frame, cropped to cover by default', () => {
+    const [frame] = render([image()]);
+    const picture = asNode(frame?.children[0]);
+    expect(picture.tagName).toBe('img');
+    expect(picture.attributes).toMatchObject({
+      src: 'https://example.com/a.webp',
+      alt: 'A drawing',
+      referrerpolicy: 'no-referrer',
+    });
+    expect(picture.styles).toMatchObject({
+      'object-fit': 'cover',
+      'object-position': '50% 50%',
+      width: '100%',
+      height: '100%',
+    });
+    expect(picture.styles['transform']).toBeUndefined();
+    expect(frame?.styles).toMatchObject({ overflow: 'hidden', 'border-radius': '0px' });
+  });
+
+  it('applies fit, rounded corners and the crop (focus and zoom)', () => {
+    const [frame] = render([
+      image({}, { fit: 'contain', radius: 20, focusX: 25, focusY: 75, zoom: 2 }),
+    ]);
+    const picture = asNode(frame?.children[0]);
+    expect(frame?.styles['border-radius']).toBe('20px');
+    expect(picture.styles).toMatchObject({
+      'object-fit': 'contain',
+      'object-position': '25% 75%',
+      transform: 'scale(2)',
+      'transform-origin': '25% 75%',
+    });
+  });
+
+  it('keeps odd alt text as a plain value', () => {
+    const [frame] = render([
+      image({ content: { src: 'https://example.com/a.webp', alt: '"><script>x</script>' } }),
+    ]);
+    expect(asNode(frame?.children[0]).attributes['alt']).toBe('"><script>x</script>');
+    expect(frame?.children).toHaveLength(1);
+  });
+});
+
 describe('registerBuiltInElements', () => {
-  it('registers text and shape, and can be called twice', () => {
+  it('registers every built-in type, and can be called twice', () => {
     const registry = createRegistry();
     registerBuiltInElements(registry);
     registerBuiltInElements(registry);
-    expect(registry.types().sort()).toEqual(['shape', 'text']);
+    expect(registry.types().sort()).toEqual(['image', 'shape', 'text']);
   });
 });

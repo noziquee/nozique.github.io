@@ -19,14 +19,14 @@ top are updated after each step is tested. Nothing gets ticked until you have te
 | 4R | Projects admin layout rework (grid, category chips, dialog editor) | 5 | ✅ |
 | 5 | Design engine: data model, renderer, element registry | 6 | ✅ |
 | 6 | Visual editor core | 8 | ✅ |
-| 7 | More elements, one at a time | 8 | ⬜ |
+| 7 | More elements, one at a time | 8 | 🟦 0 of 8 done |
 | 8 | Editor power tools | 8 | ⬜ |
 | 9 | Design system: colors, text styles, templates | 5 | ⬜ |
 | 10 | Versions, preview and responsive layouts | 5 | ⬜ |
 | 11 | Animation and interaction | 5 | ⬜ |
 | 12 | Hardening: security, accessibility, performance | 6 | ⬜ |
 
-**Current step:** Phase 7 planning (Phase 6 complete)
+**Current step:** 7.1 (written, awaiting your test)
 
 ### Changelog
 - 2026-10-18: Plan drafted.
@@ -353,3 +353,4 @@ collaboration/roles, scheduled publishing, analytics.
 - 2026-10-24: Phase 6.6 tested by user (layers panel, stacking buttons) and ticked. Phase 6.7 written: Undo and Redo (buttons and Ctrl+Z, Ctrl+Shift+Z, Ctrl+Y) from a unit-tested history engine (src/admin/editor/history.ts): up to 100 steps; a whole drag, resize or rotate is one step, and typing in one field is one step; a new change clears Redo. Text boxes keep the browser's own undo while you are typing in them. Still unsaved until 6.8. Awaiting test.
 - 2026-10-24: Phase 6.7 tested by user (undo/redo) and ticked. Phase 6.8 written: a bar above the editor with a status badge (Unsaved changes / Draft saved, not live / Live), Save draft (stores the draft; the live site is untouched), Publish (saves then calls publish_section; warns if the design has no elements), Discard changes (back to the live version, deletes the draft) and Use built-in version (removes the design from the live section so the old hero returns). Leaving with unsaved changes asks first (tab close/reload and admin links; the browser Back button is not covered). Invalid designs are refused with a message. Awaiting test: publishing should change the public hero.
 - 2026-10-24: Phase 6.8 tested by user (save draft, publish, discard, built-in fallback) and ticked. Phase 6 complete: the hero can be designed visually and published. (Lint fix: a function named useBuiltIn was renamed because the lint rule treats use* names as hooks.)
+- 2026-10-24: Main is green and deployed (the red CI was formatting; the user's Format commit fixed it). Phase 7.1 written: Image element. Schema (https addresses only, alt text, fit, corner radius, crop focus and zoom), a renderer shared with the public site, an Image... button (compresses and uploads to the site-images bucket, admin-only write), Replace picture and alt text in Properties, and crop mode (double-click a picture, drag it inside its frame, zoom buttons, Done or Esc). Crop dragging is a close approximation, not pixel-exact. Pictures of deleted elements stay in storage until a cleanup step in Phase 12. Awaiting test.

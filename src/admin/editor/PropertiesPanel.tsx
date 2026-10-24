@@ -1,5 +1,6 @@
 import { useEffect, useId, useState } from 'react';
 import type { Design } from '../../shared/design';
+import { uploadDesignImage } from '../data/siteImages';
 import { findElement } from './designOps';
 import { COMMON_GROUPS, NAME_FIELD, TYPE_GROUPS, applyField, getAt } from './fields';
 import type { FieldSpec, FieldValue } from './fields';
@@ -25,6 +26,7 @@ function FieldInput({ spec, value, onCommit }: FieldProps) {
   const [draft, setDraft] = useState(show(value));
   const [focused, setFocused] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [uploading, setUploading] = useState(false);
 
   // Follow outside changes (dragging on the canvas, for example) unless you are typing here.
   useEffect(() => {
@@ -46,6 +48,18 @@ function FieldInput({ spec, value, onCommit }: FieldProps) {
     }
     const optional = (spec.kind === 'text' || spec.kind === 'colour') && spec.optional;
     setError(onCommit(text === '' && optional ? undefined : text));
+  }
+
+  async function replacePicture(file: File) {
+    setUploading(true);
+    setError(null);
+    try {
+      const uploaded = await uploadDesignImage(file);
+      setError(onCommit(uploaded.url));
+    } catch (problem) {
+      setError(problem instanceof Error ? problem.message : 'The upload failed.');
+    }
+    setUploading(false);
   }
 
   const focusProps = { onFocus: () => setFocused(true), onBlur: () => setFocused(false) };
@@ -123,6 +137,28 @@ function FieldInput({ spec, value, onCommit }: FieldProps) {
         </select>
       );
       break;
+    case 'image':
+      return (
+        <div className="prop">
+          <label htmlFor={id}>{spec.label}</label>
+          {typeof value === 'string' && (
+            <img className="prop-thumb" src={value} alt="" referrerPolicy="no-referrer" />
+          )}
+          <input
+            id={id}
+            type="file"
+            accept="image/jpeg,image/png,image/webp"
+            disabled={uploading}
+            onChange={(event) => {
+              const file = event.target.files?.[0];
+              event.target.value = '';
+              if (file) void replacePicture(file);
+            }}
+          />
+          {uploading && <span className="muted">Uploading…</span>}
+          {error && <span className="prop-error">{error}</span>}
+        </div>
+      );
     case 'toggle':
       return (
         <div className="prop prop-toggle">

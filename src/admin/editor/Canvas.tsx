@@ -1,10 +1,10 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import type { PointerEvent as ReactPointerEvent } from 'react';
+import type { MouseEvent as ReactMouseEvent, PointerEvent as ReactPointerEvent } from 'react';
 import { registerBuiltInElements, renderDesign } from '../../shared/design/render';
 import type { Design } from '../../shared/design';
-import { findElement, updateElement } from './designOps';
-import { moveBox, resizeBox, rotationFor } from './transform';
-import type { Box, Handle } from './transform';
+import { findElement, updateElement, updateImageStyle } from './designOps';
+import { moveBox, panCrop, resizeBox, rotationFor } from './transform';
+import type { Box, CropStyle, Handle } from './transform';
 import { fitView, panBy, screenToStage, wheelZoomFactor, zoomAround } from './viewport';
 import type { Point, View } from './viewport';
 
@@ -16,9 +16,12 @@ interface Props {
   onChange: (design: Design, group?: string) => void;
   /** Called when the Delete or Backspace key is pressed on the canvas. */
   onDelete: () => void;
+  /** The picture being cropped (dragged inside its frame), if any. */
+  cropId: string | null;
+  onCrop: (id: string | null) => void;
 }
 
-type Mode = 'pan' | 'move' | 'resize' | 'rotate';
+type Mode = 'pan' | 'move' | 'resize' | 'rotate' | 'crop';
 
 interface Gesture {
   mode: Mode;
@@ -31,6 +34,8 @@ interface Gesture {
   moved: boolean;
   /** Names this drag, so all its steps undo together. */
   group: string;
+  /** How a picture was cropped when a crop drag began. */
+  crop?: CropStyle;
 }
 
 const CLICK_SLOP = 4;
@@ -67,7 +72,15 @@ function boxOf(element: Framed): Box {
  * zoom (Ctrl + scroll, pinch or the buttons) and pan (scroll, or drag the empty background),
  * and select one element by clicking it.
  */
-export function Canvas({ design, selectedId, onSelect, onChange, onDelete }: Props) {
+export function Canvas({
+  design,
+  selectedId,
+  onSelect,
+  onChange,
+  onDelete,
+  cropId,
+  onCrop,
+}: Props) {
   const viewportRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
   const gesture = useRef<Gesture | null>(null);
@@ -161,8 +174,23 @@ export function Canvas({ design, selectedId, onSelect, onChange, onDelete }: Pro
     let next: Gesture = { ...base, mode: 'pan', elementId: null, origin: null, handle: null };
     const selectedElement = selectedId ? findElement(design, selectedId) : undefined;
     const hitElement = hitId ? findElement(design, hitId) : undefined;
+    const cropped = cropId ? findElement(design, cropId) : undefined;
 
-    if (event.button === 0 && handleName && selectedElement && !selectedElement.locked) {
+    if (cropId && event.button === 0 && hitElement?.id === cropId && cropped?.type === 'image') {
+      // In crop mode, dragging the picture moves it inside its frame.
+      next = {
+        ...base,
+        mode: 'crop',
+        elementId: cropped.id,
+        origin: boxOf(cropped),
+        handle: null,
+        crop: {
+          focusX: cropped.style.focusX,
+          focusY: cropped.style.focusY,
+          zoom: cropped.style.zoom,
+        },
+      };
+    } else if (event.button === 0 && handleName && selectedElement && !selectedElement.locked) {
       const isRotate = handleName === 'rotate';
       next = {
         ...base,
@@ -172,6 +200,7 @@ export function Canvas({ design, selectedId, onSelect, onChange, onDelete }: Pro
         handle: isRotate ? null : (handleName as Handle),
       };
     } else if (event.button === 0 && hitElement) {
+      if (cropId) onCrop(null);
       if (hitElement.id !== selectedId) onSelect(hitElement.id);
       next = {
         ...base,
@@ -181,6 +210,7 @@ export function Canvas({ design, selectedId, onSelect, onChange, onDelete }: Pro
         handle: null,
       };
     }
+    if (cropId && next.mode === 'pan' && event.button === 0) onCrop(null);
     gesture.current = next;
     event.currentTarget.setPointerCapture(event.pointerId);
   }
@@ -204,7 +234,15 @@ export function Canvas({ design, selectedId, onSelect, onChange, onDelete }: Pro
     const stageDx = dx / g.view.zoom;
     const stageDy = dy / g.view.zoom;
 
-    if (g.mode === 'move') {
+    if (g.mode === 'crop' && g.crop) {
+      // Turn the drag into the picture's own (rotated) directions before moving the crop.
+      const angle = (g.origin.rotation * Math.PI) / 180;
+      const localX = stageDx * Math.cos(angle) + stageDy * Math.sin(angle);
+      const localY = -stageDx * Math.sin(angle) + stageDy * Math.cos(angle);
+      const next = panCrop(g.crop, localX, localY, g.origin);
+      const patch = { focusX: next.focusX, focusY: next.focusY };
+      onChange(updateImageStyle(design, g.elementId, patch), g.group);
+    } else if (g.mode === 'move') {
       const next = moveBox(g.origin, stageDx, stageDy, event.shiftKey);
       onChange(updateElement(design, g.elementId, { position: { x: next.x, y: next.y } }), g.group);
     } else if (g.mode === 'resize' && g.handle) {
@@ -238,6 +276,25 @@ export function Canvas({ design, selectedId, onSelect, onChange, onDelete }: Pro
   const selected = selectedId
     ? layout.elements.find((element) => element.id === selectedId)
     : undefined;
+  const cropElement = cropId ? findElement(design, cropId) : undefined;
+  const cropping = cropElement?.type === 'image' && cropElement.id === selected?.id;
+
+  function zoomPicture(factor: number) {
+    if (cropElement?.type !== 'image') return;
+    const zoom = Math.round(Math.min(5, Math.max(1, cropElement.style.zoom * factor)) * 100) / 100;
+    onChange(updateImageStyle(design, cropElement.id, { zoom }), `crop-zoom-${cropElement.id}`);
+  }
+
+  /** Double-clicking a picture starts crop mode: drag the picture inside its frame. */
+  function onDoubleClick(event: ReactMouseEvent<HTMLDivElement>) {
+    const id = (event.target as HTMLElement).closest<HTMLElement>('[data-element-id]')?.dataset
+      .elementId;
+    const element = id ? findElement(design, id) : undefined;
+    if (element?.type === 'image' && !element.locked && element.style.fit !== 'fill') {
+      onSelect(element.id);
+      onCrop(element.id);
+    }
+  }
 
   return (
     <div className="canvas">
@@ -257,7 +314,28 @@ export function Canvas({ design, selectedId, onSelect, onChange, onDelete }: Pro
         <button type="button" onClick={actualSize}>
           100%
         </button>
-        <span className="muted canvas-hint">Ctrl + scroll: zoom · Shift: constrain</span>
+        {cropping ? (
+          <>
+            <span className="canvas-crop-note">Crop: drag the picture · zoom it</span>
+            <button
+              type="button"
+              aria-label="Zoom picture out"
+              onClick={() => zoomPicture(1 / 1.2)}
+            >
+              −
+            </button>
+            <button type="button" aria-label="Zoom picture in" onClick={() => zoomPicture(1.2)}>
+              +
+            </button>
+            <button type="button" className="primary" onClick={() => onCrop(null)}>
+              Done
+            </button>
+          </>
+        ) : (
+          <span className="muted canvas-hint">
+            Ctrl + scroll: zoom · Shift: constrain · Double-click a picture to crop
+          </span>
+        )}
       </div>
       <div
         ref={viewportRef}
@@ -267,8 +345,12 @@ export function Canvas({ design, selectedId, onSelect, onChange, onDelete }: Pro
         onPointerMove={onPointerMove}
         onPointerUp={onPointerUp}
         onPointerCancel={onPointerUp}
+        onDoubleClick={onDoubleClick}
         onKeyDown={(event) => {
-          if (event.key === 'Escape') onSelect(null);
+          if (event.key === 'Escape') {
+            if (cropId) onCrop(null);
+            else onSelect(null);
+          }
           if (event.key === 'Delete' || event.key === 'Backspace') {
             event.preventDefault();
             onDelete();
@@ -286,7 +368,7 @@ export function Canvas({ design, selectedId, onSelect, onChange, onDelete }: Pro
           <div ref={contentRef} className="canvas-content" />
           {selected && (
             <div
-              className="canvas-selection"
+              className={`canvas-selection${cropping ? ' cropping' : ''}`}
               style={{
                 left: selected.position.x,
                 top: selected.position.y,
@@ -296,7 +378,7 @@ export function Canvas({ design, selectedId, onSelect, onChange, onDelete }: Pro
                 outlineWidth: 2 / view.zoom,
               }}
             >
-              {!selected.locked && (
+              {!selected.locked && !cropping && (
                 <>
                   {RESIZE_HANDLES.map((handle) => (
                     <span

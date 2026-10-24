@@ -1,11 +1,19 @@
 import { describe, expect, it } from 'vitest';
 import { createEmptyDesign } from '../../shared/design';
 import type { Design } from '../../shared/design';
-import { addElement, findElement } from './designOps';
+import { addElement, addImageElement, findElement } from './designOps';
 import { COMMON_GROUPS, TYPE_GROUPS, applyField, getAt, setAt } from './fields';
 
-function withElement(kind: 'text' | 'rectangle'): { design: Design; id: string } {
-  const result = addElement(createEmptyDesign(), kind);
+function withElement(kind: 'text' | 'rectangle' | 'image'): { design: Design; id: string } {
+  const result =
+    kind === 'image'
+      ? addImageElement(createEmptyDesign(), {
+          src: 'https://example.com/a.webp',
+          alt: 'A drawing',
+          width: 400,
+          height: 300,
+        })
+      : addElement(createEmptyDesign(), kind);
   if (!result.ok) throw new Error('add failed');
   return { design: result.design, id: result.id };
 }
@@ -74,6 +82,7 @@ describe('field lists', () => {
     const cases = [
       { kind: 'text' as const, type: 'text' as const },
       { kind: 'rectangle' as const, type: 'shape' as const },
+      { kind: 'image' as const, type: 'image' as const },
     ];
     for (const { kind, type } of cases) {
       const { design, id } = withElement(kind);
@@ -85,5 +94,19 @@ describe('field lists', () => {
         if (!optional) expect(getAt(element, field.key), field.key).not.toBeUndefined();
       }
     }
+  });
+});
+
+describe('image fields', () => {
+  it('accepts a crop and refuses a picture address that is not https', () => {
+    const { design, id } = withElement('image');
+    const zoomed = applyField(design, id, { key: 'style.zoom' }, 2);
+    expect(zoomed.ok && getAt(findElement(zoomed.design, id), 'style.zoom')).toBe(2);
+    expect(applyField(design, id, { key: 'style.zoom' }, 9).ok).toBe(false);
+    expect(applyField(design, id, { key: 'content.src' }, 'http://example.com/a.png').ok).toBe(
+      false,
+    );
+    const replaced = applyField(design, id, { key: 'content.src' }, 'https://example.com/b.webp');
+    expect(replaced.ok).toBe(true);
   });
 });

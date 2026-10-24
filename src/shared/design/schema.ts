@@ -85,8 +85,38 @@ export const shapeElementSchema = z
   })
   .strict();
 
+/** An image address: https only, so never data:, javascript: or http: addresses. */
+const imageUrlSchema = z
+  .string()
+  .max(2000)
+  .url()
+  .refine((value) => value.startsWith('https://'), 'must start with https://');
+
+export const imageElementSchema = z
+  .object({
+    ...baseFields,
+    type: z.literal('image'),
+    content: z.object({ src: imageUrlSchema, alt: z.string().max(300) }).strict(),
+    style: z
+      .object({
+        fit: z.enum(['cover', 'contain', 'fill']).default('cover'),
+        radius: num(0, 1000).default(0),
+        /** Which part of the picture stays in view, as a percentage (50, 50 is the middle). */
+        focusX: num(0, 100).default(50),
+        focusY: num(0, 100).default(50),
+        /** Crop zoom: 1 shows the whole picture, 2 shows the middle half. */
+        zoom: num(1, 5).default(1),
+      })
+      .strict(),
+  })
+  .strict();
+
 /** Every element type the format knows. New types are added here, one per step. */
-export const elementSchema = z.discriminatedUnion('type', [textElementSchema, shapeElementSchema]);
+export const elementSchema = z.discriminatedUnion('type', [
+  textElementSchema,
+  shapeElementSchema,
+  imageElementSchema,
+]);
 
 export const layoutSchema = z
   .object({

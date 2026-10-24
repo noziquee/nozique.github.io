@@ -27,6 +27,16 @@ const shape = (over: Record<string, unknown> = {}) => ({
   ...over,
 });
 
+const picture = (over: Record<string, unknown> = {}) => ({
+  id: 'pic',
+  type: 'image',
+  position: { x: 0, y: 0 },
+  size: { width: 200, height: 150 },
+  content: { src: 'https://example.com/a.webp', alt: 'A drawing' },
+  style: {},
+  ...over,
+});
+
 const design = (elements: unknown[] = [text(), shape()]) => ({
   version: 1,
   layouts: { desktop: { width: 1200, height: 600, elements } },
@@ -107,6 +117,47 @@ describe('parseDesign: bad designs', () => {
   });
   it('rejects things that are not designs at all', () => {
     for (const raw of [null, 'text', 42, [], {}]) expect(parseDesign(raw).ok).toBe(false);
+  });
+});
+
+describe('image elements', () => {
+  it('accepts an https picture and fills in the crop defaults', () => {
+    const result = parseDesign(design([picture()]));
+    expect(result.ok).toBe(true);
+    if (!result.ok) return;
+    const [element] = result.design.layouts.desktop.elements;
+    expect(element?.type === 'image' && element.style).toEqual({
+      fit: 'cover',
+      radius: 0,
+      focusX: 50,
+      focusY: 50,
+      zoom: 1,
+    });
+  });
+  it('rejects addresses that are not plain https', () => {
+    const bad = [
+      'http://example.com/a.png',
+      'javascript:alert(1)',
+      'data:image/png;base64,AAAA',
+      '//example.com/a.png',
+      'not a url',
+      `https://example.com/${'a'.repeat(2000)}`,
+    ];
+    for (const src of bad) {
+      expect(errorsOf(design([picture({ content: { src, alt: '' } })])), src).not.toEqual([]);
+    }
+  });
+  it('rejects crop values out of range and unknown properties', () => {
+    expect(errorsOf(design([picture({ style: { zoom: 9 } })]))).not.toEqual([]);
+    expect(errorsOf(design([picture({ style: { focusX: 120 } })]))).not.toEqual([]);
+    expect(errorsOf(design([picture({ style: { fit: 'stretch' } })]))).not.toEqual([]);
+    expect(errorsOf(design([picture({ style: { onload: 'x' } })]))).not.toEqual([]);
+  });
+  it('allows an empty alt text (a decorative picture) but not an over-long one', () => {
+    const quiet = picture({ content: { src: 'https://a.example/x.png', alt: '' } });
+    expect(parseDesign(design([quiet])).ok).toBe(true);
+    const long = picture({ content: { src: 'https://a.example/x.png', alt: 'x'.repeat(301) } });
+    expect(errorsOf(design([long]))).not.toEqual([]);
   });
 });
 

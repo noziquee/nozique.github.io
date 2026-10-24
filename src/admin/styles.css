@@ -1158,3 +1158,21 @@ a.button:hover {
   margin: 4px 0 0;
   font-size: 14px;
 }
+
+.canvas-handle {
+  position: absolute;
+  box-sizing: border-box;
+  transform: translate(-50%, -50%);
+  border: 1.5px solid #4c8dff;
+  background: #fff;
+  pointer-events: auto;
+}
+
+.canvas-handle.rotate {
+  border-radius: 50%;
+  cursor: grab;
+}
+
+.canvas-content .design-element {
+  cursor: move;
+}

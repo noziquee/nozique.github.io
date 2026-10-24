@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Canvas } from '../editor/Canvas';
+import type { Design } from '../../shared/design';
 import { loadSectionForEditing } from '../data/siteSections';
 import type { SectionForEditing } from '../data/siteSections';
 import { isDesignable } from '../data/sectionRules';
@@ -24,15 +25,19 @@ export function SectionEditorPage({ sectionKey }: { sectionKey: string }) {
   const [section, setSection] = useState<SectionForEditing | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [design, setDesign] = useState<Design | null>(null);
 
   useEffect(() => {
     let cancelled = false;
     setSection(null);
     setError(null);
     setSelectedId(null);
+    setDesign(null);
     loadSectionForEditing(sectionKey).then(
       (loaded) => {
-        if (!cancelled) setSection(loaded);
+        if (cancelled) return;
+        setSection(loaded);
+        setDesign(loaded.picked.ok ? loaded.picked.design : null);
       },
       (problem: unknown) => {
         if (!cancelled) setError(problem instanceof Error ? problem.message : 'Could not load.');
@@ -86,24 +91,31 @@ export function SectionEditorPage({ sectionKey }: { sectionKey: string }) {
     );
   }
 
-  const { design, source } = section.picked;
+  const { source } = section.picked;
+  if (!design) return <Loading />;
   const selected = selectedId
     ? design.layouts.desktop.elements.find((element) => element.id === selectedId)
     : undefined;
   const status = selected
     ? `Selected: ${selected.name ?? selected.id} (${selected.type}) at ` +
-      `${Math.round(selected.position.x)}, ${Math.round(selected.position.y)}, size ` +
-      `${Math.round(selected.size.width)} × ${Math.round(selected.size.height)}`
-    : 'Nothing selected. Click an element to select it.';
+      `${selected.position.x}, ${selected.position.y}, size ` +
+      `${selected.size.width} × ${selected.size.height}, rotation ${selected.rotation}°`
+    : 'Nothing selected. Click an element to select it, then drag it or its handles.';
 
   return (
     <section className="editor-page">
       <Back />
       <h1>{section.name}</h1>
       <p className="muted">
-        {SOURCE_NOTE[source]} Changes cannot be saved yet: this step is only about looking around.
+        {SOURCE_NOTE[source]} Changes are not saved yet (saving comes in a later step), so reloading
+        undoes them.
       </p>
-      <Canvas design={design} selectedId={selectedId} onSelect={setSelectedId} />
+      <Canvas
+        design={design}
+        selectedId={selectedId}
+        onSelect={setSelectedId}
+        onChange={setDesign}
+      />
       <p className="canvas-status" aria-live="polite">
         {status}
       </p>

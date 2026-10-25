@@ -33,6 +33,21 @@ const fontFamilySchema = z
   .string()
   .regex(/^(?:var\(--[a-z0-9-]{1,40}\)|[A-Za-z0-9][A-Za-z0-9 -]{0,59})$/, 'must be a font name');
 
+/**
+ * Where a link may go: this site's own pages (#/work), a web address (https only), an email or
+ * a phone number. Nothing else gets through, so a design can never contain a javascript: or
+ * data: link. An empty value means "no link".
+ */
+const LINK_PATTERN =
+  /^(?:https:\/\/[^\s"'<>]{1,1900}|mailto:[^\s"'<>]{3,200}|tel:\+?[0-9 ()-]{3,30}|#\/[A-Za-z0-9/_-]{0,100}|#[A-Za-z0-9_-]{1,100})$/;
+export const linkSchema = z
+  .string()
+  .max(2000)
+  .refine(
+    (value) => value === '' || LINK_PATTERN.test(value),
+    'must be a link like https://example.com, #/work, mailto:you@example.com or tel:+63... (or empty)',
+  );
+
 const positionSchema = z.object({ x: num(-5000, 10000), y: num(-5000, 10000) }).strict();
 const sizeSchema = z.object({ width: num(1, 10000), height: num(1, 10000) }).strict();
 
@@ -52,7 +67,14 @@ export const textElementSchema = z
   .object({
     ...baseFields,
     type: z.literal('text'),
-    content: z.object({ text: z.string().max(LIMITS.maxTextLength) }).strict(),
+    content: z
+      .object({
+        text: z.string().max(LIMITS.maxTextLength),
+        /** Make the whole text a link (empty = plain text). */
+        href: linkSchema.default(''),
+        newTab: z.boolean().default(false),
+      })
+      .strict(),
     style: z
       .object({
         fontFamily: fontFamilySchema,
@@ -111,21 +133,6 @@ export const imageElementSchema = z
   })
   .strict();
 
-/**
- * Where a link may go: this site's own pages (#/work), a web address (https only), an email or
- * a phone number. Nothing else gets through, so a design can never contain a javascript: or
- * data: link. An empty value means "no link".
- */
-const LINK_PATTERN =
-  /^(?:https:\/\/[^\s"'<>]{1,1900}|mailto:[^\s"'<>]{3,200}|tel:\+?[0-9 ()-]{3,30}|#\/[A-Za-z0-9/_-]{0,100}|#[A-Za-z0-9_-]{1,100})$/;
-export const linkSchema = z
-  .string()
-  .max(2000)
-  .refine(
-    (value) => value === '' || LINK_PATTERN.test(value),
-    'must be a link like https://example.com, #/work, mailto:you@example.com or tel:+63... (or empty)',
-  );
-
 export const buttonElementSchema = z
   .object({
     ...baseFields,
@@ -157,12 +164,54 @@ export const buttonElementSchema = z
   })
   .strict();
 
+/** The icons that come with the editor. Each name has artwork in render/elements/icons.ts. */
+export const ICON_NAMES = [
+  'instagram',
+  'youtube',
+  'facebook',
+  'x',
+  'linkedin',
+  'github',
+  'mail',
+  'link',
+  'globe',
+  'arrow',
+] as const;
+
+export const iconElementSchema = z
+  .object({
+    ...baseFields,
+    type: z.literal('icon'),
+    content: z
+      .object({
+        icon: z.enum(ICON_NAMES),
+        /** What the icon is or does, read out by screen readers (for example "Instagram"). */
+        label: z.string().min(1).max(100),
+        href: linkSchema.default(''),
+        newTab: z.boolean().default(false),
+      })
+      .strict(),
+    style: z
+      .object({
+        shape: z.enum(['circle', 'rounded', 'square']).default('circle'),
+        color: colorSchema,
+        fill: colorSchema,
+        borderColor: colorSchema.optional(),
+        borderWidth: num(0, 50).default(0),
+        hoverFill: colorSchema.optional(),
+        hoverColor: colorSchema.optional(),
+      })
+      .strict(),
+  })
+  .strict();
+
 /** Every element type the format knows. New types are added here, one per step. */
 export const elementSchema = z.discriminatedUnion('type', [
   textElementSchema,
   shapeElementSchema,
   imageElementSchema,
   buttonElementSchema,
+  iconElementSchema,
 ]);
 
 export const layoutSchema = z

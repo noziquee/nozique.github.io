@@ -53,6 +53,25 @@ const ALIGN_OPTIONS: readonly Option[] = [
   { value: 'justify', label: 'Justify' },
 ];
 
+const ICON_OPTIONS: readonly Option[] = [
+  { value: 'instagram', label: 'Instagram' },
+  { value: 'youtube', label: 'YouTube' },
+  { value: 'facebook', label: 'Facebook' },
+  { value: 'x', label: 'X' },
+  { value: 'linkedin', label: 'LinkedIn' },
+  { value: 'github', label: 'GitHub' },
+  { value: 'mail', label: 'Email' },
+  { value: 'link', label: 'Link' },
+  { value: 'globe', label: 'Website' },
+  { value: 'arrow', label: 'Arrow' },
+];
+
+const ICON_SHAPE_OPTIONS: readonly Option[] = [
+  { value: 'circle', label: 'Circle' },
+  { value: 'rounded', label: 'Rounded square' },
+  { value: 'square', label: 'Square' },
+];
+
 const SHAPE_OPTIONS: readonly Option[] = [
   { value: 'rect', label: 'Rectangle' },
   { value: 'ellipse', label: 'Ellipse' },
@@ -85,7 +104,16 @@ export const TYPE_GROUPS: Record<ElementType, readonly FieldGroup[]> = {
   text: [
     {
       title: 'Text',
-      fields: [{ kind: 'text', key: 'content.text', label: 'Text', multiline: true }],
+      fields: [
+        { kind: 'text', key: 'content.text', label: 'Text', multiline: true },
+        {
+          kind: 'text',
+          key: 'content.href',
+          label: 'Make it a link (https://…, #/work, mailto:…)',
+          optional: true,
+        },
+        { kind: 'toggle', key: 'content.newTab', label: 'Open web links in a new tab' },
+      ],
     },
     {
       title: 'Style',
@@ -132,6 +160,41 @@ export const TYPE_GROUPS: Record<ElementType, readonly FieldGroup[]> = {
         { kind: 'number', key: 'style.zoom', label: 'Zoom (1 to 5)', step: 0.1 },
         { kind: 'number', key: 'style.focusX', label: 'Left to right (%)', step: 1 },
         { kind: 'number', key: 'style.focusY', label: 'Top to bottom (%)', step: 1 },
+      ],
+    },
+  ],
+  icon: [
+    {
+      title: 'Icon link',
+      fields: [
+        { kind: 'select', key: 'content.icon', label: 'Icon', options: ICON_OPTIONS },
+        { kind: 'text', key: 'content.label', label: 'Label for screen readers' },
+        {
+          kind: 'text',
+          key: 'content.href',
+          label: 'Link (https://…, #/work, mailto:…)',
+          optional: true,
+        },
+        { kind: 'toggle', key: 'content.newTab', label: 'Open web links in a new tab' },
+      ],
+    },
+    {
+      title: 'Look',
+      grid: true,
+      fields: [
+        { kind: 'select', key: 'style.shape', label: 'Shape', options: ICON_SHAPE_OPTIONS },
+        { kind: 'colour', key: 'style.color', label: 'Icon colour' },
+        { kind: 'colour', key: 'style.fill', label: 'Background' },
+        { kind: 'colour', key: 'style.borderColor', label: 'Border colour', optional: true },
+        { kind: 'number', key: 'style.borderWidth', label: 'Border width', step: 1 },
+      ],
+    },
+    {
+      title: 'When the pointer is over it',
+      grid: true,
+      fields: [
+        { kind: 'colour', key: 'style.hoverFill', label: 'Background', optional: true },
+        { kind: 'colour', key: 'style.hoverColor', label: 'Icon colour', optional: true },
       ],
     },
   ],

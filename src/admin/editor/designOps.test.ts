@@ -242,3 +242,24 @@ describe('adding a button', () => {
     expect(parseDesign(result.design).ok).toBe(true);
   });
 });
+
+describe('adding an icon link', () => {
+  it('adds a valid labelled icon with no link yet', () => {
+    const result = addElement(createEmptyDesign(), 'icon');
+    expect(result.ok).toBe(true);
+    if (!result.ok) return;
+    expect(result.id).toBe('icon-1');
+    const element = findElement(result.design, result.id);
+    expect(element?.type === 'icon' && element.content).toMatchObject({
+      icon: 'instagram',
+      label: 'Instagram',
+      href: '',
+    });
+    expect(parseDesign(result.design).ok).toBe(true);
+  });
+
+  it('new text is valid and unlinked', () => {
+    const result = addElement(createEmptyDesign(), 'text');
+    expect(result.ok && parseDesign(result.design).ok).toBe(true);
+  });
+});

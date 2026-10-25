@@ -3,6 +3,7 @@ import type {
   ButtonElement,
   Design,
   DesignElement,
+  IconElement,
   ImageElement,
   ShapeElement,
   TextElement,
@@ -35,7 +36,7 @@ export function findElement(design: Design, id: string): DesignElement | undefin
   return design.layouts.desktop.elements.find((element) => element.id === id);
 }
 
-export type NewElementKind = 'text' | 'rectangle' | 'ellipse' | 'button';
+export type NewElementKind = 'text' | 'rectangle' | 'ellipse' | 'button' | 'icon';
 
 /** The biggest a newly added picture is on the canvas. */
 const NEW_IMAGE_BOX = { width: 480, height: 360 };
@@ -76,7 +77,7 @@ function newText(design: Design, id: string): TextElement {
     ...common(design, id, 320, 80),
     type: 'text',
     name: 'Text',
-    content: { text: 'New text' },
+    content: { text: 'New text', href: '', newTab: false },
     style: {
       fontFamily: 'Archivo',
       fontSize: 48,
@@ -88,6 +89,16 @@ function newText(design: Design, id: string): TextElement {
       letterSpacing: 0,
       color: NEW_COLOUR,
     },
+  };
+}
+
+function newIcon(design: Design, id: string): IconElement {
+  return {
+    ...common(design, id, 64, 64),
+    type: 'icon',
+    name: 'Icon link',
+    content: { icon: 'instagram', label: 'Instagram', href: '', newTab: false },
+    style: { shape: 'circle', color: '#ffffff', fill: NEW_COLOUR, borderWidth: 0 },
   };
 }
 
@@ -134,7 +145,9 @@ export function addElement(design: Design, kind: NewElementKind): AddResult {
       ? newText(design, id)
       : kind === 'button'
         ? newButton(design, id)
-        : newShape(design, id, kind);
+        : kind === 'icon'
+          ? newIcon(design, id)
+          : newShape(design, id, kind);
   const { desktop } = design.layouts;
   const next: Design = {
     ...design,

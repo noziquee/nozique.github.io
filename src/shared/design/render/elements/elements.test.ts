@@ -217,11 +217,113 @@ describe('button element', () => {
   });
 });
 
+const icon = (content: Record<string, unknown> = {}, style: Record<string, unknown> = {}) => ({
+  ...base,
+  id: 'ic',
+  type: 'icon',
+  content: { icon: 'instagram', label: 'Instagram', ...content },
+  style: { color: '#ffffff', fill: '#e8281e', ...style },
+});
+
+function renderIcon(content: Record<string, unknown>, style = {}, editing = false) {
+  const result = parseDesign({
+    version: 1,
+    layouts: { desktop: { width: 800, height: 400, elements: [icon(content, style)] } },
+  });
+  if (!result.ok) throw new Error(result.errors.join('; '));
+  const registry = createRegistry();
+  registerBuiltInElements(registry);
+  const root = asNode(renderDesign(result.design, { document: fakeDocument, registry, editing }));
+  return asNode(asNode(root.children[0]).children[0]);
+}
+
+describe('icon element', () => {
+  it('draws the chosen icon as an svg, hidden from screen readers, with an accessible label', () => {
+    const node = renderIcon({});
+    expect(node.attributes).toMatchObject({ class: 'design-icon', 'aria-label': 'Instagram', role: 'img' });
+    const svg = asNode(node.children[0]);
+    expect(svg.tagName).toBe('svg');
+    expect(svg.attributes).toMatchObject({ 'aria-hidden': 'true', stroke: 'currentColor' });
+    expect(svg.children.length).toBeGreaterThan(0);
+  });
+
+  it('is a labelled link when it has an address', () => {
+    const node = renderIcon({ href: 'https://instagram.com/nozique', newTab: true });
+    expect(node.tagName).toBe('a');
+    expect(node.attributes).toMatchObject({
+      href: 'https://instagram.com/nozique',
+      'aria-label': 'Instagram',
+      target: '_blank',
+      rel: 'noopener noreferrer',
+    });
+    expect(node.attributes['role']).toBeUndefined();
+  });
+
+  it('links to a place on the same page without opening a new tab', () => {
+    const node = renderIcon({ href: '#about', newTab: true });
+    expect(node.attributes).toMatchObject({ href: '#about' });
+    expect(node.attributes['target']).toBeUndefined();
+  });
+
+  it('shapes the background and colours it through custom properties', () => {
+    expect(renderIcon({}).styles['border-radius']).toBe('50%');
+    expect(renderIcon({}, { shape: 'rounded' }).styles['border-radius']).toBe('22%');
+    expect(renderIcon({}, { shape: 'square' }).styles['border-radius']).toBe('0');
+    expect(renderIcon({}, { hoverFill: '#000000' }).styles).toMatchObject({
+      '--db-fill': '#e8281e',
+      '--db-color': '#ffffff',
+      '--db-hover-fill': '#000000',
+    });
+  });
+
+  it('does nothing when clicked inside the editor', () => {
+    const node = renderIcon({ href: 'https://instagram.com/x' }, {}, true);
+    expect(node.tagName).toBe('div');
+    expect(node.attributes['href']).toBeUndefined();
+  });
+});
+
+describe('text as a link', () => {
+  function renderText(content: Record<string, unknown>, editing = false) {
+    const result = parseDesign({
+      version: 1,
+      layouts: {
+        desktop: {
+          width: 800,
+          height: 400,
+          elements: [text({}, 'Hello')].map((el) => ({ ...el, content: { text: 'Hello', ...content } })),
+        },
+      },
+    });
+    if (!result.ok) throw new Error(result.errors.join('; '));
+    const registry = createRegistry();
+    registerBuiltInElements(registry);
+    const root = asNode(renderDesign(result.design, { document: fakeDocument, registry, editing }));
+    return asNode(asNode(root.children[0]).children[0]);
+  }
+
+  it('stays a plain box without a link', () => {
+    expect(renderText({}).tagName).toBe('div');
+  });
+
+  it('becomes a link without underline unless the design asks for it', () => {
+    const node = renderText({ href: '#/contact' });
+    expect(node.tagName).toBe('a');
+    expect(node.attributes).toMatchObject({ href: '#/contact' });
+    expect(node.styles).toMatchObject({ display: 'block', 'text-decoration': 'none' });
+    expect(node.textContent).toBe('Hello');
+  });
+
+  it('stays plain text inside the editor', () => {
+    expect(renderText({ href: '#/contact' }, true).tagName).toBe('div');
+  });
+});
+
 describe('registerBuiltInElements', () => {
   it('registers every built-in type, and can be called twice', () => {
     const registry = createRegistry();
     registerBuiltInElements(registry);
     registerBuiltInElements(registry);
-    expect(registry.types().sort()).toEqual(['button', 'image', 'shape', 'text']);
+    expect(registry.types().sort()).toEqual(['button', 'icon', 'image', 'shape', 'text']);
   });
 });

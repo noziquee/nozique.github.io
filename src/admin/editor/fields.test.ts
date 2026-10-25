@@ -4,7 +4,7 @@ import type { Design } from '../../shared/design';
 import { addElement, addImageElement, findElement } from './designOps';
 import { COMMON_GROUPS, TYPE_GROUPS, applyField, getAt, setAt } from './fields';
 
-function withElement(kind: 'text' | 'rectangle' | 'button' | 'image'): { design: Design; id: string } {
+function withElement(kind: 'text' | 'rectangle' | 'button' | 'icon' | 'image'): { design: Design; id: string } {
   const result =
     kind === 'image'
       ? addImageElement(createEmptyDesign(), {
@@ -84,6 +84,7 @@ describe('field lists', () => {
       { kind: 'rectangle' as const, type: 'shape' as const },
       { kind: 'image' as const, type: 'image' as const },
       { kind: 'button' as const, type: 'button' as const },
+      { kind: 'icon' as const, type: 'icon' as const },
     ];
     for (const { kind, type } of cases) {
       const { design, id } = withElement(kind);
@@ -136,5 +137,27 @@ describe('button fields', () => {
     if (!hovered.ok) throw new Error('should be valid');
     const cleared = applyField(hovered.design, id, { key: 'style.hoverFill' }, undefined);
     expect(cleared.ok && getAt(findElement(cleared.design, id), 'style.hoverFill')).toBeUndefined();
+  });
+});
+
+describe('icon and text link fields', () => {
+  it('lets you pick another icon but not one that does not exist', () => {
+    const { design, id } = withElement('icon');
+    expect(applyField(design, id, { key: 'content.icon' }, 'github').ok).toBe(true);
+    expect(applyField(design, id, { key: 'content.icon' }, 'myspace').ok).toBe(false);
+  });
+
+  it('needs a label and checks the link', () => {
+    const { design, id } = withElement('icon');
+    expect(applyField(design, id, { key: 'content.label' }, '').ok).toBe(false);
+    expect(applyField(design, id, { key: 'content.href' }, '#about').ok).toBe(true);
+    expect(applyField(design, id, { key: 'content.href' }, 'javascript:alert(1)').ok).toBe(false);
+  });
+
+  it('turns text into a link', () => {
+    const { design, id } = withElement('text');
+    const linked = applyField(design, id, { key: 'content.href' }, '#/contact');
+    expect(linked.ok && getAt(findElement(linked.design, id), 'content.href')).toBe('#/contact');
+    expect(applyField(design, id, { key: 'content.href' }, 'http://example.com').ok).toBe(false);
   });
 });

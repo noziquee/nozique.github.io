@@ -17,6 +17,7 @@ export class FakeNode {
 
 export const fakeDocument = {
   createElement: (tag: string) => new FakeNode(tag),
+  createElementNS: (_namespace: string, tag: string) => new FakeNode(tag),
 } as unknown as Document;
 
 export const asNode = (value: unknown) => value as FakeNode;

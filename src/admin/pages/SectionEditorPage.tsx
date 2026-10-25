@@ -381,6 +381,9 @@ export function SectionEditorPage({ sectionKey }: { sectionKey: string }) {
           <button type="button" onClick={() => add('button')}>
             Button
           </button>
+          <button type="button" onClick={() => add('icon')}>
+            Icon link
+          </button>
           <button type="button" disabled={uploading} onClick={() => fileInput.current?.click()}>
             {uploading ? 'Uploading…' : 'Image…'}
           </button>

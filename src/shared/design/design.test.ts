@@ -254,3 +254,54 @@ describe('button elements', () => {
     expect(errorsOf(design([button({}, { onclick: 'x' })]))).not.toEqual([]);
   });
 });
+
+const icon = (content: Record<string, unknown> = {}, style: Record<string, unknown> = {}) => ({
+  id: 'ico',
+  type: 'icon',
+  position: { x: 0, y: 0 },
+  size: { width: 64, height: 64 },
+  content: { icon: 'instagram', label: 'Instagram', ...content },
+  style: { color: '#ffffff', fill: '#e8281e', ...style },
+});
+
+describe('icon elements', () => {
+  it('accepts an icon link and fills in the defaults', () => {
+    const result = parseDesign(design([icon({ href: 'https://instagram.com/nozique' })]));
+    expect(result.ok).toBe(true);
+    if (!result.ok) return;
+    const [element] = result.design.layouts.desktop.elements;
+    expect(element?.type === 'icon' && element.content.newTab).toBe(false);
+    expect(element?.type === 'icon' && element.style.shape).toBe('circle');
+  });
+
+  it('only knows the icons that come with the editor', () => {
+    expect(errorsOf(design([icon({ icon: 'myspace' })]))).not.toEqual([]);
+    expect(errorsOf(design([icon({ icon: '<script>' })]))).not.toEqual([]);
+  });
+
+  it('needs a label so screen readers can say what it is', () => {
+    expect(errorsOf(design([icon({ label: '' })]))).not.toEqual([]);
+    expect(errorsOf(design([icon({ label: undefined })]))).not.toEqual([]);
+  });
+
+  it('uses the same safe link rules as buttons, and allows links to places on the page', () => {
+    expect(errorsOf(design([icon({ href: '#about' })]))).toEqual([]);
+    expect(errorsOf(design([icon({ href: 'javascript:alert(1)' })]))).not.toEqual([]);
+  });
+});
+
+describe('text links', () => {
+  it('keeps old text elements working and makes them unlinked', () => {
+    const result = parseDesign(design([text()]));
+    expect(result.ok).toBe(true);
+    if (!result.ok) return;
+    const [element] = result.design.layouts.desktop.elements;
+    expect(element?.type === 'text' && element.content).toMatchObject({ href: '', newTab: false });
+  });
+
+  it('accepts a safe link on text and refuses an unsafe one', () => {
+    const linked = (href: string) => text({ content: { text: 'Hi', href } });
+    expect(errorsOf(design([linked('#/contact')]))).toEqual([]);
+    expect(errorsOf(design([linked('javascript:alert(1)')]))).not.toEqual([]);
+  });
+});

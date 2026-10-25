@@ -19,14 +19,14 @@ top are updated after each step is tested. Nothing gets ticked until you have te
 | 4R | Projects admin layout rework (grid, category chips, dialog editor) | 5 | ✅ |
 | 5 | Design engine: data model, renderer, element registry | 6 | ✅ |
 | 6 | Visual editor core | 8 | ✅ |
-| 7 | More elements, one at a time | 8 | 🟦 1 of 8 done |
+| 7 | More elements, one at a time | 8 | 🟦 2 of 8 done |
 | 8 | Editor power tools | 8 | ⬜ |
 | 9 | Design system: colors, text styles, templates | 5 | ⬜ |
 | 10 | Versions, preview and responsive layouts | 5 | ⬜ |
 | 11 | Animation and interaction | 5 | ⬜ |
 | 12 | Hardening: security, accessibility, performance | 6 | ⬜ |
 
-**Current step:** 7.2 (written, awaiting your test)
+**Current step:** 7.3 (written, awaiting your test)
 
 ### Changelog
 - 2026-10-18: Plan drafted.
@@ -265,7 +265,7 @@ types and lint pass, build succeeds, tested by you, tracker updated.
 
 ### Phase 7 — More elements (one per step)
 - [x] **7.1 (M)** Image (upload, fit, opacity, radius, alt text) + crop mode
-- [ ] **7.2 (M)** Button (colors, border, hover styles, link)
+- [x] **7.2 (M)** Button (colors, border, hover styles, link)
 - [ ] **7.3 (M)** Link and social icons (circular icons, accessible labels, internal anchors)
 - [ ] **7.4 (M)** SVG / icon (library + upload, safe sanitizing, recolor that actually works)
 - [ ] **7.5 (S)** Dividers (dashed, scalloped, line/arrow)
@@ -356,3 +356,5 @@ collaboration/roles, scheduled publishing, analytics.
 - 2026-10-24: Main is green and deployed (the red CI was formatting; the user's Format commit fixed it). Phase 7.1 written: Image element. Schema (https addresses only, alt text, fit, corner radius, crop focus and zoom), a renderer shared with the public site, an Image... button (compresses and uploads to the site-images bucket, admin-only write), Replace picture and alt text in Properties, and crop mode (double-click a picture, drag it inside its frame, zoom buttons, Done or Esc). Crop dragging is a close approximation, not pixel-exact. Pictures of deleted elements stay in storage until a cleanup step in Phase 12. Awaiting test.
 - 2026-10-25: Phase 7.1 tested by user (after three fixes: an option list defined too late, a missing import and a field-name mismatch that the type check caught, and a double-click that the browser reported on the canvas instead of the picture) and ticked.
 - 2026-10-25: Phase 7.2 written: Button element. Label, link (this site's pages like #/work, https web addresses, mailto:, tel:; javascript:, data:, http: and // are refused), open-in-new-tab for web links (noopener), text colour, button colour, corner radius, border colour and width, font, and hover colours. Hover and keyboard focus use one small fixed stylesheet that the renderer adds once per page. Inside the editor a button is a plain box, so clicking never navigates. Awaiting test.
+- 2026-10-25: Phase 7.2 tested by user (button, safe links, hover) and ticked.
+- 2026-10-25: Phase 7.3 written: Icon link element (Instagram, YouTube, Facebook, X, LinkedIn, GitHub, Email, Link, Website, Arrow; circle, rounded or square background; required label for screen readers; same safe links as buttons, including #section anchors on the same page; hover colours) and any Text can now be made a link. Icons are fixed drawings (Feather set, MIT), so nothing can be injected. Existing text elements are unaffected. Awaiting test.

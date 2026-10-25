@@ -4,6 +4,7 @@ export type { Migration, MigrationResult } from './migrate';
 export { createEmptyDesign, loadDesign, parseDesign } from './parse';
 export type { LoadResult } from './parse';
 export type {
+  ButtonElement,
   Design,
   DesignElement,
   ElementType,

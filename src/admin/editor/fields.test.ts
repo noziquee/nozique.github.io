@@ -4,7 +4,7 @@ import type { Design } from '../../shared/design';
 import { addElement, addImageElement, findElement } from './designOps';
 import { COMMON_GROUPS, TYPE_GROUPS, applyField, getAt, setAt } from './fields';
 
-function withElement(kind: 'text' | 'rectangle' | 'image'): { design: Design; id: string } {
+function withElement(kind: 'text' | 'rectangle' | 'button' | 'image'): { design: Design; id: string } {
   const result =
     kind === 'image'
       ? addImageElement(createEmptyDesign(), {
@@ -83,6 +83,7 @@ describe('field lists', () => {
       { kind: 'text' as const, type: 'text' as const },
       { kind: 'rectangle' as const, type: 'shape' as const },
       { kind: 'image' as const, type: 'image' as const },
+      { kind: 'button' as const, type: 'button' as const },
     ];
     for (const { kind, type } of cases) {
       const { design, id } = withElement(kind);
@@ -108,5 +109,32 @@ describe('image fields', () => {
     );
     const replaced = applyField(design, id, { key: 'content.src' }, 'https://example.com/b.webp');
     expect(replaced.ok).toBe(true);
+  });
+});
+
+describe('button fields', () => {
+  it('accepts safe links and refuses unsafe ones', () => {
+    const { design, id } = withElement('button');
+    const link = (value: string) => applyField(design, id, { key: 'content.href' }, value).ok;
+    for (const good of ['', 'https://example.com/a?b=1', '#/work', '#/', 'mailto:me@example.com']) {
+      expect(link(good), good).toBe(true);
+    }
+    for (const bad of ['javascript:alert(1)', 'http://example.com', 'data:text/html,x', '//evil.com']) {
+      expect(link(bad), bad).toBe(false);
+    }
+  });
+
+  it('needs a label', () => {
+    const { design, id } = withElement('button');
+    expect(applyField(design, id, { key: 'content.label' }, '').ok).toBe(false);
+    expect(applyField(design, id, { key: 'content.label' }, 'Hire me').ok).toBe(true);
+  });
+
+  it('takes hover colours and lets them be removed', () => {
+    const { design, id } = withElement('button');
+    const hovered = applyField(design, id, { key: 'style.hoverFill' }, '#000000');
+    if (!hovered.ok) throw new Error('should be valid');
+    const cleared = applyField(hovered.design, id, { key: 'style.hoverFill' }, undefined);
+    expect(cleared.ok && getAt(findElement(cleared.design, id), 'style.hoverFill')).toBeUndefined();
   });
 });

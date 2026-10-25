@@ -148,11 +148,80 @@ describe('image element', () => {
   });
 });
 
+const button = (content: Record<string, unknown> = {}, style: Record<string, unknown> = {}) => ({
+  ...base,
+  id: 'b',
+  type: 'button',
+  content: { label: 'Hire me', ...content },
+  style: { fontFamily: 'Archivo', fontSize: 18, color: '#ffffff', fill: '#e8281e', ...style },
+});
+
+function renderButton(
+  content: Record<string, unknown>,
+  style: Record<string, unknown> = {},
+  editing = false,
+) {
+  const result = parseDesign({
+    version: 1,
+    layouts: { desktop: { width: 800, height: 400, elements: [button(content, style)] } },
+  });
+  if (!result.ok) throw new Error(result.errors.join('; '));
+  const registry = createRegistry();
+  registerBuiltInElements(registry);
+  const root = asNode(renderDesign(result.design, { document: fakeDocument, registry, editing }));
+  return asNode(asNode(root.children[0]).children[0]);
+}
+
+describe('button element', () => {
+  it('draws a box with the label as plain text and the colours as custom properties', () => {
+    const node = renderButton({}, { hoverFill: '#000000', radius: 28 });
+    expect(node.tagName).toBe('div');
+    expect(node.textContent).toBe('Hire me');
+    expect(node.attributes['class']).toBe('design-button');
+    expect(node.styles).toMatchObject({
+      '--db-fill': '#e8281e',
+      '--db-color': '#ffffff',
+      '--db-hover-fill': '#000000',
+      'border-radius': '28px',
+      'font-weight': '700',
+    });
+    expect(node.styles['--db-hover-color']).toBeUndefined();
+  });
+
+  it('is a real link when it has an address', () => {
+    const node = renderButton({ href: '#/contact' });
+    expect(node.tagName).toBe('a');
+    expect(node.attributes).toMatchObject({ href: '#/contact' });
+    expect(node.attributes['target']).toBeUndefined();
+  });
+
+  it('opens web addresses in a new tab safely, but never internal ones', () => {
+    const web = renderButton({ href: 'https://example.com', newTab: true });
+    expect(web.attributes).toMatchObject({ target: '_blank', rel: 'noopener noreferrer' });
+    const inside = renderButton({ href: '#/work', newTab: true });
+    expect(inside.attributes['target']).toBeUndefined();
+  });
+
+  it('does nothing when clicked inside the editor', () => {
+    const node = renderButton({ href: 'https://example.com' }, {}, true);
+    expect(node.tagName).toBe('div');
+    expect(node.attributes['href']).toBeUndefined();
+  });
+
+  it('keeps odd label text as plain text and draws a border only when asked', () => {
+    const node = renderButton({ label: '<img src=x onerror=1>' }, { borderColor: '#fff', borderWidth: 2 });
+    expect(node.textContent).toBe('<img src=x onerror=1>');
+    expect(node.children).toHaveLength(0);
+    expect(node.styles['border']).toBe('2px solid #fff');
+    expect(renderButton({}).styles['border']).toBeUndefined();
+  });
+});
+
 describe('registerBuiltInElements', () => {
   it('registers every built-in type, and can be called twice', () => {
     const registry = createRegistry();
     registerBuiltInElements(registry);
     registerBuiltInElements(registry);
-    expect(registry.types().sort()).toEqual(['image', 'shape', 'text']);
+    expect(registry.types().sort()).toEqual(['button', 'image', 'shape', 'text']);
   });
 });

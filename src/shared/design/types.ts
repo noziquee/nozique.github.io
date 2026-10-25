@@ -1,5 +1,6 @@
 import type { z } from 'zod';
 import type {
+  buttonElementSchema,
   designSchema,
   elementSchema,
   imageElementSchema,
@@ -14,5 +15,6 @@ export type DesignElement = z.infer<typeof elementSchema>;
 export type TextElement = z.infer<typeof textElementSchema>;
 export type ShapeElement = z.infer<typeof shapeElementSchema>;
 export type ImageElement = z.infer<typeof imageElementSchema>;
+export type ButtonElement = z.infer<typeof buttonElementSchema>;
 export type ElementType = DesignElement['type'];
 export type LayoutName = keyof Design['layouts'];

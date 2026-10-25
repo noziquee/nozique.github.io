@@ -135,6 +135,50 @@ export const TYPE_GROUPS: Record<ElementType, readonly FieldGroup[]> = {
       ],
     },
   ],
+  button: [
+    {
+      title: 'Button',
+      fields: [
+        { kind: 'text', key: 'content.label', label: 'Label' },
+        {
+          kind: 'text',
+          key: 'content.href',
+          label: 'Link (https://…, #/work, mailto:…)',
+          optional: true,
+        },
+        { kind: 'toggle', key: 'content.newTab', label: 'Open web links in a new tab' },
+      ],
+    },
+    {
+      title: 'Look',
+      grid: true,
+      fields: [
+        { kind: 'select', key: 'style.fontFamily', label: 'Font', options: FONT_OPTIONS },
+        {
+          kind: 'select',
+          key: 'style.fontWeight',
+          label: 'Weight',
+          options: WEIGHT_OPTIONS,
+          numeric: true,
+        },
+        { kind: 'number', key: 'style.fontSize', label: 'Size', step: 1 },
+        { kind: 'number', key: 'style.letterSpacing', label: 'Letter spacing', step: 0.5 },
+        { kind: 'colour', key: 'style.color', label: 'Text colour' },
+        { kind: 'colour', key: 'style.fill', label: 'Button colour' },
+        { kind: 'number', key: 'style.radius', label: 'Corner radius', step: 1 },
+        { kind: 'colour', key: 'style.borderColor', label: 'Border colour', optional: true },
+        { kind: 'number', key: 'style.borderWidth', label: 'Border width', step: 1 },
+      ],
+    },
+    {
+      title: 'When the pointer is over it',
+      grid: true,
+      fields: [
+        { kind: 'colour', key: 'style.hoverFill', label: 'Button colour', optional: true },
+        { kind: 'colour', key: 'style.hoverColor', label: 'Text colour', optional: true },
+      ],
+    },
+  ],
   shape: [
     {
       title: 'Shape',

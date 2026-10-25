@@ -8,6 +8,8 @@ export interface RenderOptions {
   layout?: LayoutName;
   /** Draw elements marked hidden too (the editor does; the public site does not). */
   includeHidden?: boolean;
+  /** Draw for the editor: links and buttons do nothing when clicked. */
+  editing?: boolean;
   registry?: ElementRegistry;
   /** Defaults to the page's document. Tests pass their own. */
   document?: Document;
@@ -59,7 +61,7 @@ export function renderDesign(design: Design, options: RenderOptions = {}): HTMLE
   root.style.setProperty('height', px(layout.height));
   if (layout.background) root.style.setProperty('background', layout.background);
 
-  const context = { document: doc, layoutName: name, layout };
+  const context = { document: doc, layoutName: name, layout, editing: options.editing ?? false };
   for (const element of layout.elements) {
     if (element.hidden && !options.includeHidden) continue;
     const definition = registry.get(element.type);

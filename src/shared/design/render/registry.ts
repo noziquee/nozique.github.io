@@ -5,6 +5,8 @@ export interface RenderContext {
   document: Document;
   layoutName: LayoutName;
   layout: Layout;
+  /** True inside the editor: links must not be clickable there. */
+  editing: boolean;
 }
 
 /**

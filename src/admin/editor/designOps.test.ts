@@ -226,3 +226,19 @@ describe('image elements', () => {
     expect(updateImageStyle(shape.design, shape.id, { zoom: 3 })).toEqual(shape.design);
   });
 });
+
+describe('adding a button', () => {
+  it('adds a valid button on top, with no link yet', () => {
+    const result = addElement(createEmptyDesign(), 'button');
+    expect(result.ok).toBe(true);
+    if (!result.ok) return;
+    expect(result.id).toBe('button-1');
+    const element = findElement(result.design, result.id);
+    expect(element?.type === 'button' && element.content).toEqual({
+      label: 'Button',
+      href: '',
+      newTab: false,
+    });
+    expect(parseDesign(result.design).ok).toBe(true);
+  });
+});

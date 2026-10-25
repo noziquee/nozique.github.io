@@ -95,7 +95,7 @@ export function Canvas({
     registerBuiltInElements();
     const content = contentRef.current;
     if (!content) return;
-    content.replaceChildren(renderDesign(design, { layout: 'desktop', includeHidden: true }));
+    content.replaceChildren(renderDesign(design, { layout: 'desktop', includeHidden: true, editing: true }));
   }, [design]);
 
   const fit = useCallback(() => {

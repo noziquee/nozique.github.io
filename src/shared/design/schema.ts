@@ -111,11 +111,58 @@ export const imageElementSchema = z
   })
   .strict();
 
+/**
+ * Where a link may go: this site's own pages (#/work), a web address (https only), an email or
+ * a phone number. Nothing else gets through, so a design can never contain a javascript: or
+ * data: link. An empty value means "no link".
+ */
+const LINK_PATTERN =
+  /^(?:https:\/\/[^\s"'<>]{1,1900}|mailto:[^\s"'<>]{3,200}|tel:\+?[0-9 ()-]{3,30}|#\/[A-Za-z0-9/_-]{0,100}|#[A-Za-z0-9_-]{1,100})$/;
+export const linkSchema = z
+  .string()
+  .max(2000)
+  .refine(
+    (value) => value === '' || LINK_PATTERN.test(value),
+    'must be a link like https://example.com, #/work, mailto:you@example.com or tel:+63... (or empty)',
+  );
+
+export const buttonElementSchema = z
+  .object({
+    ...baseFields,
+    type: z.literal('button'),
+    content: z
+      .object({
+        label: z.string().min(1).max(100),
+        href: linkSchema.default(''),
+        /** Open web addresses in a new tab. */
+        newTab: z.boolean().default(false),
+      })
+      .strict(),
+    style: z
+      .object({
+        fontFamily: fontFamilySchema,
+        fontSize: num(1, 200),
+        fontWeight: z.number().int().min(100).max(900).multipleOf(100).default(700),
+        letterSpacing: num(-10, 50).default(0),
+        color: colorSchema,
+        fill: colorSchema,
+        borderColor: colorSchema.optional(),
+        borderWidth: num(0, 50).default(0),
+        radius: num(0, 1000).default(0),
+        /** Colours while the pointer is over the button. Empty = no change. */
+        hoverFill: colorSchema.optional(),
+        hoverColor: colorSchema.optional(),
+      })
+      .strict(),
+  })
+  .strict();
+
 /** Every element type the format knows. New types are added here, one per step. */
 export const elementSchema = z.discriminatedUnion('type', [
   textElementSchema,
   shapeElementSchema,
   imageElementSchema,
+  buttonElementSchema,
 ]);
 
 export const layoutSchema = z

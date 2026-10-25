@@ -206,3 +206,51 @@ describe('migrateDesign', () => {
     });
   });
 });
+
+const button = (content: Record<string, unknown> = {}, style: Record<string, unknown> = {}) => ({
+  id: 'btn',
+  type: 'button',
+  position: { x: 0, y: 0 },
+  size: { width: 200, height: 56 },
+  content: { label: 'Hire me', ...content },
+  style: { fontFamily: 'Archivo', fontSize: 18, color: '#ffffff', fill: '#e8281e', ...style },
+});
+
+describe('button elements', () => {
+  it('accepts a button and fills in the defaults', () => {
+    const result = parseDesign(design([button()]));
+    expect(result.ok).toBe(true);
+    if (!result.ok) return;
+    const [element] = result.design.layouts.desktop.elements;
+    expect(element?.type === 'button' && element.content).toEqual({
+      label: 'Hire me',
+      href: '',
+      newTab: false,
+    });
+    expect(element?.type === 'button' && element.style).toMatchObject({
+      fontWeight: 700,
+      borderWidth: 0,
+      radius: 0,
+    });
+  });
+
+  it('accepts links to this site, web addresses, email and phone', () => {
+    for (const href of ['#/contact', '#/', 'https://example.com/a', 'mailto:me@example.com', 'tel:+639171234567']) {
+      expect(errorsOf(design([button({ href })])), href).toEqual([]);
+    }
+  });
+
+  it('rejects links that could run code or leave the safe list', () => {
+    const bad = ['javascript:alert(1)', 'JAVASCRIPT:alert(1)', 'data:text/html,x', 'http://example.com', '//example.com', 'ftp://example.com', 'https://a.com/"onmouseover="x', 'https://a.com/ b'];
+    for (const href of bad) {
+      expect(errorsOf(design([button({ href })])), href).not.toEqual([]);
+    }
+  });
+
+  it('rejects an empty label, bad colours and unknown properties', () => {
+    expect(errorsOf(design([button({ label: '' })]))).not.toEqual([]);
+    expect(errorsOf(design([button({}, { fill: 'url(http://x)' })]))).not.toEqual([]);
+    expect(errorsOf(design([button({}, { hoverFill: 'expression(1)' })]))).not.toEqual([]);
+    expect(errorsOf(design([button({}, { onclick: 'x' })]))).not.toEqual([]);
+  });
+});

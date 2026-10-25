@@ -196,7 +196,12 @@ export function SectionEditorPage({ sectionKey }: { sectionKey: string }) {
       const uploaded = await uploadDesignImage(file);
       const current = latest.current;
       if (!current) return;
-      const result = addImageElement(current, uploaded);
+      const result = addImageElement(current, {
+        src: uploaded.url,
+        alt: uploaded.alt,
+        width: uploaded.width,
+        height: uploaded.height,
+      });
       if (!result.ok) throw new Error(result.error);
       change(result.design);
       select(result.id);

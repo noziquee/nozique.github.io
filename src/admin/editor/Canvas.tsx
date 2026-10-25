@@ -287,8 +287,13 @@ export function Canvas({
 
   /** Double-clicking a picture starts crop mode: drag the picture inside its frame. */
   function onDoubleClick(event: ReactMouseEvent<HTMLDivElement>) {
-    const id = (event.target as HTMLElement).closest<HTMLElement>('[data-element-id]')?.dataset
-      .elementId;
+    // While a drag is captured, the browser reports the canvas itself as the target of the
+    // click, so find the picture under the pointer by position instead.
+    const hit = document
+      .elementsFromPoint(event.clientX, event.clientY)
+      .map((node) => node.closest<HTMLElement>('[data-element-id]'))
+      .find((node) => node !== null);
+    const id = hit?.dataset.elementId;
     const element = id ? findElement(design, id) : undefined;
     if (element?.type === 'image' && !element.locked && element.style.fit !== 'fill') {
       onSelect(element.id);

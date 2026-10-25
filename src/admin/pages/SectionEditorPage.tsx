@@ -2,7 +2,14 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { Canvas } from '../editor/Canvas';
 import { PropertiesPanel } from '../editor/PropertiesPanel';
 import { LayersPanel } from '../editor/LayersPanel';
-import { addElement, canStep, deleteElement, findElement, stepElement } from '../editor/designOps';
+import {
+  addElement,
+  addImageElement,
+  canStep,
+  deleteElement,
+  findElement,
+  stepElement,
+} from '../editor/designOps';
 import { canRedo, canUndo, createHistory, endGroup, record, redo, undo } from '../editor/history';
 import type { History } from '../editor/history';
 import type { NewElementKind, StackStep } from '../editor/designOps';

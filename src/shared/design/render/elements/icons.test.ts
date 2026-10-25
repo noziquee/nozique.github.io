@@ -12,7 +12,7 @@ describe('icon artwork', () => {
 
   it('only uses plain drawing shapes with plain numeric values', () => {
     const tags = ['path', 'rect', 'circle', 'line', 'polyline', 'polygon'];
-    const plain = /^[0-9a-zA-Z .,\-]+$/;
+    const plain = /^[0-9a-zA-Z .,-]+$/;
     for (const name of ICON_NAMES) {
       for (const part of ICON_ARTWORK[name]) {
         expect(tags, name).toContain(part.tag);
